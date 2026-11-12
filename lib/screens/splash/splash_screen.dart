@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -70,8 +70,8 @@ class _SplashScreenState extends State<SplashScreen>
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => targetScreen,
-        transitionsBuilder: (_, animation, __, child) {
+        pageBuilder: (_, _, _) => targetScreen,
+        transitionsBuilder: (_, animation, _, child) {
           return FadeTransition(opacity: animation, child: child);
         },
         transitionDuration: const Duration(milliseconds: 400),
@@ -121,12 +121,12 @@ class _SplashScreenState extends State<SplashScreen>
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.08),
+                            color: AppColors.primary.withValues(alpha: 0.08),
                             blurRadius: 28,
                             offset: const Offset(0, 10),
                           ),
                           BoxShadow(
-                            color: AppColors.accent.withOpacity(0.12),
+                            color: AppColors.accent.withValues(alpha: 0.12),
                             blurRadius: 20,
                             offset: const Offset(0, 4),
                           ),
@@ -137,7 +137,7 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Image.asset(
                           'assets/images/icon.png',
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, _, _) => const Icon(
                             Icons.holiday_village_rounded,
                             size: 48,
                             color: AppColors.primary,
@@ -153,7 +153,7 @@ class _SplashScreenState extends State<SplashScreen>
                       'assets/images/findbookstay-logo.png',
                       width: 220,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => RichText(
+                      errorBuilder: (_, _, _) => RichText(
                         text: TextSpan(
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 26,
@@ -175,7 +175,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                     // App Tagline
                     Text(
-                      '0% Broker Fee • Stays, Rentals & Turfs',
+                      '0% Broker Fee | Stays, Rentals & Turfs',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,

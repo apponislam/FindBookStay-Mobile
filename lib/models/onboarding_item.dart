@@ -43,7 +43,7 @@ class OnboardingItem {
           primaryIcon: Icons.hotel_rounded,
           imageAssetPath: 'assets/images/onboarding_book.png',
           highlights: ['Instant Booking', 'Boutique Resorts', 'Best Rates'],
-          metricValue: '4.9★',
+          metricValue: '4.9/5',
           metricLabel: 'Top Stays',
         ),
         const OnboardingItem(

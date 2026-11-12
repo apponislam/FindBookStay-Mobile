@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+﻿import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -49,7 +49,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                       color: AppColors.accentLight,
                       borderRadius: BorderRadius.circular(30.0),
                       border: Border.all(
-                        color: AppColors.accent.withOpacity(0.25),
+                        color: AppColors.accent.withValues(alpha: 0.25),
                         width: 1,
                       ),
                     ),

@@ -75,7 +75,7 @@ class SignInScreen extends StatelessWidget {
               _buildInputLabel('Password'),
               const SizedBox(height: 8),
               _buildTextField(
-                hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+                hint: 'Enter your password',
                 icon: Icons.lock_outline_rounded,
                 isPassword: true,
               ),

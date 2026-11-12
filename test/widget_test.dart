@@ -24,7 +24,7 @@ void main() {
 
     // Verify SplashScreen is loaded
     expect(find.byType(SplashScreen), findsOneWidget);
-    expect(find.text('0% Broker Fee • Stays, Rentals & Turfs'), findsOneWidget);
+    expect(find.text('0% Broker Fee | Stays, Rentals & Turfs'), findsOneWidget);
     expect(find.text('FINDBOOKSTAY'), findsOneWidget);
 
     // Let the splash timer finish (2.1s) and transition to Onboarding

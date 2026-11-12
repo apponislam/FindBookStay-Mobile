@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+﻿import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -23,12 +23,12 @@ class OnboardingIllustrationCard extends StatelessWidget {
           border: Border.all(color: AppColors.border, width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.04),
+              color: AppColors.primary.withValues(alpha: 0.04),
               blurRadius: 24.0,
               offset: const Offset(0, 10),
             ),
             BoxShadow(
-              color: AppColors.accent.withOpacity(0.05),
+              color: AppColors.accent.withValues(alpha: 0.05),
               blurRadius: 30.0,
               offset: const Offset(0, 6),
             ),
@@ -47,7 +47,7 @@ class OnboardingIllustrationCard extends StatelessWidget {
                   height: 160,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.accent.withOpacity(0.07),
+                    color: AppColors.accent.withValues(alpha: 0.07),
                   ),
                 ),
               ),
@@ -59,7 +59,7 @@ class OnboardingIllustrationCard extends StatelessWidget {
                   height: 140,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.primary.withOpacity(0.04),
+                    color: AppColors.primary.withValues(alpha: 0.04),
                   ),
                 ),
               ),
@@ -107,7 +107,7 @@ class OnboardingIllustrationCard extends StatelessWidget {
                   border: Border.all(color: AppColors.border),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.05),
+                      color: AppColors.primary.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -126,11 +126,29 @@ class OnboardingIllustrationCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${item.metricValue} • ${item.metricLabel}',
+                      item.metricValue,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 7),
+                      width: 3.5,
+                      height: 3.5,
+                      decoration: const BoxDecoration(
+                        color: AppColors.textMuted,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    Text(
+                      item.metricLabel,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
                         letterSpacing: 0.3,
                       ),
                     ),
@@ -143,66 +161,72 @@ class OnboardingIllustrationCard extends StatelessWidget {
           const Spacer(),
 
           // Hero Icon Badge with Concentric Rings
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              // Outer pulse ring
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.accent.withOpacity(0.12),
+          Center(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Outer pulse ring
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.accent.withValues(alpha: 0.12),
+                  ),
                 ),
-              ),
-              // Inner glowing ring
-              Container(
-                width: 82,
-                height: 82,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.accent.withOpacity(0.22),
+                // Inner glowing ring
+                Container(
+                  width: 82,
+                  height: 82,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.accent.withValues(alpha: 0.22),
+                  ),
                 ),
-              ),
-              // Central Icon Container
-              Container(
-                width: 66,
-                height: 66,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryDark.withOpacity(0.35),
-                      blurRadius: 14.0,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+                // Central Icon Container
+                Container(
+                  width: 66,
+                  height: 66,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryDark.withValues(alpha: 0.35),
+                        blurRadius: 14.0,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    item.primaryIcon,
+                    size: 32.0,
+                    color: AppColors.textWhite,
+                  ),
                 ),
-                child: Icon(
-                  item.primaryIcon,
-                  size: 32.0,
-                  color: AppColors.textWhite,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const Spacer(),
 
-          // Highlights Chip Row
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8.0,
-            runSpacing: 6.0,
-            children: item.highlights.map((highlight) {
+          // Highlights Chip Row (Explicit full-width centering)
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8.0,
+              runSpacing: 6.0,
+              children: item.highlights.map((highlight) {
               return Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10.0,
                   vertical: 5.0,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.background.withOpacity(0.9),
+                  color: AppColors.background.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(12.0),
                   border: Border.all(color: AppColors.border, width: 0.8),
                 ),
@@ -228,7 +252,8 @@ class OnboardingIllustrationCard extends StatelessWidget {
               );
             }).toList(),
           ),
-          const SizedBox(height: 4),
+        ),
+        const SizedBox(height: 4),
         ],
       ),
     );

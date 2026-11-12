@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+﻿import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,7 +38,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (mounted) {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const HomeScreen(),
+          pageBuilder: (_, _, _) => const HomeScreen(),
           transitionsBuilder: (_, animation, _, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -77,8 +77,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return Column(
-              children: [
+            return SizedBox(
+              width: double.infinity,
+              height: constraints.maxHeight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 // 1. Top Header: Minimalist Logo/Wordmark + Skip Button
                 _buildHeader(context),
 
@@ -131,8 +135,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 // 4. Bottom Action Area (Primary CTA + Secondary Sign In)
                 _buildBottomControls(isLastPage),
               ],
-            );
-          },
+            ),
+          );
+        },
         ),
       ),
     );
@@ -143,6 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: SizedBox(
+        width: double.infinity,
         height: 44.0,
         child: Stack(
           alignment: Alignment.center,
@@ -160,7 +166,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       width: 30,
                       height: 30,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         width: 30,
                         height: 30,
                         decoration: BoxDecoration(
