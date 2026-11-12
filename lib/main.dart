@@ -1,11 +1,9 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'core/theme/app_colors.dart';
-import 'screens/home/home_screen.dart';
-import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,20 +18,11 @@ void main() async {
     ),
   );
 
-  // Check persistence for onboarding display
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
-
-  runApp(FindBookStayApp(hasSeenOnboarding: hasSeenOnboarding));
+  runApp(const FindBookStayApp());
 }
 
 class FindBookStayApp extends StatelessWidget {
-  final bool hasSeenOnboarding;
-
-  const FindBookStayApp({
-    super.key,
-    required this.hasSeenOnboarding,
-  });
+  const FindBookStayApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +40,7 @@ class FindBookStayApp extends StatelessWidget {
         ),
         fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
       ),
-      home: hasSeenOnboarding ? const HomeScreen() : const OnboardingScreen(),
+      home: const SplashScreen(),
     );
   }
 }

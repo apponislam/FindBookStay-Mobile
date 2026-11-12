@@ -1,17 +1,15 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../models/onboarding_item.dart';
 import 'onboarding_illustration_card.dart';
 
-/// Renders a single onboarding slide content cleanly and responsively.
+/// Renders a single onboarding slide content cleanly, centered and responsively.
 class OnboardingSlideWidget extends StatelessWidget {
   final OnboardingItem item;
 
-  const OnboardingSlideWidget({
-    super.key,
-    required this.item,
-  });
+  const OnboardingSlideWidget({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -20,78 +18,92 @@ class OnboardingSlideWidget extends StatelessWidget {
         final availableHeight = constraints.maxHeight;
         final isShortScreen = availableHeight < 560;
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: isShortScreen ? 12 : 20),
+        return SizedBox(
+          width: double.infinity,
+          height: availableHeight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: isShortScreen ? 8 : 16),
 
-              // Illustration / Hero Area
-              Expanded(
-                child: Center(
-                  child: OnboardingIllustrationCard(item: item),
-                ),
-              ),
-
-              SizedBox(height: isShortScreen ? 14 : 22),
-
-              // Slide Tag / Category Badge (e.g. "01 / APARTMENTS")
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12.0,
-                  vertical: 5.0,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.accentLight,
-                  borderRadius: BorderRadius.circular(30.0),
-                  border: Border.all(
-                    color: AppColors.accent.withOpacity(0.25),
-                    width: 1,
+                // Illustration / Hero Area - Dead Center
+                Expanded(
+                  child: Center(
+                    child: OnboardingIllustrationCard(item: item),
                   ),
                 ),
-                child: Text(
-                  item.tag,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                    letterSpacing: 1.4,
+
+                SizedBox(height: isShortScreen ? 14 : 22),
+
+                // Slide Tag / Category Badge (e.g. "01 / RENT") - Centered
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14.0,
+                      vertical: 6.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.accentLight,
+                      borderRadius: BorderRadius.circular(30.0),
+                      border: Border.all(
+                        color: AppColors.accent.withOpacity(0.25),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      item.tag,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                        letterSpacing: 1.4,
+                      ),
+                    ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-              // Title
-              Text(
-                item.title,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: isShortScreen ? 22.0 : 26.0,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                  height: 1.25,
-                  letterSpacing: -0.5,
+                // Title - Full Width Center
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    item.title,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: isShortScreen ? 22.0 : 26.0,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                      height: 1.25,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // Subtitle
-              Text(
-                item.subtitle,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: isShortScreen ? 13.0 : 14.5,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
-                  height: 1.45,
+                // Subtitle - Full Width Center
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    item.subtitle,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: isShortScreen ? 13.0 : 14.5,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textSecondary,
+                      height: 1.45,
+                    ),
+                  ),
                 ),
-              ),
 
-              SizedBox(height: isShortScreen ? 12 : 18),
-            ],
+                SizedBox(height: isShortScreen ? 12 : 20),
+              ],
+            ),
           ),
         );
       },

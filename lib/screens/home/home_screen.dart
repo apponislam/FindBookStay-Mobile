@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/theme/app_colors.dart';
 import '../onboarding/onboarding_screen.dart';
 
@@ -28,16 +29,25 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.holiday_village_rounded,
-                color: AppColors.accent,
-                size: 20,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/images/icon.png',
+                width: 28,
+                height: 28,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.holiday_village_rounded,
+                    color: AppColors.accent,
+                    size: 18,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -93,24 +103,24 @@ class HomeScreen extends StatelessWidget {
                   mainAxisSpacing: 14,
                   children: const [
                     _HomeCategoryCard(
-                      title: 'Apartments',
-                      subtitle: 'Zero broker fee',
-                      icon: Icons.apartment_rounded,
+                      title: 'Rent Spaces',
+                      subtitle: 'Flats & bachelor seats',
+                      icon: Icons.home_work_rounded,
                     ),
                     _HomeCategoryCard(
-                      title: 'Bachelor Seats',
-                      subtitle: 'Co-living rooms',
-                      icon: Icons.people_alt_rounded,
-                    ),
-                    _HomeCategoryCard(
-                      title: 'Boutique Hotels',
-                      subtitle: 'Instant bookings',
+                      title: 'Book Stays',
+                      subtitle: 'Hotels & getaways',
                       icon: Icons.hotel_rounded,
                     ),
                     _HomeCategoryCard(
                       title: 'Sports Turfs',
-                      subtitle: 'Hourly booking',
+                      subtitle: 'Hourly slot booking',
                       icon: Icons.sports_soccer_rounded,
+                    ),
+                    _HomeCategoryCard(
+                      title: 'Buy Properties',
+                      subtitle: 'Plots, flats & villas',
+                      icon: Icons.real_estate_agent_rounded,
                     ),
                   ],
                 ),
@@ -120,7 +130,11 @@ class HomeScreen extends StatelessWidget {
               Center(
                 child: TextButton.icon(
                   onPressed: () => _resetOnboarding(context),
-                  icon: const Icon(Icons.refresh_rounded, size: 18, color: AppColors.textSecondary),
+                  icon: const Icon(
+                    Icons.refresh_rounded,
+                    size: 18,
+                    color: AppColors.textSecondary,
+                  ),
                   label: Text(
                     'Replay Onboarding (Testing)',
                     style: GoogleFonts.plusJakartaSans(
@@ -197,4 +211,3 @@ class _HomeCategoryCard extends StatelessWidget {
     );
   }
 }
-

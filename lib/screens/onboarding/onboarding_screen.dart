@@ -138,91 +138,101 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  /// Top Header: Logo + "Skip" button
+  /// Top Header: Centered Logo + Wordmark with Skip button on the right
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // FindBookStay Wordmark
-          Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.maps_home_work_rounded,
-                    size: 18,
-                    color: AppColors.accent,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              RichText(
-                text: TextSpan(
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                    letterSpacing: -0.3,
-                  ),
-                  children: const [
-                    TextSpan(text: 'FindBookStay'),
-                    TextSpan(
-                      text: '.',
-                      style: TextStyle(
-                        color: AppColors.accent,
-                        fontWeight: FontWeight.w900,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      child: SizedBox(
+        height: 44.0,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Center Brand Logo & Wordmark (Dead Middle)
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(9),
+                    child: Image.asset(
+                      'assets/images/icon.png',
+                      width: 30,
+                      height: 30,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(9),
+                        ),
+                        child: const Icon(
+                          Icons.maps_home_work_rounded,
+                          size: 16,
+                          color: AppColors.accent,
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                        letterSpacing: -0.3,
+                      ),
+                      children: const [
+                        TextSpan(text: 'FindBookStay'),
+                        TextSpan(
+                          text: '.',
+                          style: TextStyle(
+                            color: AppColors.accent,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
 
-          // "Skip" Button
-          AnimatedOpacity(
-            duration: const Duration(milliseconds: 250),
-            opacity: _currentPage == _slides.length - 1 ? 0.0 : 1.0,
-            child: TextButton(
-              onPressed: _currentPage == _slides.length - 1
-                  ? null
-                  : _completeOnboarding,
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.textSecondary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                'Skip',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+            // "Skip" Button placed on the far right
+            Positioned(
+              right: 0,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 250),
+                opacity: _currentPage == _slides.length - 1 ? 0.0 : 1.0,
+                child: TextButton(
+                  onPressed: _currentPage == _slides.length - 1
+                      ? null
+                      : _completeOnboarding,
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textSecondary,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    'Skip',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -296,29 +306,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 14.0),
 
           // Secondary "Already have an account? Sign In" Button
-          GestureDetector(
-            onTap: _onSignInPressed,
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: RichText(
-                text: TextSpan(
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13.5,
-                    color: AppColors.textSecondary,
-                  ),
-                  children: const [
-                    TextSpan(text: 'Already have an account? '),
-                    TextSpan(
-                      text: 'Sign In',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
-                        decoration: TextDecoration.underline,
-                        decorationColor: AppColors.accent,
-                      ),
+          Center(
+            child: GestureDetector(
+              onTap: _onSignInPressed,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13.5,
+                      color: AppColors.textSecondary,
                     ),
-                  ],
+                    children: const [
+                      TextSpan(text: 'Already have an account? '),
+                      TextSpan(
+                        text: 'Sign In',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                          decoration: TextDecoration.underline,
+                          decorationColor: AppColors.accent,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

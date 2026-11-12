@@ -22,52 +22,51 @@ class OnboardingItem {
     required this.metricLabel,
   });
 
-  /// Factory list containing the 4 required onboarding slides for FindBookStay
+  /// 4 Onboarding Slides in exact order: 01 RENT -> 02 BOOK -> 03 SPORTS -> 04 BUY
   static List<OnboardingItem> get items => [
         const OnboardingItem(
-          tag: '01 / APARTMENTS',
-          title: 'Verified Living Spaces',
+          tag: '01 / RENT',
+          title: 'Rent Verified Spaces',
           subtitle:
-              'Find and rent furnished family apartments and flats directly from verified owners with zero broker commissions.',
-          primaryIcon: Icons.apartment_rounded,
-          imageAssetPath: 'assets/images/onboarding_apartments.png',
-          highlights: ['0% Broker Fee', '100% Verified Owners', 'Furnished Flats'],
+              'Rent family apartments, furnished flats, and flexible bachelor seats directly from verified owners with zero broker fees.',
+          primaryIcon: Icons.home_work_rounded,
+          imageAssetPath: 'assets/images/onboarding_rent.png',
+          highlights: ['0% Broker Fee', 'Family Apartments', 'Bachelor Seats'],
           metricValue: '0%',
           metricLabel: 'Broker Fees',
         ),
         const OnboardingItem(
-          tag: '02 / CO-LIVING',
-          title: 'Flexible Bachelor Seats',
+          tag: '02 / BOOK',
+          title: 'Book Stays & Getaways',
           subtitle:
-              'Discover transparent, affordable shared rooms and bachelor seats with verified roommates in prime locations.',
-          primaryIcon: Icons.people_alt_rounded,
-          imageAssetPath: 'assets/images/onboarding_bachelor.png',
-          highlights: ['Verified Roommates', 'All-Inclusive Bills', 'Month-to-Month'],
-          metricValue: '5,000+',
-          metricLabel: 'Active Seats',
-        ),
-        const OnboardingItem(
-          tag: '03 / HOTELS',
-          title: 'Boutique Hotel Stays',
-          subtitle:
-              'Book weekend getaways, city stays, and holiday rooms with instant booking confirmation.',
+              'Discover and book boutique hotels, vacation resorts, and short stays with transparent pricing and instant confirmations.',
           primaryIcon: Icons.hotel_rounded,
-          imageAssetPath: 'assets/images/onboarding_hotels.png',
-          highlights: ['Instant Confirmation', 'Best Rates Guaranteed', 'Curated Stays'],
-          metricValue: '4.9â˜…',
-          metricLabel: 'Guest Rating',
+          imageAssetPath: 'assets/images/onboarding_book.png',
+          highlights: ['Instant Booking', 'Boutique Resorts', 'Best Rates'],
+          metricValue: '4.9★',
+          metricLabel: 'Top Stays',
         ),
         const OnboardingItem(
-          tag: '04 / SPORTS TURFS',
+          tag: '03 / SPORTS',
           title: 'Reserve Sports Turfs',
           subtitle:
-              'Book cricket nets, football turfs, and sports venues by the hour with real-time slot availability.',
+              'Book football pitches, cricket nets, and sports arenas by the hour with real-time slot availability.',
           primaryIcon: Icons.sports_soccer_rounded,
-          imageAssetPath: 'assets/images/onboarding_turfs.png',
-          highlights: ['Real-Time Slot Booking', 'Cricket & Football', 'Hourly Pricing'],
+          imageAssetPath: 'assets/images/onboarding_sports.png',
+          highlights: ['Real-Time Slots', 'Football & Cricket', 'Hourly Booking'],
           metricValue: '60s',
-          metricLabel: 'Instant Booking',
+          metricLabel: 'Quick Reserve',
+        ),
+        const OnboardingItem(
+          tag: '04 / BUY',
+          title: 'Buy Verified Properties',
+          subtitle:
+              'Explore premium residential apartments, luxury villas, and verified plots with direct developer & owner connections.',
+          primaryIcon: Icons.real_estate_agent_rounded,
+          imageAssetPath: 'assets/images/onboarding_buy.png',
+          highlights: ['Verified Titles', 'Direct Owners', 'Zero Hidden Fees'],
+          metricValue: '100%',
+          metricLabel: 'Verified Deals',
         ),
       ];
 }
-

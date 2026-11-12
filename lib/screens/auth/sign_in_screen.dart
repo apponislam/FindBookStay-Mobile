@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/theme/app_colors.dart';
 import '../home/home_screen.dart';
 
@@ -13,9 +14,9 @@ class SignInScreen extends StatelessWidget {
     await prefs.setBool('hasSeenOnboarding', true);
 
     if (context.mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
     }
   }
 
@@ -27,7 +28,10 @@ class SignInScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -60,7 +64,10 @@ class SignInScreen extends StatelessWidget {
               // Email Field Placeholder
               _buildInputLabel('Email Address'),
               const SizedBox(height: 8),
-              _buildTextField(hint: 'you@example.com', icon: Icons.email_outlined),
+              _buildTextField(
+                hint: 'you@example.com',
+                icon: Icons.email_outlined,
+              ),
 
               const SizedBox(height: 20),
 
@@ -138,10 +145,12 @@ class SignInScreen extends StatelessWidget {
           ),
           prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 20),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
         ),
       ),
     );
   }
 }
-
