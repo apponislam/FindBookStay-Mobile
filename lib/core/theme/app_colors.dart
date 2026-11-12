@@ -26,6 +26,11 @@ class AppColors {
   static const Color border = Color(0xFFE2EAE6);
   static const Color borderSubtle = Color(0xFFF1F5F3);
 
+  // Status & Feedback Colors
+  static const Color error = Color(0xFFDC2626);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color success = Color(0xFF10B981);
+
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,

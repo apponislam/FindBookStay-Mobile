@@ -1,0 +1,348 @@
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:material_ui/material_ui.dart';
+
+import '../../core/theme/app_colors.dart';
+import 'sign_in_screen.dart';
+import 'widgets/custom_auth_button.dart';
+import 'widgets/custom_auth_input.dart';
+import 'widgets/password_strength_meter.dart';
+
+/// Screen for entering new password and confirm password with real-time matching indicator.
+/// Vertically centered with warning badges and eye toggle animations.
+class ResetPasswordScreen extends StatefulWidget {
+  final String email;
+
+  const ResetPasswordScreen({super.key, required this.email});
+
+  @override
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+}
+
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  String? _passwordError;
+  String? _confirmPasswordError;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  bool get _doPasswordsMatch {
+    final p1 = _passwordController.text;
+    final p2 = _confirmPasswordController.text;
+    return p1.isNotEmpty && p2.isNotEmpty && p1 == p2;
+  }
+
+  void _onResetPassword() async {
+    final p1 = _passwordController.text;
+    final p2 = _confirmPasswordController.text;
+
+    setState(() {
+      if (p1.isEmpty) {
+        _passwordError = 'New password is required';
+      } else if (p1.length < 8) {
+        _passwordError = 'Min. 8 characters required';
+      } else if (!RegExp(r'[0-9]').hasMatch(p1)) {
+        _passwordError = 'Must contain at least 1 number';
+      } else {
+        _passwordError = null;
+      }
+
+      if (p2.isEmpty) {
+        _confirmPasswordError = 'Confirm password is required';
+      } else if (p1 != p2) {
+        _confirmPasswordError = 'Passwords do not match';
+      } else {
+        _confirmPasswordError = null;
+      }
+    });
+
+    if (_passwordError != null || _confirmPasswordError != null) {
+      HapticFeedback.mediumImpact();
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate password update network call
+    await Future.delayed(const Duration(milliseconds: 1200));
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    _showSuccessDialog();
+  }
+
+  void _showSuccessDialog() {
+    HapticFeedback.mediumImpact();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+          backgroundColor: AppColors.background,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Animated green checkmark badge
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.accentLight,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.accent, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accent.withValues(alpha: 0.25),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.check_rounded,
+                      size: 40,
+                      color: AppColors.accent,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  'Password Updated!',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  'Your password has been changed successfully. You can now sign in with your new credentials.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13.5,
+                    color: AppColors.textSecondary,
+                    height: 1.45,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                CustomAuthButton(
+                  text: 'Sign In Now',
+                  icon: Icons.login_rounded,
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const SignInScreen()),
+                      (_) => false,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.textPrimary,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Category Tag
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12.0,
+                            vertical: 5.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.accentLight,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.accent.withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: Text(
+                            'Security Update',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.primary,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        // Title
+                        Text(
+                          'Create New Password',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                            letterSpacing: -0.6,
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // Subtitle
+                        Text(
+                          'Your new password must be different from previously used passwords.',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondary,
+                            height: 1.45,
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // New Password Input (Required)
+                        CustomAuthInput(
+                          label: 'New Password',
+                          hint: 'Create new password (min. 8 chars)',
+                          prefixIcon: Icons.lock_outline_rounded,
+                          isPassword: true,
+                          isRequired: true,
+                          controller: _passwordController,
+                          errorMessage: _passwordError,
+                          onChanged: (_) {
+                            setState(() {
+                              if (_passwordError != null) _passwordError = null;
+                            });
+                          },
+                        ),
+
+                        PasswordStrengthMeter(password: _passwordController.text),
+
+                        const SizedBox(height: 22),
+
+                        // Confirm Password Input with Match Indicator (Required)
+                        CustomAuthInput(
+                          label: 'Confirm Password',
+                          hint: 'Re-type new password to confirm',
+                          prefixIcon: Icons.lock_reset_rounded,
+                          isPassword: true,
+                          isRequired: true,
+                          controller: _confirmPasswordController,
+                          errorMessage: _confirmPasswordError,
+                          onChanged: (_) {
+                            setState(() {
+                              if (_confirmPasswordError != null) {
+                                _confirmPasswordError = null;
+                              }
+                            });
+                          },
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // Real-time Match Indicator Pill
+                        if (_confirmPasswordController.text.isNotEmpty)
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _doPasswordsMatch
+                                      ? Icons.check_circle_rounded
+                                      : Icons.cancel_rounded,
+                                  size: 16,
+                                  color: _doPasswordsMatch
+                                      ? AppColors.accent
+                                      : AppColors.error,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _doPasswordsMatch
+                                      ? 'Passwords match perfectly'
+                                      : 'Passwords do not match yet',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: _doPasswordsMatch
+                                        ? AppColors.accent
+                                        : AppColors.error,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        const SizedBox(height: 36),
+
+                        // Reset Password CTA
+                        CustomAuthButton(
+                          text: 'Reset Password & Sign In',
+                          icon: Icons.arrow_forward_rounded,
+                          isLoading: _isLoading,
+                          onPressed: _onResetPassword,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
