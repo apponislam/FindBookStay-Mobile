@@ -89,15 +89,19 @@ class _BookingsTabState extends State<BookingsTab> {
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
               children: [
-                // Filter Segment Pills
-                Row(
-                  children: [
-                    _buildFilterChip('Upcoming (${_bookings.length})', 0),
-                    const SizedBox(width: 8),
-                    _buildFilterChip('Completed (4)', 1),
-                    const SizedBox(width: 8),
-                    _buildFilterChip('Cancelled (0)', 2),
-                  ],
+                // Filter Segment Pills (Horizontally scrollable)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: [
+                      _buildFilterChip('Upcoming (${_bookings.length})', 0),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Completed (4)', 1),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Cancelled (0)', 2),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 18),

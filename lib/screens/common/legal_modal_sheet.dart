@@ -249,3 +249,4 @@ class LegalModalSheet extends StatelessWidget {
     },
   ];
 }
+

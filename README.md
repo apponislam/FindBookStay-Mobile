@@ -15,6 +15,7 @@
 - **OTP Verification** — 6-digit squircle input boxes with auto-advance and 45s resend countdown
 - **Reset Password** — New password with real-time strength meter and confirm match indicator
 - **Terms & Privacy Modals** — Tappable inline links open polished bottom-sheet modals with full content
+- **Dynamic Bottom Navigation** — 5-tab navigation shell (Explore, Saved, Bookings, Inbox, Profile/Account) that reacts dynamically to Signed-In vs Guest (Non-Signed-In) user states
 
 ### 🎨 UI / UX
 - **Splash Screen** — Facebook-style branded splash with logo & animated tagline
@@ -26,7 +27,7 @@
 ### 🛠 Code Quality
 - Null-safe Dart 3, Flutter best practices
 - `flutter analyze` — zero issues
-- 6 widget tests — all passing
+- 7 widget tests — all passing
 - Reusable custom widgets: `CustomAuthInput`, `CustomAuthButton`, `RoleSelectionCard`, `PasswordStrengthMeter`, `OtpDigitInput`
 
 ---
@@ -37,11 +38,11 @@
 |--------|-------------|
 | `SplashScreen` | Branded 2.1s splash with logo |
 | `OnboardingScreen` | 4-slide swipeable intro (skippable) |
-| `HomeScreen` | Category marketplace grid |
+| `HomeScreen` | 5-Tab dynamic navigation shell (Explore, Saved, Bookings, Inbox, Profile/Account) |
 | `SignInScreen` | Login with email & password |
 | `RegisterRoleScreen` | Step 1 — Choose Tenant or Host role |
 | `RegisterFormScreen` | Step 2 — Full registration form with Terms modal |
-| `ForgotPasswordScreen` | Account recovery via email or phone |
+| `ForgotPasswordScreen` | Account recovery via registered email address |
 | `OtpVerificationScreen` | 6-digit code entry with countdown timer |
 | `ResetPasswordScreen` | New password with success confirmation dialog |
 
@@ -69,6 +70,8 @@
 lib/
 ├── main.dart                        # App entry point → SplashScreen
 ├── core/
+│   ├── services/
+│   │   └── auth_service.dart        # Reactive auth state (Signed-In vs Guest)
 │   └── theme/
 │       └── app_colors.dart          # Full color palette & gradients
 ├── models/
@@ -82,8 +85,18 @@ lib/
     │       ├── animated_page_indicator.dart
     │       ├── onboarding_illustration_card.dart
     │       └── onboarding_slide_widget.dart
+    ├── common/
+    │   └── legal_modal_sheet.dart   # Shared Terms & Privacy bottom modals
     ├── home/
-    │   └── home_screen.dart
+    │   ├── home_screen.dart         # 5-Tab dynamic bottom navigation shell
+    │   ├── tabs/
+    │   │   ├── explore_tab.dart     # Marketplace discovery & search
+    │   │   ├── saved_tab.dart       # Wishlist (active vs guest auth gate)
+    │   │   ├── bookings_tab.dart    # My stays & turf slots (active vs guest)
+    │   │   ├── inbox_tab.dart       # Landlord/turf chats (active vs guest)
+    │   │   └── profile_tab.dart     # Account profile & sign-out vs Join hero
+    │   └── widgets/
+    │       └── guest_auth_gate_card.dart # Reusable guest auth gate prompt
     └── auth/
         ├── sign_in_screen.dart
         ├── register_role_screen.dart
@@ -180,6 +193,7 @@ flutter analyze
 | `Register Form validation` | Required fields + terms checkbox |
 | `Forgot Password + OTP flow` | Navigation and email display |
 | `Reset Password match indicator` | Real-time password confirmation |
+| `Dynamic Bottom Navigation` | Seamless Guest & Signed-in state transitions |
 
 ---
 
@@ -198,5 +212,5 @@ flutter analyze
 
 ## 📄 License
 
-This project is proprietary and confidential.
+This project is licensed under the terms described in the [LICENSE](LICENSE) file.  
 © 2026 FindBookStay. All rights reserved.
