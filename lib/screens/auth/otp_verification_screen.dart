@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../home/home_screen.dart';
 import 'reset_password_screen.dart';
@@ -102,6 +103,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
     if (widget.isRegistrationFlow) {
       // Mark onboarding & login state in SharedPreferences
+      await AuthService.instance.signIn(email: widget.email);
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('hasSeenOnboarding', true);
 

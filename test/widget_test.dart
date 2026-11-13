@@ -10,6 +10,8 @@ import 'package:findbookstay_mobile/screens/auth/register_form_screen.dart';
 import 'package:findbookstay_mobile/screens/auth/forgot_password_screen.dart';
 import 'package:findbookstay_mobile/screens/auth/otp_verification_screen.dart';
 import 'package:findbookstay_mobile/screens/auth/reset_password_screen.dart';
+import 'package:findbookstay_mobile/screens/home/home_screen.dart';
+import 'package:findbookstay_mobile/core/services/auth_service.dart';
 
 void main() {
   setUp(() {
@@ -192,5 +194,64 @@ void main() {
     // Verify Success Dialog
     expect(find.text('Password Updated!'), findsOneWidget);
     expect(find.text('Sign In Now'), findsOneWidget);
+  });
+
+  testWidgets('Bottom navigation handles Guest and Signed-in user states dynamically', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    // Ensure logged out (Guest) state
+    await AuthService.instance.signOut();
+
+    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+    await tester.pumpAndSettle();
+
+    // Verify all 5 bottom navigation tabs exist
+    expect(find.text('Explore'), findsOneWidget);
+    expect(find.text('Saved'), findsOneWidget);
+    expect(find.text('Bookings'), findsOneWidget);
+    expect(find.text('Inbox'), findsOneWidget);
+    expect(find.text('Account'), findsOneWidget); // In guest mode, label is Account
+
+    // 1. In Guest mode: Check Saved tab displays guest auth gate
+    await tester.tap(find.text('Saved'));
+    await tester.pumpAndSettle();
+    expect(find.text('Save your favorite spots'), findsOneWidget);
+    expect(find.text('Sign In to View Wishlist'), findsOneWidget);
+
+    // 2. In Guest mode: Check Bookings tab displays guest auth gate
+    await tester.tap(find.text('Bookings'));
+    await tester.pumpAndSettle();
+    expect(find.text('Manage your reservations'), findsOneWidget);
+    expect(find.text('Sign In to View Bookings'), findsOneWidget);
+
+    // 3. In Guest mode: Check Profile / Account tab displays Join hero
+    await tester.tap(find.text('Account'));
+    await tester.pumpAndSettle();
+    expect(find.text('Join FindBookStay'), findsOneWidget);
+
+    // 4. Now Sign In user and verify reactive state update
+    await AuthService.instance.signIn(name: 'Alex Tan', email: 'alex@findbookstay.com');
+    await tester.pumpAndSettle();
+
+    // Bottom bar profile tab now says Profile instead of Account
+    expect(find.text('Profile'), findsOneWidget);
+    expect(find.text('Alex Tan'), findsOneWidget);
+    expect(find.text('Sign Out'), findsOneWidget);
+
+    // 5. In Signed-in mode: Check Saved tab displays real saved items
+    await tester.tap(find.text('Saved'));
+    await tester.pumpAndSettle();
+    expect(find.text('Saved Wishlist'), findsOneWidget);
+    expect(find.text('Furnished 2-Bed Apartment'), findsOneWidget);
+
+    // 6. In Signed-in mode: Check Bookings tab displays active bookings
+    await tester.tap(find.text('Bookings'));
+    await tester.pumpAndSettle();
+    expect(find.text('My Bookings & Stays'), findsOneWidget);
+    expect(find.text('Green Arena 7v7 Football Turf'), findsOneWidget);
   });
 }

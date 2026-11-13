@@ -7,8 +7,8 @@ import 'otp_verification_screen.dart';
 import 'widgets/custom_auth_button.dart';
 import 'widgets/custom_auth_input.dart';
 
-/// Screen for initiating password reset with registered email or mobile.
-/// Centered layout, clean placeholders, and upper warning badge.
+/// Screen for initiating password reset with registered email address only.
+/// Centered layout, clean email placeholder, and upper warning badge.
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -17,28 +17,37 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController _identifierController = TextEditingController();
-  String? _identifierError;
+  final TextEditingController _emailController = TextEditingController();
+  String? _emailError;
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _identifierController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
   void _onSendResetCode() async {
-    final text = _identifierController.text.trim();
-    if (text.isEmpty) {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
       HapticFeedback.mediumImpact();
       setState(() {
-        _identifierError = 'Email or mobile is required';
+        _emailError = 'Email address is required';
+      });
+      return;
+    }
+
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(email)) {
+      HapticFeedback.mediumImpact();
+      setState(() {
+        _emailError = 'Enter a valid email address';
       });
       return;
     }
 
     setState(() {
-      _identifierError = null;
+      _emailError = null;
       _isLoading = true;
     });
 
@@ -51,11 +60,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       _isLoading = false;
     });
 
-    // Navigate to OTP verification screen
+    // Navigate to OTP verification screen with email
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => OtpVerificationScreen(
-          email: text,
+          email: email,
           isRegistrationFlow: false,
         ),
       ),
@@ -87,7 +96,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 16.0,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,7 +145,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                         // Subtitle
                         Text(
-                          'Enter your registered email address or phone number and we will send you a 6-digit code to reset your password.',
+                          'Enter your registered email address and we will send you a 6-digit code to reset your password.',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w400,
@@ -144,18 +156,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                         const SizedBox(height: 32),
 
-                        // Form Input (Required)
+                        // Form Input (Required Email Only)
                         CustomAuthInput(
-                          label: 'Email or Mobile Number',
-                          hint: 'e.g. alex.tan@example.com or +880 1XXXXXXXXX',
-                          prefixIcon: Icons.alternate_email_rounded,
+                          label: 'Email Address',
+                          hint: 'alex.tan@example.com (registered email)',
+                          prefixIcon: Icons.email_outlined,
                           isRequired: true,
-                          controller: _identifierController,
-                          errorMessage: _identifierError,
+                          controller: _emailController,
+                          errorMessage: _emailError,
                           keyboardType: TextInputType.emailAddress,
                           onChanged: (_) {
-                            if (_identifierError != null) {
-                              setState(() => _identifierError = null);
+                            if (_emailError != null) {
+                              setState(() => _emailError = null);
                             }
                           },
                         ),
@@ -177,7 +189,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           child: GestureDetector(
                             onTap: () => Navigator.of(context).pop(),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4.0,
+                              ),
                               child: RichText(
                                 text: TextSpan(
                                   style: GoogleFonts.plusJakartaSans(

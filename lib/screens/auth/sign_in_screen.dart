@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../home/home_screen.dart';
 import 'forgot_password_screen.dart';
@@ -66,6 +67,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
     // Simulate authentication API call
     await Future.delayed(const Duration(milliseconds: 1000));
+    await AuthService.instance.signIn(email: email);
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasSeenOnboarding', true);

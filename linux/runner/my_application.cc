@@ -50,8 +50,7 @@ static void my_application_activate(GApplication* application) {
 
   // Show the window when Flutter renders.
   // Requires the view to be realized so we can start rendering.
-  g_signal_connect_swapped(view, "first-frame", G_CALLBACK(first_frame_cb),
-                           self);
+  g_signal_connect_swapped(view, "first-frame", G_CALLBACK(first_frame_cb), self);
   gtk_widget_realize(GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
@@ -123,7 +122,5 @@ MyApplication* my_application_new() {
   // the application to be recognized beyond its binary name.
   g_set_prgname(APPLICATION_ID);
 
-  return MY_APPLICATION(g_object_new(my_application_get_type(),
-                                     "application-id", APPLICATION_ID, "flags",
-                                     G_APPLICATION_NON_UNIQUE, nullptr));
+  return MY_APPLICATION(g_object_new(my_application_get_type(),"application-id", APPLICATION_ID, "flags", G_APPLICATION_NON_UNIQUE, nullptr));
 }

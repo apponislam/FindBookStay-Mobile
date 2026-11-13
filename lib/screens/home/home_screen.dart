@@ -1,212 +1,198 @@
-﻿import 'package:material_ui/material_ui.dart';
+﻿import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:material_ui/material_ui.dart';
 
+import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
-import '../onboarding/onboarding_screen.dart';
+import 'tabs/bookings_tab.dart';
+import 'tabs/explore_tab.dart';
+import 'tabs/inbox_tab.dart';
+import 'tabs/profile_tab.dart';
+import 'tabs/saved_tab.dart';
 
-/// Clean destination landing/home screen once onboarding is completed.
-class HomeScreen extends StatelessWidget {
+/// Main destination screen featuring a modern bottom navigation bar.
+/// Dynamically adapts tabs, badges, and capabilities for Signed-In vs Guest users.
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  Future<void> _resetOnboarding(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('hasSeenOnboarding', false);
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-    if (context.mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
-      );
-    }
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _tabs = const [
+    ExploreTab(),
+    SavedTab(),
+    BookingsTab(),
+    InboxTab(),
+    ProfileTab(),
+  ];
+
+  void _onTabSelected(int index) {
+    if (_currentIndex == index) return;
+    HapticFeedback.selectionClick();
+    setState(() => _currentIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.surface,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        title: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                'assets/images/icon.png',
-                width: 28,
-                height: 28,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.holiday_village_rounded,
-                    color: AppColors.accent,
-                    size: 18,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            RichText(
-              text: TextSpan(
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
-                ),
-                children: const [
-                  TextSpan(text: 'FindBookStay'),
-                  TextSpan(
-                    text: '.',
-                    style: TextStyle(color: AppColors.accent),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Explore Stays & Spaces',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '0% broker fee verified rentals, co-living rooms, boutique stays, and turf reservations.',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 28),
+    return ListenableBuilder(
+      listenable: AuthService.instance,
+      builder: (context, _) {
+        final isLoggedIn = AuthService.instance.isLoggedIn;
 
-              // Categories Grid
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
-                  children: const [
-                    _HomeCategoryCard(
-                      title: 'Rent Spaces',
-                      subtitle: 'Flats & bachelor seats',
-                      icon: Icons.home_work_rounded,
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: IndexedStack(
+            index: _currentIndex,
+            children: _tabs,
+          ),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(
+                  color: AppColors.border,
+                  width: 1.0,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryDark.withValues(alpha: 0.05),
+                  blurRadius: 16,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: SizedBox(
+                height: 64,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(
+                      index: 0,
+                      label: 'Explore',
+                      activeIcon: Icons.explore_rounded,
+                      inactiveIcon: Icons.explore_outlined,
                     ),
-                    _HomeCategoryCard(
-                      title: 'Book Stays',
-                      subtitle: 'Hotels & getaways',
-                      icon: Icons.hotel_rounded,
+                    _buildNavItem(
+                      index: 1,
+                      label: 'Saved',
+                      activeIcon: Icons.favorite_rounded,
+                      inactiveIcon: Icons.favorite_outline_rounded,
                     ),
-                    _HomeCategoryCard(
-                      title: 'Sports Turfs',
-                      subtitle: 'Hourly slot booking',
-                      icon: Icons.sports_soccer_rounded,
+                    _buildNavItem(
+                      index: 2,
+                      label: 'Bookings',
+                      activeIcon: Icons.calendar_month_rounded,
+                      inactiveIcon: Icons.calendar_month_outlined,
                     ),
-                    _HomeCategoryCard(
-                      title: 'Buy Properties',
-                      subtitle: 'Plots, flats & villas',
-                      icon: Icons.real_estate_agent_rounded,
+                    _buildNavItem(
+                      index: 3,
+                      label: 'Inbox',
+                      activeIcon: Icons.chat_bubble_rounded,
+                      inactiveIcon: Icons.chat_bubble_outline_rounded,
+                      badgeCount: isLoggedIn ? 2 : 0,
+                    ),
+                    _buildNavItem(
+                      index: 4,
+                      label: isLoggedIn ? 'Profile' : 'Account',
+                      activeIcon: Icons.person_rounded,
+                      inactiveIcon: Icons.person_outline_rounded,
+                      isUserAvatar: isLoggedIn,
                     ),
                   ],
                 ),
               ),
-
-              // Test Utility: Replay Onboarding
-              Center(
-                child: TextButton.icon(
-                  onPressed: () => _resetOnboarding(context),
-                  icon: const Icon(
-                    Icons.refresh_rounded,
-                    size: 18,
-                    color: AppColors.textSecondary,
-                  ),
-                  label: Text(
-                    'Replay Onboarding (Testing)',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
-}
 
-class _HomeCategoryCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
+  Widget _buildNavItem({
+    required int index,
+    required String label,
+    required IconData activeIcon,
+    required IconData inactiveIcon,
+    int badgeCount = 0,
+    bool isUserAvatar = false,
+  }) {
+    final bool isSelected = _currentIndex == index;
 
-  const _HomeCategoryCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.accentLight,
-              borderRadius: BorderRadius.circular(12),
+    return Expanded(
+      child: InkWell(
+        onTap: () => _onTabSelected(index),
+        splashColor: AppColors.accentLight,
+        highlightColor: Colors.transparent,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.accentLight
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    isSelected ? activeIcon : inactiveIcon,
+                    size: 23,
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                  ),
+                ),
+                if (badgeCount > 0)
+                  Positioned(
+                    top: -2,
+                    right: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$badgeCount',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            child: Icon(icon, color: AppColors.primary, size: 24),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                letterSpacing: 0.1,
               ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
