@@ -10,7 +10,7 @@ import 'tabs/inbox_tab.dart';
 import 'tabs/profile_tab.dart';
 import 'tabs/saved_tab.dart';
 
-/// Main destination screen featuring a modern bottom navigation bar.
+/// Main destination screen featuring an elevated, smoothly animated bottom navigation bar.
 /// Dynamically adapts tabs, badges, and capabilities for Signed-In vs Guest users.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryDark.withValues(alpha: 0.05),
+                  color: AppColors.primaryDark.withValues(alpha: 0.08),
                   blurRadius: 16,
                   offset: const Offset(0, -4),
                 ),
@@ -72,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 64,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _buildNavItem(
                       index: 0,
@@ -126,69 +127,107 @@ class _HomeScreenState extends State<HomeScreen> {
     final bool isSelected = _currentIndex == index;
 
     return Expanded(
-      child: InkWell(
+      child: GestureDetector(
         onTap: () => _onTabSelected(index),
-        splashColor: AppColors.accentLight,
-        highlightColor: Colors.transparent,
+        behavior: HitTestBehavior.opaque,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.accentLight
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(
-                    isSelected ? activeIcon : inactiveIcon,
-                    size: 23,
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
-                  ),
-                ),
-                if (badgeCount > 0)
-                  Positioned(
-                    top: -2,
-                    right: 6,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
+            // Floating Animated Icon Container (Moves Up and Gets Bigger on Select)
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeOutCubic,
+              transform: Matrix4.translationValues(
+                0,
+                isSelected ? -6.0 : 0.0,
+                0,
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 240),
+                    curve: Curves.easeOutCubic,
+                    width: isSelected ? 40 : 34,
+                    height: isSelected ? 40 : 34,
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primary : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        isSelected ? activeIcon : inactiveIcon,
+                        size: isSelected ? 23 : 21,
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.textSecondary,
                       ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$badgeCount',
-                          style: GoogleFonts.plusJakartaSans(
+                    ),
+                  ),
+
+                  // Notification Badge (for Inbox or notifications)
+                  if (badgeCount > 0)
+                    Positioned(
+                      top: isSelected ? -2 : -2,
+                      right: isSelected ? -2 : -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.accent : AppColors.primary,
+                          shape: BoxShape.circle,
+                          border: Border.all(
                             color: Colors.white,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w800,
+                            width: 1.5,
+                          ),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$badgeCount',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: isSelected ? AppColors.primaryDark : Colors.white,
+                              fontSize: 9.0,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
+
+            const SizedBox(height: 1),
+
+            // Animated Label
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 11,
+                fontSize: isSelected ? 11.5 : 10.5,
                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                 color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                letterSpacing: 0.1,
+                letterSpacing: isSelected ? 0.2 : 0.0,
+              ),
+              child: Text(label),
+            ),
+
+            const SizedBox(height: 2),
+
+            // Animated Mint Active Dot Indicator
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              width: isSelected ? 12.0 : 0.0,
+              height: 2.5,
+              decoration: BoxDecoration(
+                color: AppColors.accent,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
           ],
