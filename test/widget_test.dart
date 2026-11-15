@@ -97,12 +97,13 @@ void main() {
     await tester.tap(find.text('Continue to Sign Up'));
     await tester.pumpAndSettle();
 
-    // Verifies transition to Step 2 with Host account title
+    // Verifies transition to Step 1 of Sign Up
     expect(find.byType(RegisterFormScreen), findsOneWidget);
-    expect(find.text('Create Host Account'), findsOneWidget);
+    expect(find.text('Create your account'), findsOneWidget);
+    expect(find.text('Continue to Step 2'), findsOneWidget);
   });
 
-  testWidgets('Register Form validates required fields and terms checkbox', (
+  testWidgets('Register Form validates required fields across 2 steps', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(1080, 2400);
@@ -112,19 +113,38 @@ void main() {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
-          home: RegisterFormScreen(initialRole: UserRole.tenant),
+          home: RegisterFormScreen(),
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    // Tap Create Account without input
-    await tester.tap(find.text('Create Tenant Account'));
+    // Tap Continue to Step 2 without inputs
+    await tester.tap(find.text('Continue to Step 2'));
     await tester.pumpAndSettle();
 
-    // Verify error badges appear on upper side
+    // Verify Step 1 error badges appear
     expect(find.text('Full name is required'), findsOneWidget);
     expect(find.text('Email address is required'), findsOneWidget);
+
+    // Enter valid Step 1 details
+    await tester.enterText(find.byType(TextField).at(0), 'John Doe');
+    await tester.enterText(find.byType(TextField).at(1), 'john@example.com');
+    await tester.pumpAndSettle();
+
+    // Tap Continue to Step 2 with valid Step 1 inputs
+    await tester.tap(find.text('Continue to Step 2'));
+    await tester.pumpAndSettle();
+
+    // Verify transitioned to Step 2 (Security)
+    expect(find.text('Secure your account'), findsOneWidget);
+    expect(find.text('Create Account'), findsOneWidget);
+
+    // Tap Create Account without entering password and terms
+    await tester.tap(find.text('Create Account'));
+    await tester.pumpAndSettle();
+
+    // Verify Step 2 error badges appear
     expect(find.text('Password is required'), findsOneWidget);
     expect(find.text('Please accept the Terms to continue'), findsOneWidget);
   });

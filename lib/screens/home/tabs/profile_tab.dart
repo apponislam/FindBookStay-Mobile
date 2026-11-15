@@ -6,7 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../features/auth/presentation/providers/auth_providers.dart';
-import '../../auth/register_role_screen.dart';
+import '../../auth/register_form_screen.dart';
 import '../../auth/sign_in_screen.dart';
 import '../../common/legal_modal_sheet.dart';
 
@@ -537,7 +537,7 @@ class ProfileTab extends ConsumerWidget {
                     HapticFeedback.lightImpact();
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const RegisterRoleScreen(),
+                        builder: (_) => const RegisterFormScreen(),
                       ),
                     );
                   },

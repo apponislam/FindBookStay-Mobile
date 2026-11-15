@@ -9,7 +9,7 @@ import '../../features/auth/domain/auth_state.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../home/home_screen.dart';
 import 'forgot_password_screen.dart';
-import 'register_role_screen.dart';
+import 'register_form_screen.dart';
 import 'widgets/custom_auth_button.dart';
 import 'widgets/custom_auth_input.dart';
 
@@ -246,7 +246,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => const RegisterRoleScreen(),
+                                  builder: (_) => const RegisterFormScreen(),
                                 ),
                               );
                             },
