@@ -23,17 +23,21 @@ class AuthController extends Notifier<AuthState> {
     state = AuthState.loading(state.user);
     try {
       final isAuth = await _authRepository.isAuthenticated();
+      if (!ref.mounted) return;
       if (isAuth) {
         final cachedUser = await _authRepository.getCachedUser();
+        if (!ref.mounted) return;
         if (cachedUser != null) {
           state = AuthState.authenticated(cachedUser);
           _syncWithAuthService(cachedUser, isLoggedIn: true);
           return;
         }
       }
+      if (!ref.mounted) return;
       state = AuthState.unauthenticated();
       _syncWithAuthService(UserModel.guest, isLoggedIn: false);
     } catch (_) {
+      if (!ref.mounted) return;
       state = AuthState.unauthenticated();
       _syncWithAuthService(UserModel.guest, isLoggedIn: false);
     }
@@ -51,13 +55,16 @@ class AuthController extends Notifier<AuthState> {
         password: password,
       );
 
+      if (!ref.mounted) return true;
       state = AuthState.authenticated(user);
       _syncWithAuthService(user, isLoggedIn: true);
       return true;
     } on AppException catch (e) {
+      if (!ref.mounted) return false;
       state = AuthState.error(e.userMessage, state.user);
       return false;
     } catch (_) {
+      if (!ref.mounted) return false;
       state = AuthState.error('An unexpected error occurred during sign in.', state.user);
       return false;
     }
@@ -81,13 +88,16 @@ class AuthController extends Notifier<AuthState> {
         role: role,
       );
 
+      if (!ref.mounted) return true;
       state = AuthState.authenticated(user);
       _syncWithAuthService(user, isLoggedIn: true);
       return true;
     } on AppException catch (e) {
+      if (!ref.mounted) return false;
       state = AuthState.error(e.userMessage, state.user);
       return false;
     } catch (_) {
+      if (!ref.mounted) return false;
       state = AuthState.error('An unexpected error occurred during registration.', state.user);
       return false;
     }
@@ -99,8 +109,10 @@ class AuthController extends Notifier<AuthState> {
     try {
       await _authRepository.logout();
     } finally {
-      state = AuthState.unauthenticated();
-      _syncWithAuthService(UserModel.guest, isLoggedIn: false);
+      if (ref.mounted) {
+        state = AuthState.unauthenticated();
+        _syncWithAuthService(UserModel.guest, isLoggedIn: false);
+      }
     }
   }
 
@@ -109,9 +121,11 @@ class AuthController extends Notifier<AuthState> {
     state = AuthState.loading(state.user);
     try {
       await _authRepository.forgotPassword(email);
+      if (!ref.mounted) return true;
       state = state.copyWith(status: AuthStatus.unauthenticated);
       return true;
     } on AppException catch (e) {
+      if (!ref.mounted) return false;
       state = AuthState.error(e.userMessage, state.user);
       return false;
     }
@@ -125,9 +139,11 @@ class AuthController extends Notifier<AuthState> {
     state = AuthState.loading(state.user);
     try {
       final isValid = await _authRepository.verifyOtp(email: email, otp: otp);
+      if (!ref.mounted) return isValid;
       state = state.copyWith(status: AuthStatus.unauthenticated);
       return isValid;
     } on AppException catch (e) {
+      if (!ref.mounted) return false;
       state = AuthState.error(e.userMessage, state.user);
       return false;
     }
@@ -146,9 +162,11 @@ class AuthController extends Notifier<AuthState> {
         newPassword: newPassword,
         otp: otp,
       );
+      if (!ref.mounted) return true;
       state = state.copyWith(status: AuthStatus.unauthenticated);
       return true;
     } on AppException catch (e) {
+      if (!ref.mounted) return false;
       state = AuthState.error(e.userMessage, state.user);
       return false;
     }
@@ -166,6 +184,7 @@ class AuthController extends Notifier<AuthState> {
     final updatedUser = currentUser.copyWith(role: newRole);
     await _authRepository.saveUserProfile(updatedUser);
 
+    if (!ref.mounted) return;
     state = AuthState.authenticated(updatedUser);
     _syncWithAuthService(updatedUser, isLoggedIn: true);
   }

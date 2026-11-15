@@ -1,19 +1,21 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../features/auth/presentation/providers/auth_providers.dart';
 import '../../auth/register_role_screen.dart';
 import '../../auth/sign_in_screen.dart';
 import '../../common/legal_modal_sheet.dart';
 
 /// Profile / Account Tab:
-/// Supports both Signed-In user and Non-Signed-In (Guest) user views.
-class ProfileTab extends StatelessWidget {
+/// Supports both Signed-In user and Non-Signed-In (Guest) user views via Riverpod & AuthService.
+class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
 
-  void _confirmSignOut(BuildContext context) {
+  void _confirmSignOut(BuildContext context, WidgetRef ref) {
     HapticFeedback.mediumImpact();
     showDialog<void>(
       context: context,
@@ -48,6 +50,7 @@ class ProfileTab extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               Navigator.of(dialogCtx).pop();
+              await ref.read(authControllerProvider.notifier).logout();
               await AuthService.instance.signOut();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -82,14 +85,17 @@ class ProfileTab extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authControllerProvider);
+    final user = authState.user;
+
     return ListenableBuilder(
       listenable: AuthService.instance,
       builder: (context, _) {
-        final isLoggedIn = AuthService.instance.isLoggedIn;
-        final userName = AuthService.instance.userName;
-        final userEmail = AuthService.instance.userEmail;
-        final userRole = AuthService.instance.userRole;
+        final isLoggedIn = authState.isAuthenticated || AuthService.instance.isLoggedIn;
+        final userName = (user != null && !user.isGuest) ? user.name : AuthService.instance.userName;
+        final userEmail = (user != null && !user.isGuest) ? user.email : AuthService.instance.userEmail;
+        final userRole = (user != null && !user.isGuest) ? user.role : AuthService.instance.userRole;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -113,6 +119,7 @@ class ProfileTab extends StatelessWidget {
                 if (isLoggedIn)
                   _buildSignedInHeader(
                     context,
+                    ref,
                     name: userName,
                     email: userEmail,
                     role: userRole,
@@ -231,6 +238,14 @@ class ProfileTab extends StatelessWidget {
                       TextButton(
                         onPressed: () async {
                           HapticFeedback.selectionClick();
+                          if (isLoggedIn) {
+                            await ref.read(authControllerProvider.notifier).logout();
+                          } else {
+                            await ref.read(authControllerProvider.notifier).login(
+                              email: 'alex.tan@example.com',
+                              password: 'password123',
+                            );
+                          }
                           await AuthService.instance.toggleAuthState();
                         },
                         style: TextButton.styleFrom(
@@ -251,7 +266,7 @@ class ProfileTab extends StatelessWidget {
                 // ── Sign Out Button (When Signed In) ──────────────────
                 if (isLoggedIn)
                   OutlinedButton.icon(
-                    onPressed: () => _confirmSignOut(context),
+                    onPressed: () => _confirmSignOut(context, ref),
                     icon: const Icon(
                       Icons.logout_rounded,
                       size: 18,
@@ -296,7 +311,8 @@ class ProfileTab extends StatelessWidget {
 
   /// Signed-in user header card
   Widget _buildSignedInHeader(
-    BuildContext context, {
+    BuildContext context,
+    WidgetRef ref, {
     required String name,
     required String email,
     required String role,
@@ -400,6 +416,7 @@ class ProfileTab extends StatelessWidget {
           GestureDetector(
             onTap: () async {
               HapticFeedback.selectionClick();
+              await ref.read(authControllerProvider.notifier).toggleRole();
               await AuthService.instance.toggleRole();
             },
             child: Row(

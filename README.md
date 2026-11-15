@@ -68,16 +68,48 @@
 
 ```
 lib/
-├── main.dart                        # App entry point → SplashScreen
+├── main.dart                             # App entry point (ProviderScope → SplashScreen)
 ├── core/
 │   ├── config/
-│   │   └── env_config.dart          # Centralized .env loader & API endpoint helpers
+│   │   └── env_config.dart               # Centralized .env loader & API endpoint helpers
+│   ├── errors/
+│   │   ├── app_exception.dart            # Strongly typed domain exceptions (Network, 401, 404, 422, 500)
+│   │   └── error_handler.dart            # Centralized DioException → AppException mapper
+│   ├── network/
+│   │   ├── api_endpoints.dart            # Centralized backend endpoint catalog
+│   │   ├── api_response.dart             # Generic ApiResponse<T> wrapper
+│   │   ├── dio_client.dart               # Configured Dio HTTP client with Riverpod provider
+│   │   └── interceptors/
+│   │       ├── auth_interceptor.dart     # JWT Bearer injection & auto-refresh (401 queue)
+│   │       └── logging_interceptor.dart  # Formatted request/response logging for development
+│   ├── storage/
+│   │   └── token_storage.dart            # Persistent JWT token and session storage
 │   ├── services/
-│   │   └── auth_service.dart        # Reactive auth state (Signed-In vs Guest)
+│   │   └── auth_service.dart             # Reactive auth state bridge (Signed-In vs Guest)
 │   └── theme/
-│       └── app_colors.dart          # Full color palette & gradients
+│       └── app_colors.dart               # Full color palette & gradients
+├── features/
+│   └── auth/                             # Feature-based scalable architecture
+│       ├── data/
+│       │   ├── datasources/
+│       │   │   └── auth_remote_datasource.dart # Dio-powered remote auth API calls
+│       │   ├── models/
+│       │   │   ├── user_model.dart             # Strongly typed UserModel
+│       │   │   ├── auth_tokens_model.dart      # JWT Access & Refresh token model
+│       │   │   ├── auth_response_model.dart    # Aggregated AuthResponse
+│       │   │   ├── login_request.dart          # Strongly typed Login payload
+│       │   │   └── register_request.dart       # Strongly typed Register payload
+│       │   └── repositories/
+│       │       └── auth_repository.dart        # Clean repository contract & implementation
+│       ├── domain/
+│       │   └── auth_state.dart                 # Immutable AuthState with status enum
+│       └── presentation/
+│           ├── controllers/
+│           │   └── auth_controller.dart        # Riverpod Notifier managing auth logic & state
+│           └── providers/
+│               └── auth_providers.dart         # Global Riverpod providers
 ├── models/
-│   └── onboarding_item.dart         # Onboarding slide data model
+│   └── onboarding_item.dart              # Onboarding slide data model
 └── screens/
     ├── splash/
     │   └── splash_screen.dart
@@ -88,30 +120,30 @@ lib/
     │       ├── onboarding_illustration_card.dart
     │       └── onboarding_slide_widget.dart
     ├── common/
-    │   └── legal_modal_sheet.dart   # Shared Terms & Privacy bottom modals
+    │   └── legal_modal_sheet.dart        # Shared Terms & Privacy bottom modals
     ├── home/
-    │   ├── home_screen.dart         # 5-Tab dynamic bottom navigation shell
+    │   ├── home_screen.dart              # 5-Tab dynamic bottom navigation shell (ConsumerWidget)
     │   ├── tabs/
-    │   │   ├── explore_tab.dart     # Marketplace discovery & search
-    │   │   ├── saved_tab.dart       # Wishlist (active vs guest auth gate)
-    │   │   ├── bookings_tab.dart    # My stays & turf slots (active vs guest)
-    │   │   ├── inbox_tab.dart       # Landlord/turf chats (active vs guest)
-    │   │   └── profile_tab.dart     # Account profile & sign-out vs Join hero
+    │   │   ├── explore_tab.dart          # Marketplace discovery & search
+    │   │   ├── saved_tab.dart            # Wishlist (active vs guest auth gate)
+    │   │   ├── bookings_tab.dart         # My stays & turf slots (active vs guest)
+    │   │   ├── inbox_tab.dart            # Landlord/turf chats (active vs guest)
+    │   │   └── profile_tab.dart          # Account profile & sign-out vs Join hero (ConsumerWidget)
     │   └── widgets/
     │       └── guest_auth_gate_card.dart # Reusable guest auth gate prompt
     └── auth/
-        ├── sign_in_screen.dart
+        ├── sign_in_screen.dart           # Riverpod-powered Sign In
         ├── register_role_screen.dart
-        ├── register_form_screen.dart  # Includes Terms & Privacy modals
+        ├── register_form_screen.dart     # Riverpod-powered Register with Terms & Privacy
         ├── forgot_password_screen.dart
         ├── otp_verification_screen.dart
         ├── reset_password_screen.dart
         └── widgets/
-            ├── custom_auth_input.dart      # 52px input with animated error badge
-            ├── custom_auth_button.dart     # 54px CTA with loading spinner & haptics
+            ├── custom_auth_input.dart    # 52px input with animated error badge
+            ├── custom_auth_button.dart   # 54px CTA with loading spinner & haptics
             ├── password_strength_meter.dart
-            ├── role_selection_card.dart    # Animated press + slide arrow
-            └── otp_digit_input.dart       # Auto-advance squircle digit box
+            ├── role_selection_card.dart  # Animated press + slide arrow
+            └── otp_digit_input.dart      # Auto-advance squircle digit box
 ```
 
 ---
@@ -120,9 +152,11 @@ lib/
 
 | Package | Version | Purpose |
 |---------|---------|---------|
+| `flutter_riverpod` | `^3.5.0` | Reactive state management & dependency injection |
+| `dio` | `^5.11.1` | Powerful HTTP client with interceptors, timeouts & token refresh |
 | `material_ui` | `^1.1.0` | Flutter Material Design components |
 | `google_fonts` | `^6.2.1` | Plus Jakarta Sans typography |
-| `shared_preferences` | `^2.3.2` | Persist onboarding completion state |
+| `shared_preferences` | `^2.3.2` | Persistent token, session & onboarding state |
 | `flutter_dotenv` | `^5.2.1` | Environment variable management (.env) |
 | `cupertino_icons` | `^1.0.8` | iOS-style icons |
 | `flutter_lints` | `^6.0.0` | Dart/Flutter lint rules (dev) |

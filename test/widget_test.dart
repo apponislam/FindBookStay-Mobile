@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,7 +26,7 @@ void main() {
     tester.view.devicePixelRatio = 2.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    await tester.pumpWidget(const FindBookStayApp());
+    await tester.pumpWidget(const ProviderScope(child: FindBookStayApp()));
     await tester.pump(); // Initial frame
 
     // Verify SplashScreen is loaded
@@ -80,7 +81,7 @@ void main() {
     tester.view.devicePixelRatio = 2.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    await tester.pumpWidget(const MaterialApp(home: RegisterRoleScreen()));
+    await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: RegisterRoleScreen())));
     await tester.pumpAndSettle();
 
     expect(find.text('Step 1 of 2'), findsOneWidget);
@@ -109,8 +110,10 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: RegisterFormScreen(initialRole: UserRole.tenant),
+      const ProviderScope(
+        child: MaterialApp(
+          home: RegisterFormScreen(initialRole: UserRole.tenant),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -206,7 +209,7 @@ void main() {
     // Ensure logged out (Guest) state
     await AuthService.instance.signOut();
 
-    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+    await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: HomeScreen())));
     await tester.pumpAndSettle();
 
     // Verify all 5 bottom navigation tabs exist

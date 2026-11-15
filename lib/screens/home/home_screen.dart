@@ -1,9 +1,11 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'tabs/bookings_tab.dart';
 import 'tabs/explore_tab.dart';
 import 'tabs/inbox_tab.dart';
@@ -12,14 +14,14 @@ import 'tabs/saved_tab.dart';
 
 /// Main destination screen featuring an elevated, smoothly animated bottom navigation bar.
 /// Dynamically adapts tabs, badges, and capabilities for Signed-In vs Guest users.
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _tabs = const [
@@ -38,10 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final riverpodAuth = ref.watch(isAuthenticatedProvider);
+
     return ListenableBuilder(
       listenable: AuthService.instance,
       builder: (context, _) {
-        final isLoggedIn = AuthService.instance.isLoggedIn;
+        final isLoggedIn = riverpodAuth || AuthService.instance.isLoggedIn;
 
         return Scaffold(
           backgroundColor: AppColors.background,
