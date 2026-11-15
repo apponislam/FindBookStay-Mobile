@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,9 +8,18 @@ import 'core/config/env_config.dart';
 import 'core/services/auth_service.dart';
 import 'core/theme/app_colors.dart';
 import 'screens/splash/splash_screen.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase (reads google-services.json on Android)
+  try {
+    await Firebase.initializeApp();
+    await NotificationService.instance.init();
+  } catch (e) {
+    debugPrint('Firebase/NotificationService init failed: $e');
+  }
 
   try {
     await EnvConfig.init();

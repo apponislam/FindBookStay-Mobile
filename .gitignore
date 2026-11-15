@@ -52,3 +52,6 @@ app.*.map.json
 !.env.example
 
 doc.txt
+
+# Firebase configuration
+android/app/google-services.json
