@@ -1,4 +1,4 @@
-﻿name: findbookstay_mobile
+name: findbookstay_mobile
 description: "FindBookStay — Marketplace for Renting, Booking, Sports Turfs & Buying Properties."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -35,6 +35,8 @@ dependencies:
   google_fonts: ^6.2.1
   shared_preferences: ^2.3.2
   flutter_dotenv: ^5.2.1
+  flutter_riverpod: ^3.5.0
+  dio: ^5.11.1
 
 dev_dependencies:
   flutter_test:

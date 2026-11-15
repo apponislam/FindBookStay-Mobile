@@ -1,9 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'otp_verification_screen.dart';
 import 'register_role_screen.dart';
 import 'widgets/custom_auth_button.dart';
@@ -12,16 +14,16 @@ import 'widgets/password_strength_meter.dart';
 
 /// Step 2 of Registration Flow: Dynamic Form with Role Switcher & Real-time Validation.
 /// Features top-bottom centering, clean placeholders, eye toggle animation, and required field warning badges.
-class RegisterFormScreen extends StatefulWidget {
+class RegisterFormScreen extends ConsumerStatefulWidget {
   final UserRole initialRole;
 
   const RegisterFormScreen({super.key, required this.initialRole});
 
   @override
-  State<RegisterFormScreen> createState() => _RegisterFormScreenState();
+  ConsumerState<RegisterFormScreen> createState() => _RegisterFormScreenState();
 }
 
-class _RegisterFormScreenState extends State<RegisterFormScreen> {
+class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
   late UserRole _currentRole;
 
   final TextEditingController _nameController = TextEditingController();
@@ -106,8 +108,14 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
       _isLoading = true;
     });
 
-    // Simulate secure network registration request
-    await Future.delayed(const Duration(milliseconds: 1200));
+    final roleTitle = _currentRole == UserRole.tenant ? 'Tenant & Player' : 'Host & Turf Owner';
+    final success = await ref.read(authControllerProvider.notifier).register(
+      name: name,
+      email: email,
+      password: password,
+      phone: _phoneController.text.trim(),
+      role: roleTitle,
+    );
 
     if (!mounted) return;
 
@@ -115,15 +123,25 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
       _isLoading = false;
     });
 
-    // Navigate to OTP verification for account activation
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => OtpVerificationScreen(
-          email: _emailController.text.trim(),
-          isRegistrationFlow: true,
+    if (success) {
+      // Navigate to OTP verification for account activation
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => OtpVerificationScreen(
+            email: _emailController.text.trim(),
+            isRegistrationFlow: true,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      final error = ref.read(authErrorProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error ?? 'Registration failed. Please try again.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   /// Shows a beautiful bottom-sheet modal for Terms of Service or Privacy Policy.

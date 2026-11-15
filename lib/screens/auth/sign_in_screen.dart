@@ -1,31 +1,32 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../features/auth/domain/auth_state.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../home/home_screen.dart';
 import 'forgot_password_screen.dart';
 import 'register_role_screen.dart';
 import 'widgets/custom_auth_button.dart';
 import 'widgets/custom_auth_input.dart';
 
-/// Production-ready Sign In Screen with vertical centering and warning badges.
-class SignInScreen extends StatefulWidget {
+/// Production-ready Sign In Screen powered by Riverpod and Dio.
+class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  ConsumerState<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignInScreenState extends ConsumerState<SignInScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   String? _emailError;
   String? _passwordError;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -61,31 +62,35 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate authentication API call
-    await Future.delayed(const Duration(milliseconds: 1000));
-    await AuthService.instance.signIn(email: email);
+    final success = await ref.read(authControllerProvider.notifier).login(
+      email: email,
+      password: password,
+    );
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasSeenOnboarding', true);
 
     if (!mounted) return;
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-      (route) => false,
-    );
+    if (success) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (route) => false,
+      );
+    } else {
+      final error = ref.read(authErrorProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error ?? 'Invalid email or password.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authStatusProvider) == AuthStatus.loading;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -229,7 +234,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         CustomAuthButton(
                           text: 'Sign In',
                           icon: Icons.login_rounded,
-                          isLoading: _isLoading,
+                          isLoading: isLoading,
                           onPressed: _onSignIn,
                         ),
 
