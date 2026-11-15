@@ -2,12 +2,14 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'core/config/env_config.dart';
 import 'core/services/auth_service.dart';
 import 'core/theme/app_colors.dart';
 import 'screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EnvConfig.init();
   await AuthService.instance.init();
 
   // Set system navigation bar & status bar colors for a seamless experience

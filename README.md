@@ -70,6 +70,8 @@
 lib/
 ├── main.dart                        # App entry point → SplashScreen
 ├── core/
+│   ├── config/
+│   │   └── env_config.dart          # Centralized .env loader & API endpoint helpers
 │   ├── services/
 │   │   └── auth_service.dart        # Reactive auth state (Signed-In vs Guest)
 │   └── theme/
@@ -121,6 +123,7 @@ lib/
 | `material_ui` | `^1.1.0` | Flutter Material Design components |
 | `google_fonts` | `^6.2.1` | Plus Jakarta Sans typography |
 | `shared_preferences` | `^2.3.2` | Persist onboarding completion state |
+| `flutter_dotenv` | `^5.2.1` | Environment variable management (.env) |
 | `cupertino_icons` | `^1.0.8` | iOS-style icons |
 | `flutter_lints` | `^6.0.0` | Dart/Flutter lint rules (dev) |
 
@@ -142,6 +145,9 @@ lib/
 git clone https://github.com/your-org/findbookstay_mobile.git
 cd findbookstay_mobile
 
+# Copy environment variables template
+cp .env.example .env
+
 # Install dependencies
 flutter pub get
 
@@ -154,6 +160,23 @@ flutter run -d <device-id>
 # List available devices
 flutter devices
 ```
+
+### ⚙️ Environment Configuration (.env)
+
+The application uses `flutter_dotenv` to load backend API configurations at runtime:
+
+```env
+# .env
+API_BASE_URL=http://localhost:5075/
+API_TIMEOUT_MS=15000
+APP_ENV=development
+```
+
+> **Testing on a Physical Android Device (e.g. Vivo):**  
+> If testing on a physical Android device connected via USB, run the ADB reverse proxy command so the phone can reach your PC's `localhost:5075`:
+> ```bash
+> adb reverse tcp:5075 tcp:5075
+> ```
 
 ### Build
 
