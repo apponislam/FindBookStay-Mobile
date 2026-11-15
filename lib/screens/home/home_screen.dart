@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: SafeArea(
               top: false,
               child: SizedBox(
-                height: 68,
+                height: 70,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -193,6 +193,26 @@ class _NavBarItemState extends State<_NavBarItem> {
                     clipBehavior: Clip.none,
                     alignment: Alignment.center,
                     children: [
+                      // Smooth Drop Shadow for Active Pod (Faded via AnimatedOpacity to prevent BoxShadow.lerp assertion)
+                      Positioned.fill(
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 240),
+                          opacity: isSelected ? 1.0 : 0.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(alpha: 0.28),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
                       // Circular Pod with Accent Ring
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 240),
@@ -203,15 +223,20 @@ class _NavBarItemState extends State<_NavBarItem> {
                           color: isSelected
                               ? AppColors.primary
                               : (_isHovered
-                                  ? AppColors.accentLight
+                                  ? AppColors.accentLight.withValues(alpha: 0.6)
                                   : Colors.transparent),
                           shape: BoxShape.circle,
                           border: isSelected
                               ? Border.all(
-                                  color: AppColors.accent.withValues(alpha: 0.4),
+                                  color: AppColors.accent,
                                   width: 1.5,
                                 )
-                              : null,
+                              : (_isHovered
+                                  ? Border.all(
+                                      color: AppColors.accent.withValues(alpha: 0.3),
+                                      width: 1.0,
+                                    )
+                                  : null),
                         ),
                         child: Center(
                           child: Icon(
@@ -266,24 +291,27 @@ class _NavBarItemState extends State<_NavBarItem> {
 
                 const SizedBox(height: 2),
 
-                // Animated Label
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: isSelected ? 11.5 : 10.5,
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                    color: isSelected
-                        ? AppColors.primary
-                        : (_isHovered
-                            ? AppColors.textPrimary
-                            : AppColors.textSecondary),
-                    letterSpacing: isSelected ? 0.2 : 0.0,
-                  ),
-                  child: Text(
-                    widget.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                // Animated Label with Text Scaler Protection
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeInOut,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: isSelected ? 11.5 : 10.5,
+                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                      color: isSelected
+                          ? AppColors.primary
+                          : (_isHovered
+                              ? AppColors.textPrimary
+                              : AppColors.textSecondary),
+                      letterSpacing: isSelected ? 0.2 : 0.0,
+                    ),
+                    child: Text(
+                      widget.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
 
