@@ -10,18 +10,30 @@ import 'screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await EnvConfig.init();
-  await AuthService.instance.init();
+
+  try {
+    await EnvConfig.init();
+  } catch (e) {
+    debugPrint('EnvConfig init failed: $e');
+  }
+
+  try {
+    await AuthService.instance.init();
+  } catch (e) {
+    debugPrint('AuthService init failed: $e');
+  }
 
   // Set system navigation bar & status bar colors for a seamless experience
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: AppColors.background,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ),
-  );
+  try {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: AppColors.background,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
+  } catch (_) {}
 
   runApp(
     const ProviderScope(
