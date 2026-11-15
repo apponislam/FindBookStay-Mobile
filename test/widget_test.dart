@@ -164,7 +164,7 @@ void main() {
     tester.view.devicePixelRatio = 2.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    await tester.pumpWidget(const MaterialApp(home: ForgotPasswordScreen()));
+    await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: ForgotPasswordScreen())));
     await tester.pumpAndSettle();
 
     expect(find.text('Account Recovery'), findsOneWidget);

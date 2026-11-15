@@ -12,6 +12,9 @@ abstract class ApiEndpoints {
   static const String authMe = '$apiVersion/auth/me';
   static const String authForgotPassword = '$apiVersion/auth/forgot-password';
   static const String authVerifyOtp = '$apiVersion/auth/verify-otp';
+  static const String authResendOtp = '$apiVersion/auth/resend-otp';
+  static const String authVerifyEmail = '$apiVersion/auth/verify-email';
+  static const String authResendVerification = '$apiVersion/auth/resend-verification';
   static const String authResetPassword = '$apiVersion/auth/reset-password';
   static const String authUpdateProfile = '$apiVersion/auth/profile';
 

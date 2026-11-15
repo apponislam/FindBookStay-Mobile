@@ -15,6 +15,9 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> getCurrentUser();
   Future<void> forgotPassword(String email);
   Future<bool> verifyOtp({required String email, required String otp});
+  Future<void> resendOtp(String email);
+  Future<bool> verifyEmail({required String email, required String otp});
+  Future<void> resendVerificationEmail(String email);
   Future<void> resetPassword({
     required String email,
     required String newPassword,
@@ -106,6 +109,40 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (isValid != null) return isValid;
     }
     return true;
+  }
+
+  @override
+  Future<void> resendOtp(String email) async {
+    await dioClient.post(
+      ApiEndpoints.authResendOtp,
+      data: {'email': email.trim()},
+    );
+  }
+
+  @override
+  Future<bool> verifyEmail({required String email, required String otp}) async {
+    final response = await dioClient.post(
+      ApiEndpoints.authVerifyEmail,
+      data: {
+        'email': email.trim(),
+        'otp': otp.trim(),
+      },
+    );
+
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      final isValid = data['success'] as bool? ?? data['valid'] as bool?;
+      if (isValid != null) return isValid;
+    }
+    return true;
+  }
+
+  @override
+  Future<void> resendVerificationEmail(String email) async {
+    await dioClient.post(
+      ApiEndpoints.authResendVerification,
+      data: {'email': email.trim()},
+    );
   }
 
   @override

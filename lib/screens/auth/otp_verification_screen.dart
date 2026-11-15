@@ -1,19 +1,21 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../home/home_screen.dart';
 import 'reset_password_screen.dart';
 import 'widgets/custom_auth_button.dart';
 import 'widgets/otp_digit_input.dart';
 
 /// Screen for verifying 6-digit OTP code with countdown timer and auto-advance inputs.
-/// Centered layout and clear state feedback.
-class OtpVerificationScreen extends StatefulWidget {
+/// Connected directly to the backend verification and resend endpoints.
+class OtpVerificationScreen extends ConsumerStatefulWidget {
   final String email;
   final bool isRegistrationFlow;
 
@@ -24,16 +26,17 @@ class OtpVerificationScreen extends StatefulWidget {
   });
 
   @override
-  State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
+  ConsumerState<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
-class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   String _otpCode = '';
   String? _otpError;
   bool _isLoading = false;
+  bool _isResending = false;
 
   Timer? _resendTimer;
-  int _secondsRemaining = 45;
+  int _secondsRemaining = 60;
 
   @override
   void initState() {
@@ -42,7 +45,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   void _startTimer() {
-    _secondsRemaining = 45;
+    _secondsRemaining = 60;
     _resendTimer?.cancel();
     _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
@@ -61,21 +64,52 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     super.dispose();
   }
 
-  void _onResendCode() {
+  void _onResendCode() async {
     HapticFeedback.lightImpact();
     setState(() {
       _otpError = null;
+      _isResending = true;
     });
-    _startTimer();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: AppColors.primary,
-        content: Text(
-          'A new 6-digit verification code has been sent to ${widget.email}',
-          style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 13),
-        ),
-      ),
+
+    final success = await ref.read(authControllerProvider.notifier).resendCode(
+      email: widget.email,
+      isRegistrationFlow: widget.isRegistrationFlow,
     );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isResending = false;
+    });
+
+    if (success) {
+      _startTimer();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          content: Text(
+            'A new 6-digit verification code has been sent to ${widget.email}',
+            style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+        ),
+      );
+    } else {
+      final error = ref.read(authErrorProvider);
+      HapticFeedback.heavyImpact();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          content: Text(
+            error ?? 'Failed to resend code. Please try again.',
+            style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+        ),
+      );
+    }
   }
 
   void _onVerifyCode() async {
@@ -92,8 +126,18 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       _isLoading = true;
     });
 
-    // Simulate OTP verification API
-    await Future.delayed(const Duration(milliseconds: 1200));
+    bool success = false;
+    if (widget.isRegistrationFlow) {
+      success = await ref.read(authControllerProvider.notifier).verifyEmail(
+        email: widget.email,
+        otp: _otpCode,
+      );
+    } else {
+      success = await ref.read(authControllerProvider.notifier).verifyOtp(
+        email: widget.email,
+        otp: _otpCode,
+      );
+    }
 
     if (!mounted) return;
 
@@ -101,22 +145,39 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       _isLoading = false;
     });
 
-    if (widget.isRegistrationFlow) {
-      // Mark onboarding & login state in SharedPreferences
-      await AuthService.instance.signIn(email: widget.email);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('hasSeenOnboarding', true);
+    if (success) {
+      if (widget.isRegistrationFlow) {
+        await AuthService.instance.signIn(email: widget.email);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('hasSeenOnboarding', true);
 
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-        (_) => false,
-      );
+        if (!mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (_) => false,
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ResetPasswordScreen(email: widget.email),
+          ),
+        );
+      }
     } else {
-      // Navigate to create new password
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => ResetPasswordScreen(email: widget.email),
+      final error = ref.read(authErrorProvider);
+      HapticFeedback.heavyImpact();
+      setState(() {
+        _otpError = error ?? 'Invalid or expired verification code';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          content: Text(
+            error ?? 'Verification failed. Please check the code and try again.',
+            style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+          ),
         ),
       );
     }
@@ -198,8 +259,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         const SizedBox(height: 8),
 
                         // Subtitle
-                        Text.rich(
-                          TextSpan(
+                        RichText(
+                          text: TextSpan(
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w400,
@@ -208,44 +269,45 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             ),
                             children: [
                               const TextSpan(
-                                text: 'We sent a 6-digit verification code to ',
+                                text: 'We have sent a 6-digit confirmation code to ',
                               ),
                               TextSpan(
-                                text: widget.email.isNotEmpty
-                                    ? widget.email
-                                    : 'your email address',
+                                text: widget.email,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primary,
                                 ),
                               ),
-                              const TextSpan(text: '. Enter it below to proceed.'),
+                              const TextSpan(
+                                text: '. Enter the code below to confirm your identity.',
+                              ),
                             ],
                           ),
                         ),
 
                         const SizedBox(height: 36),
 
-                        // 6 Squircle Digit Boxes
+                        // 6-Digit OTP Block Input
                         OtpDigitInput(
                           length: 6,
-                          onChanged: (val) {
+                          onCompleted: (code) {
                             setState(() {
-                              _otpCode = val;
-                              if (_otpError != null) _otpError = null;
-                            });
-                          },
-                          onCompleted: (val) {
-                            setState(() {
-                              _otpCode = val;
+                              _otpCode = code;
                               _otpError = null;
                             });
                             _onVerifyCode();
                           },
+                          onChanged: (code) {
+                            setState(() {
+                              _otpCode = code;
+                              if (_otpError != null) _otpError = null;
+                            });
+                          },
                         ),
 
+                        // Error Banner
                         if (_otpError != null) ...[
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 16),
                           Center(
                             child: Container(
                               padding: const EdgeInsets.symmetric(
@@ -256,7 +318,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 color: AppColors.error.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: AppColors.error.withValues(alpha: 0.3),
+                                  color: AppColors.error.withValues(alpha: 0.25),
                                 ),
                               ),
                               child: Row(
@@ -284,7 +346,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
                         const SizedBox(height: 32),
 
-                        // Resend Countdown Timer
+                        // Resend Countdown Timer / Button
                         Center(
                           child: _secondsRemaining > 0
                               ? RichText(
@@ -307,24 +369,33 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                     ],
                                   ),
                                 )
-                              : TextButton.icon(
-                                  onPressed: _onResendCode,
-                                  icon: const Icon(
-                                    Icons.refresh_rounded,
-                                    size: 18,
-                                    color: AppColors.primary,
-                                  ),
-                                  label: Text(
-                                    'Resend Code',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primary,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: AppColors.accent,
+                              : _isResending
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                      ),
+                                    )
+                                  : TextButton.icon(
+                                      onPressed: _onResendCode,
+                                      icon: const Icon(
+                                        Icons.refresh_rounded,
+                                        size: 18,
+                                        color: AppColors.primary,
+                                      ),
+                                      label: Text(
+                                        'Resend Code',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primary,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: AppColors.accent,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
                         ),
 
                         const SizedBox(height: 32),

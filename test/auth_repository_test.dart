@@ -75,6 +75,17 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
+  Future<void> resendOtp(String email) async {}
+
+  @override
+  Future<bool> verifyEmail({required String email, required String otp}) async {
+    return otp == '123456';
+  }
+
+  @override
+  Future<void> resendVerificationEmail(String email) async {}
+
+  @override
   Future<void> resetPassword({
     required String email,
     required String newPassword,
@@ -264,6 +275,20 @@ void main() {
       expect(
         await repository.verifyOtp(email: 'user@test.com', otp: '0000'),
         isFalse,
+      );
+    });
+
+    test('Verify email returns boolean check', () async {
+      expect(
+        await repository.verifyEmail(email: 'user@test.com', otp: '123456'),
+        isTrue,
+      );
+    });
+
+    test('Resend verification email completes without throwing', () async {
+      await expectLater(
+        repository.resendVerificationEmail('user@test.com'),
+        completes,
       );
     });
   });

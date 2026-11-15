@@ -79,6 +79,16 @@ class MockTestAuthRepository implements AuthRepository {
       otp == '1234';
 
   @override
+  Future<void> resendOtp(String email) async {}
+
+  @override
+  Future<bool> verifyEmail({required String email, required String otp}) async =>
+      otp == '123456';
+
+  @override
+  Future<void> resendVerificationEmail(String email) async {}
+
+  @override
   Future<void> resetPassword({
     required String email,
     required String newPassword,
@@ -263,6 +273,42 @@ void main() {
         container.read(currentUserProvider)?.role,
         equals('Tenant & Player'),
       );
+    });
+
+    test('resendCode handles registration and password reset flows', () async {
+      final mockRepo = MockTestAuthRepository();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(authControllerProvider.notifier);
+      final resendRegSuccess = await notifier.resendCode(
+        email: 'user@example.com',
+        isRegistrationFlow: true,
+      );
+      expect(resendRegSuccess, isTrue);
+
+      final resendPwdSuccess = await notifier.resendCode(
+        email: 'user@example.com',
+        isRegistrationFlow: false,
+      );
+      expect(resendPwdSuccess, isTrue);
+    });
+
+    test('verifyEmail validates 6-digit OTP code against backend', () async {
+      final mockRepo = MockTestAuthRepository();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(authControllerProvider.notifier);
+      final verifySuccess = await notifier.verifyEmail(
+        email: 'user@example.com',
+        otp: '123456',
+      );
+      expect(verifySuccess, isTrue);
     });
   });
 }

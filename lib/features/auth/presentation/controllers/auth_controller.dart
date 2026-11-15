@@ -140,7 +140,52 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
-  /// OTP verification
+  /// Resend verification or password reset OTP
+  Future<bool> resendCode({
+    required String email,
+    required bool isRegistrationFlow,
+  }) async {
+    try {
+      if (isRegistrationFlow) {
+        await _authRepository.resendVerificationEmail(email);
+      } else {
+        await _authRepository.resendOtp(email);
+      }
+      return true;
+    } on AppException catch (e) {
+      if (!ref.mounted) return false;
+      state = AuthState.error(e.userMessage, state.user);
+      return false;
+    } catch (_) {
+      if (!ref.mounted) return false;
+      state = AuthState.error('Failed to resend code. Please try again.', state.user);
+      return false;
+    }
+  }
+
+  /// Verify email with 6-digit OTP code (Registration flow)
+  Future<bool> verifyEmail({
+    required String email,
+    required String otp,
+  }) async {
+    state = AuthState.loading(state.user);
+    try {
+      final isValid = await _authRepository.verifyEmail(email: email, otp: otp);
+      if (!ref.mounted) return isValid;
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+      return isValid;
+    } on AppException catch (e) {
+      if (!ref.mounted) return false;
+      state = AuthState.error(e.userMessage, state.user);
+      return false;
+    } catch (_) {
+      if (!ref.mounted) return false;
+      state = AuthState.error('Failed to verify code. Please try again.', state.user);
+      return false;
+    }
+  }
+
+  /// OTP verification (Password reset flow)
   Future<bool> verifyOtp({
     required String email,
     required String otp,

@@ -37,6 +37,15 @@ abstract class AuthRepository {
     required String otp,
   });
 
+  Future<void> resendOtp(String email);
+
+  Future<bool> verifyEmail({
+    required String email,
+    required String otp,
+  });
+
+  Future<void> resendVerificationEmail(String email);
+
   Future<void> resetPassword({
     required String email,
     required String newPassword,
@@ -185,6 +194,39 @@ class AuthRepositoryImpl implements AuthRepository {
       if (e is NetworkException) {
         return otp.length == 4;
       }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> resendOtp(String email) async {
+    try {
+      await remoteDataSource.resendOtp(email);
+    } on AppException catch (e) {
+      if (e is NetworkException) return;
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> verifyEmail({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      return await remoteDataSource.verifyEmail(email: email, otp: otp);
+    } on AppException catch (e) {
+      if (e is NetworkException) return true;
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> resendVerificationEmail(String email) async {
+    try {
+      await remoteDataSource.resendVerificationEmail(email);
+    } on AppException catch (e) {
+      if (e is NetworkException) return;
       rethrow;
     }
   }
