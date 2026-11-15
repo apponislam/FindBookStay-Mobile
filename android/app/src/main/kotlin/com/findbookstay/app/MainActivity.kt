@@ -1,4 +1,4 @@
-package com.example.findbookstay_mobile
+package com.findbookstay.app
 
 import io.flutter.embedding.android.FlutterActivity
 
