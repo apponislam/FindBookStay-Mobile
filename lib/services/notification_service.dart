@@ -21,7 +21,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 /// Service responsible for managing Firebase Cloud Messaging (FCM),
-/// including notification permissions, token generation/refresh,
+/// including notification permissions, registration tokens,
 /// and foreground/background/tap event handling.
 class NotificationService {
   NotificationService._internal();
@@ -41,7 +41,7 @@ class NotificationService {
   /// Optional listener callback invoked when a foreground message arrives.
   void Function(RemoteMessage message)? onForegroundMessage;
 
-  /// Initializes FCM listeners, requests permissions, and fetches the device token.
+  /// Initializes FCM listeners, requests permissions, and registers the device.
   Future<void> init() async {
     try {
       // 1. Register top-level background handler
@@ -57,23 +57,22 @@ class NotificationService {
         sound: true,
       );
 
-      // 4. Retrieve and print FCM Token
+      // 4. Listen for device registration and token updates
+      _messaging.onRegistered.listen((String token) {
+        _fcmToken = token;
+        debugPrint('🔔 [FCM TOKEN REGISTERED/UPDATED]: $token');
+      });
+
+      // 5. Listen for unregistration events
+      _messaging.onUnregistered.listen((String token) {
+        _fcmToken = null;
+        debugPrint('🔔 [FCM TOKEN UNREGISTERED]: $token');
+      });
+
+      // 6. Register device and print token
       await getFcmToken();
 
-      // 5. Listen for token refreshes / registrations
-      _messaging.onRegistered.listen((String newToken) {
-        _fcmToken = newToken;
-        debugPrint('🔔 [FCM TOKEN REGISTERED/REFRESHED]: $newToken');
-      });
-
-      // Also listen to legacy onTokenRefresh stream for cross-version compatibility
-      // ignore: deprecated_member_use
-      _messaging.onTokenRefresh.listen((String newToken) {
-        _fcmToken = newToken;
-        debugPrint('🔔 [FCM TOKEN REFRESHED]: $newToken');
-      });
-
-      // 6. Handle foreground notifications
+      // 7. Handle foreground notifications
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         debugPrint('🔔 [FCM FOREGROUND MESSAGE]: ${message.messageId}');
         debugPrint('   Title: ${message.notification?.title}');
@@ -83,13 +82,13 @@ class NotificationService {
         onForegroundMessage?.call(message);
       });
 
-      // 7. Handle notification tap when the app is in background (but running)
+      // 8. Handle notification tap when the app is in background (but running)
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         debugPrint('🔔 [FCM APP OPENED FROM NOTIFICATION]: ${message.messageId}');
         _handleTap(message);
       });
 
-      // 8. Handle notification tap when the app was launched from a terminated state
+      // 9. Handle notification tap when the app was launched from a terminated state
       final RemoteMessage? initialMessage = await _messaging.getInitialMessage();
       if (initialMessage != null) {
         debugPrint('🔔 [FCM INITIAL MESSAGE FROM TERMINATED]: ${initialMessage.messageId}');
@@ -117,14 +116,25 @@ class NotificationService {
     return settings;
   }
 
-  /// Retrieves the unique FCM registration token for this device instance.
+  /// Registers the device instance with FCM and returns the registration token.
   Future<String?> getFcmToken() async {
     try {
-      // ignore: deprecated_member_use
-      _fcmToken = await _messaging.getToken();
-      if (_fcmToken == null) {
-        await _messaging.register();
+      if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+        return _fcmToken;
       }
+
+      final Future<String> tokenFuture = _messaging.onRegistered.first;
+      await _messaging.register();
+
+      _fcmToken = await tokenFuture.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => '',
+      );
+
+      if (_fcmToken != null && _fcmToken!.isEmpty) {
+        _fcmToken = null;
+      }
+
       debugPrint('==================================================');
       debugPrint('🔔 [FCM DEVICE TOKEN]:');
       debugPrint('$_fcmToken');
@@ -136,18 +146,19 @@ class NotificationService {
     }
   }
 
-  /// Deletes the current FCM registration token.
-  Future<void> deleteToken() async {
+  /// Unregisters the current app instance from Firebase Cloud Messaging.
+  Future<void> unregisterDevice() async {
     try {
-      // ignore: deprecated_member_use
-      await _messaging.deleteToken();
       await _messaging.unregister();
       _fcmToken = null;
-      debugPrint('🔔 [FCM] Device token deleted.');
+      debugPrint('🔔 [FCM] Device unregistered and token removed.');
     } catch (e) {
-      debugPrint('❌ [FCM] Failed to delete device token: $e');
+      debugPrint('❌ [FCM] Failed to unregister device: $e');
     }
   }
+
+  /// Removes access to the FCM registration token (alias for unregisterDevice).
+  Future<void> deleteToken() => unregisterDevice();
 
   /// Internal handler for notification tap events.
   void _handleTap(RemoteMessage message) {
