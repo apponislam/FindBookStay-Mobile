@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.findbookstay.app"
+    namespace = "com.appon.findbookstay"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.findbookstay.app"
+        applicationId = "com.appon.findbookstay"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
