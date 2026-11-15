@@ -23,11 +23,17 @@ class ApiResponse<T> {
   ) {
     final rawData = json['data'];
     return ApiResponse<T>(
-      success: json['success'] as bool? ?? (json['status'] == 'success' || json['statusCode'] == 200),
+      success:
+          json['success'] as bool? ??
+          (json['status'] == 'success' || json['statusCode'] == 200),
       message: json['message'] as String?,
       statusCode: json['statusCode'] as int?,
-      errors: json['errors'] is Map<String, dynamic> ? json['errors'] as Map<String, dynamic> : null,
-      meta: json['meta'] is Map<String, dynamic> ? json['meta'] as Map<String, dynamic> : null,
+      errors: json['errors'] is Map<String, dynamic>
+          ? json['errors'] as Map<String, dynamic>
+          : null,
+      meta: json['meta'] is Map<String, dynamic>
+          ? json['meta'] as Map<String, dynamic>
+          : null,
       data: (rawData != null && fromJsonT != null)
           ? fromJsonT(rawData)
           : (rawData is T ? rawData : null),

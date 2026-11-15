@@ -50,7 +50,9 @@ class UserModel {
       phone: json['phone'] as String?,
       avatarUrl: json['avatarUrl'] as String? ?? json['avatar'] as String?,
       isEmailVerified: json['isEmailVerified'] as bool? ?? false,
-      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'].toString())
+          : null,
     );
   }
 
@@ -102,5 +104,6 @@ class UserModel {
   int get hashCode => id.hashCode ^ email.hashCode ^ role.hashCode;
 
   @override
-  String toString() => 'UserModel(id: $id, name: $name, email: $email, role: $role)';
+  String toString() =>
+      'UserModel(id: $id, name: $name, email: $email, role: $role)';
 }

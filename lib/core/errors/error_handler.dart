@@ -1,5 +1,7 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
+
 import 'app_exception.dart';
 
 /// Centralized error handler that translates raw network errors, Dio exceptions,
@@ -20,7 +22,8 @@ class ErrorHandler {
     if (error is SocketException) {
       return NetworkException(
         message: 'SocketException: ${error.message}',
-        userMessage: 'Cannot reach the server. Please check your internet connection.',
+        userMessage:
+            'Cannot reach the server. Please check your internet connection.',
       );
     }
 
@@ -110,7 +113,9 @@ class ErrorHandler {
       case 400:
         return BadRequestException(
           message: serverMessage ?? 'Bad request (400)',
-          userMessage: serverMessage ?? 'Invalid request. Please verify your data and try again.',
+          userMessage:
+              serverMessage ??
+              'Invalid request. Please verify your data and try again.',
           statusCode: 400,
           errors: errors,
         );
@@ -118,28 +123,33 @@ class ErrorHandler {
       case 401:
         return UnauthorizedException(
           message: serverMessage ?? 'Unauthorized (401)',
-          userMessage: serverMessage ?? 'Invalid email or password. Please try again.',
+          userMessage:
+              serverMessage ?? 'Invalid email or password. Please try again.',
           statusCode: 401,
         );
 
       case 403:
         return ForbiddenException(
           message: serverMessage ?? 'Forbidden (403)',
-          userMessage: serverMessage ?? 'You do not have permission to perform this action.',
+          userMessage:
+              serverMessage ??
+              'You do not have permission to perform this action.',
           statusCode: 403,
         );
 
       case 404:
         return NotFoundException(
           message: serverMessage ?? 'Resource not found (404)',
-          userMessage: serverMessage ?? 'The requested information could not be found.',
+          userMessage:
+              serverMessage ?? 'The requested information could not be found.',
           statusCode: 404,
         );
 
       case 409:
         return ConflictException(
           message: serverMessage ?? 'Conflict (409)',
-          userMessage: serverMessage ?? 'A record with these details already exists.',
+          userMessage:
+              serverMessage ?? 'A record with these details already exists.',
           statusCode: 409,
           errors: errors,
         );
@@ -147,7 +157,9 @@ class ErrorHandler {
       case 422:
         return ValidationException(
           message: serverMessage ?? 'Validation failed (422)',
-          userMessage: serverMessage ?? 'Validation failed. Please correct the highlighted fields.',
+          userMessage:
+              serverMessage ??
+              'Validation failed. Please correct the highlighted fields.',
           statusCode: 422,
           errors: errors,
         );

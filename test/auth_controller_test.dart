@@ -13,7 +13,10 @@ class MockTestAuthRepository implements AuthRepository {
   UserModel? cachedUser;
 
   @override
-  Future<UserModel> login({required String email, required String password}) async {
+  Future<UserModel> login({
+    required String email,
+    required String password,
+  }) async {
     if (throwErrorOnLogin) {
       throw const UnauthorizedException(
         message: 'Invalid credentials',
@@ -65,7 +68,8 @@ class MockTestAuthRepository implements AuthRepository {
   Future<void> forgotPassword(String email) async {}
 
   @override
-  Future<bool> verifyOtp({required String email, required String otp}) async => otp == '1234';
+  Future<bool> verifyOtp({required String email, required String otp}) async =>
+      otp == '1234';
 
   @override
   Future<void> resetPassword({
@@ -87,104 +91,109 @@ void main() {
   });
 
   group('Riverpod AuthController & Providers Tests', () {
-    test('Initializes with Unauthenticated state when no cached user', () async {
-      final mockRepo = MockTestAuthRepository();
-      final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(mockRepo),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'Initializes with Unauthenticated state when no cached user',
+      () async {
+        final mockRepo = MockTestAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
+        );
+        addTearDown(container.dispose);
 
-      // Trigger build and wait for microtask checkAuthStatus
-      final initialState = container.read(authControllerProvider);
-      expect(initialState.status, equals(AuthStatus.initial));
+        // Trigger build and wait for microtask checkAuthStatus
+        final initialState = container.read(authControllerProvider);
+        expect(initialState.status, equals(AuthStatus.initial));
 
-      await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
 
-      final resolvedState = container.read(authControllerProvider);
-      expect(resolvedState.status, equals(AuthStatus.unauthenticated));
-      expect(container.read(isAuthenticatedProvider), isFalse);
-      expect(container.read(isGuestProvider), isTrue);
-    });
+        final resolvedState = container.read(authControllerProvider);
+        expect(resolvedState.status, equals(AuthStatus.unauthenticated));
+        expect(container.read(isAuthenticatedProvider), isFalse);
+        expect(container.read(isGuestProvider), isTrue);
+      },
+    );
 
-    test('Successful login transitions to Authenticated with user profile', () async {
-      final mockRepo = MockTestAuthRepository();
-      final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(mockRepo),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'Successful login transitions to Authenticated with user profile',
+      () async {
+        final mockRepo = MockTestAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
+        );
+        addTearDown(container.dispose);
 
-      final notifier = container.read(authControllerProvider.notifier);
-      final success = await notifier.login(
-        email: 'alex@findbookstay.com',
-        password: 'password123',
-      );
+        final notifier = container.read(authControllerProvider.notifier);
+        final success = await notifier.login(
+          email: 'alex@findbookstay.com',
+          password: 'password123',
+        );
 
-      expect(success, isTrue);
+        expect(success, isTrue);
 
-      final state = container.read(authControllerProvider);
-      expect(state.status, equals(AuthStatus.authenticated));
-      expect(state.user?.email, equals('alex@findbookstay.com'));
-      expect(container.read(isAuthenticatedProvider), isTrue);
-      expect(container.read(currentUserProvider)?.name, equals('Alex Tan'));
-    });
+        final state = container.read(authControllerProvider);
+        expect(state.status, equals(AuthStatus.authenticated));
+        expect(state.user?.email, equals('alex@findbookstay.com'));
+        expect(container.read(isAuthenticatedProvider), isTrue);
+        expect(container.read(currentUserProvider)?.name, equals('Alex Tan'));
+      },
+    );
 
-    test('Failed login transitions to Error state with friendly userMessage', () async {
-      final mockRepo = MockTestAuthRepository()..throwErrorOnLogin = true;
-      final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(mockRepo),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'Failed login transitions to Error state with friendly userMessage',
+      () async {
+        final mockRepo = MockTestAuthRepository()..throwErrorOnLogin = true;
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
+        );
+        addTearDown(container.dispose);
 
-      final notifier = container.read(authControllerProvider.notifier);
-      final success = await notifier.login(
-        email: 'wrong@findbookstay.com',
-        password: 'wrongpassword',
-      );
+        final notifier = container.read(authControllerProvider.notifier);
+        final success = await notifier.login(
+          email: 'wrong@findbookstay.com',
+          password: 'wrongpassword',
+        );
 
-      expect(success, isFalse);
+        expect(success, isFalse);
 
-      final state = container.read(authControllerProvider);
-      expect(state.status, equals(AuthStatus.error));
-      expect(state.errorMessage, equals('Incorrect email or password.'));
-      expect(container.read(authErrorProvider), equals('Incorrect email or password.'));
-    });
+        final state = container.read(authControllerProvider);
+        expect(state.status, equals(AuthStatus.error));
+        expect(state.errorMessage, equals('Incorrect email or password.'));
+        expect(
+          container.read(authErrorProvider),
+          equals('Incorrect email or password.'),
+        );
+      },
+    );
 
-    test('Logout transitions back to Unauthenticated state and guest user', () async {
-      final mockRepo = MockTestAuthRepository();
-      final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(mockRepo),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'Logout transitions back to Unauthenticated state and guest user',
+      () async {
+        final mockRepo = MockTestAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
+        );
+        addTearDown(container.dispose);
 
-      final notifier = container.read(authControllerProvider.notifier);
-      await notifier.login(
-        email: 'alex@findbookstay.com',
-        password: 'password123',
-      );
-      expect(container.read(isAuthenticatedProvider), isTrue);
+        final notifier = container.read(authControllerProvider.notifier);
+        await notifier.login(
+          email: 'alex@findbookstay.com',
+          password: 'password123',
+        );
+        expect(container.read(isAuthenticatedProvider), isTrue);
 
-      await notifier.logout();
+        await notifier.logout();
 
-      final state = container.read(authControllerProvider);
-      expect(state.status, equals(AuthStatus.unauthenticated));
-      expect(container.read(isAuthenticatedProvider), isFalse);
-      expect(container.read(isGuestProvider), isTrue);
-    });
+        final state = container.read(authControllerProvider);
+        expect(state.status, equals(AuthStatus.unauthenticated));
+        expect(container.read(isAuthenticatedProvider), isFalse);
+        expect(container.read(isGuestProvider), isTrue);
+      },
+    );
 
     test('toggleRole switches between Tenant and Host', () async {
       final mockRepo = MockTestAuthRepository();
       final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(mockRepo),
-        ],
+        overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
       );
       addTearDown(container.dispose);
 
@@ -193,13 +202,22 @@ void main() {
         email: 'alex@findbookstay.com',
         password: 'password123',
       );
-      expect(container.read(currentUserProvider)?.role, equals('Tenant & Player'));
+      expect(
+        container.read(currentUserProvider)?.role,
+        equals('Tenant & Player'),
+      );
 
       await notifier.toggleRole();
-      expect(container.read(currentUserProvider)?.role, equals('Host & Turf Owner'));
+      expect(
+        container.read(currentUserProvider)?.role,
+        equals('Host & Turf Owner'),
+      );
 
       await notifier.toggleRole();
-      expect(container.read(currentUserProvider)?.role, equals('Tenant & Player'));
+      expect(
+        container.read(currentUserProvider)?.role,
+        equals('Tenant & Player'),
+      );
     });
   });
 }

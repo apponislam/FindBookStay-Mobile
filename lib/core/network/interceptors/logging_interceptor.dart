@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+
 import '../../config/env_config.dart';
 
 /// Clean, formatted console logging interceptor for Dio requests, responses, and errors.
@@ -24,7 +25,9 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (kDebugMode && EnvConfig.isDevelopment) {
-      debugPrint('✅ [DIO RES] ${response.statusCode} ${response.requestOptions.uri}');
+      debugPrint(
+        '✅ [DIO RES] ${response.statusCode} ${response.requestOptions.uri}',
+      );
     }
     super.onResponse(response, handler);
   }
@@ -32,7 +35,9 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (kDebugMode) {
-      debugPrint('❌ [DIO ERR] ${err.response?.statusCode ?? 'NO_STATUS'} ${err.requestOptions.uri}');
+      debugPrint(
+        '❌ [DIO ERR] ${err.response?.statusCode ?? 'NO_STATUS'} ${err.requestOptions.uri}',
+      );
       debugPrint('   Message: ${err.message}');
       if (err.response?.data != null) {
         debugPrint('   Response Data: ${err.response?.data}');
@@ -44,7 +49,12 @@ class LoggingInterceptor extends Interceptor {
   dynamic _sanitizeBody(dynamic data) {
     if (data is Map<String, dynamic>) {
       final copy = Map<String, dynamic>.from(data);
-      for (final key in ['password', 'newPassword', 'confirmPassword', 'token']) {
+      for (final key in [
+        'password',
+        'newPassword',
+        'confirmPassword',
+        'token',
+      ]) {
         if (copy.containsKey(key)) {
           copy[key] = '******';
         }

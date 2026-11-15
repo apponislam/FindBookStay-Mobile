@@ -19,13 +19,15 @@ abstract class ApiEndpoints {
   static const String properties = '$apiVersion/properties';
   static const String featuredProperties = '$apiVersion/properties/featured';
   static String propertyDetails(String id) => '$apiVersion/properties/$id';
-  static String propertyReviews(String id) => '$apiVersion/properties/$id/reviews';
+  static String propertyReviews(String id) =>
+      '$apiVersion/properties/$id/reviews';
 
   // Sports Turfs & Venues
   static const String turfs = '$apiVersion/turfs';
   static const String featuredTurfs = '$apiVersion/turfs/featured';
   static String turfDetails(String id) => '$apiVersion/turfs/$id';
-  static String turfSlots(String id, String date) => '$apiVersion/turfs/$id/slots?date=$date';
+  static String turfSlots(String id, String date) =>
+      '$apiVersion/turfs/$id/slots?date=$date';
 
   // Bookings & Reservations
   static const String bookings = '$apiVersion/bookings';
@@ -35,9 +37,11 @@ abstract class ApiEndpoints {
 
   // Wishlist & Saved Items
   static const String wishlist = '$apiVersion/wishlist';
-  static String wishlistToggle(String itemId) => '$apiVersion/wishlist/toggle/$itemId';
+  static String wishlistToggle(String itemId) =>
+      '$apiVersion/wishlist/toggle/$itemId';
 
   // Messages & Inbox
   static const String conversations = '$apiVersion/conversations';
-  static String messages(String conversationId) => '$apiVersion/conversations/$conversationId/messages';
+  static String messages(String conversationId) =>
+      '$apiVersion/conversations/$conversationId/messages';
 }

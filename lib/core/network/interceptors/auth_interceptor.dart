@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../api_endpoints.dart';
 import '../../storage/token_storage.dart';
 
@@ -19,14 +20,18 @@ class AuthInterceptor extends QueuedInterceptor {
   });
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     // Add default JSON headers if missing
     options.headers['Accept'] ??= 'application/json';
     options.headers['Content-Type'] ??= 'application/json';
 
     // Skip Authorization header on public auth endpoints
     final path = options.path;
-    final isPublicAuthEndpoint = path.contains(ApiEndpoints.authLogin) ||
+    final isPublicAuthEndpoint =
+        path.contains(ApiEndpoints.authLogin) ||
         path.contains(ApiEndpoints.authRegister) ||
         path.contains(ApiEndpoints.authRefreshToken) ||
         path.contains(ApiEndpoints.authForgotPassword);
@@ -47,7 +52,8 @@ class AuthInterceptor extends QueuedInterceptor {
     final path = err.requestOptions.path;
 
     // Only intercept 401 Unauthorized errors on non-auth paths
-    final isAuthEndpoint = path.contains(ApiEndpoints.authLogin) ||
+    final isAuthEndpoint =
+        path.contains(ApiEndpoints.authLogin) ||
         path.contains(ApiEndpoints.authRefreshToken);
 
     if (response?.statusCode == 401 && !isAuthEndpoint) {
@@ -59,7 +65,10 @@ class AuthInterceptor extends QueuedInterceptor {
           final refreshDio = Dio(
             BaseOptions(
               baseUrl: dio.options.baseUrl,
-              headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
             ),
           );
 
@@ -68,10 +77,16 @@ class AuthInterceptor extends QueuedInterceptor {
             data: {'refreshToken': refreshToken},
           );
 
-          if (refreshResponse.statusCode == 200 && refreshResponse.data != null) {
+          if (refreshResponse.statusCode == 200 &&
+              refreshResponse.data != null) {
             final data = refreshResponse.data;
-            final newAccessToken = data['accessToken'] as String? ?? data['data']?['accessToken'] as String?;
-            final newRefreshToken = data['refreshToken'] as String? ?? data['data']?['refreshToken'] as String? ?? refreshToken;
+            final newAccessToken =
+                data['accessToken'] as String? ??
+                data['data']?['accessToken'] as String?;
+            final newRefreshToken =
+                data['refreshToken'] as String? ??
+                data['data']?['refreshToken'] as String? ??
+                refreshToken;
 
             if (newAccessToken != null) {
               await tokenStorage.saveTokens(

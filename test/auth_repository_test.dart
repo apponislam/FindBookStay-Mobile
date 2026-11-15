@@ -179,15 +179,15 @@ void main() {
     late TokenStorage tokenStorage;
     late AuthRepositoryImpl repository;
 
-  setUp(() {
-    SharedPreferences.setMockInitialValues({});
-    mockRemote = MockAuthRemoteDataSource();
-    tokenStorage = SharedPrefsTokenStorage();
-    repository = AuthRepositoryImpl(
-      remoteDataSource: mockRemote,
-      tokenStorage: tokenStorage,
-    );
-  });
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      mockRemote = MockAuthRemoteDataSource();
+      tokenStorage = SharedPrefsTokenStorage();
+      repository = AuthRepositoryImpl(
+        remoteDataSource: mockRemote,
+        tokenStorage: tokenStorage,
+      );
+    });
 
     test('Successful login persists tokens and user profile', () async {
       final user = await repository.login(
@@ -229,8 +229,14 @@ void main() {
     });
 
     test('Verify OTP returns boolean check', () async {
-      expect(await repository.verifyOtp(email: 'user@test.com', otp: '1234'), isTrue);
-      expect(await repository.verifyOtp(email: 'user@test.com', otp: '0000'), isFalse);
+      expect(
+        await repository.verifyOtp(email: 'user@test.com', otp: '1234'),
+        isTrue,
+      );
+      expect(
+        await repository.verifyOtp(email: 'user@test.com', otp: '0000'),
+        isFalse,
+      );
     });
   });
 }
