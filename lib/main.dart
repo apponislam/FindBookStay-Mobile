@@ -35,11 +35,7 @@ void main() async {
     );
   } catch (_) {}
 
-  runApp(
-    const ProviderScope(
-      child: FindBookStayApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: FindBookStayApp()));
 }
 
 class FindBookStayApp extends StatelessWidget {
