@@ -256,7 +256,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         // New Password Input (Required)
                         CustomAuthInput(
                           label: 'New Password',
-                          hint: 'Create new password (min. 8 chars)',
+                          hint: '••••••••',
                           prefixIcon: Icons.lock_outline_rounded,
                           isPassword: true,
                           isRequired: true,
@@ -276,7 +276,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         // Confirm Password Input with Match Indicator (Required)
                         CustomAuthInput(
                           label: 'Confirm Password',
-                          hint: 'Re-type new password to confirm',
+                          hint: '••••••••',
                           prefixIcon: Icons.lock_reset_rounded,
                           isPassword: true,
                           isRequired: true,

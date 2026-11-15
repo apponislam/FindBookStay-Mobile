@@ -159,7 +159,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         // Form Input (Required Email Only)
                         CustomAuthInput(
                           label: 'Email Address',
-                          hint: 'alex.tan@example.com (registered email)',
+                          hint: 'name@example.com',
                           prefixIcon: Icons.email_outlined,
                           isRequired: true,
                           controller: _emailController,

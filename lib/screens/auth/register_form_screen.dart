@@ -1,10 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../features/auth/data/models/register_request.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'otp_verification_screen.dart';
 import 'register_role_screen.dart';
@@ -12,11 +17,12 @@ import 'widgets/custom_auth_button.dart';
 import 'widgets/custom_auth_input.dart';
 import 'widgets/password_strength_meter.dart';
 
-/// Complete 2-Step Sign Up Page for FindBookStay.
+/// Complete, Production-Ready 3-Step Registration Flow for FindBookStay.
 ///
-/// Flow:
-/// - Step 1: Personal & Contact Information (Full Name, Email, Phone Number).
-/// - Step 2: Account Security (Password, Confirm Password, Terms & Policy).
+/// Steps:
+/// - Step 1: Personal Details (Profile Photo, Full Name, Email Address, Phone Number).
+/// - Step 2: Addresses & Referral (Present Address, Permanent Address with "Same as Present" toggle, Optional Referral Code).
+/// - Step 3: Account Security (Password, Strength Meter, Confirm Password, Terms & Privacy Agreement).
 class RegisterFormScreen extends ConsumerStatefulWidget {
   final UserRole initialRole;
 
@@ -33,12 +39,34 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
   int _currentStep = 0;
   late final PageController _pageController;
 
+  // Profile Photo
+  XFile? _profilePhoto;
+  final ImagePicker _imagePicker = ImagePicker();
+
+  // Step 1 Controllers: Personal Details
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+
+  // Step 2 Controllers: Present Address
+  final TextEditingController _presentStreetController = TextEditingController();
+  final TextEditingController _presentCityController = TextEditingController();
+  final TextEditingController _presentStateController = TextEditingController();
+  final TextEditingController _presentZipController = TextEditingController();
+
+  // Step 2 Controllers: Permanent Address & Referral
+  bool _sameAsPresent = false;
+  final TextEditingController _permanentStreetController = TextEditingController();
+  final TextEditingController _permanentCityController = TextEditingController();
+  final TextEditingController _permanentStateController = TextEditingController();
+  final TextEditingController _permanentZipController = TextEditingController();
+  final TextEditingController _referralCodeController = TextEditingController();
+
+  // Step 3 Controllers: Security & Password
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
+  // Validation Errors
   String? _nameError;
   String? _emailError;
   String? _passwordError;
@@ -66,6 +94,15 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _presentStreetController.dispose();
+    _presentCityController.dispose();
+    _presentStateController.dispose();
+    _presentZipController.dispose();
+    _permanentStreetController.dispose();
+    _permanentCityController.dispose();
+    _permanentStateController.dispose();
+    _permanentZipController.dispose();
+    _referralCodeController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _termsRecognizer.dispose();
@@ -85,6 +122,135 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Profile Photo Upload (Camera / Gallery)
+  // ---------------------------------------------------------------------------
+  void _showPhotoOptions() {
+    HapticFeedback.selectionClick();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Profile Photo',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 18),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: AppColors.accentLight,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.camera_alt_rounded, color: AppColors.primary),
+                ),
+                title: Text(
+                  'Take Photo with Camera',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _pickPhoto(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: AppColors.accentLight,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.photo_library_rounded, color: AppColors.primary),
+                ),
+                title: Text(
+                  'Choose from Gallery',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _pickPhoto(ImageSource.gallery);
+                },
+              ),
+              if (_profilePhoto != null)
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
+                  ),
+                  title: Text(
+                    'Remove Photo',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.error,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    setState(() => _profilePhoto = null);
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickPhoto(ImageSource source) async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: source,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 75,
+      );
+      if (image != null) {
+        setState(() {
+          _profilePhoto = image;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to pick profile image: $e');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Validation Handlers
+  // ---------------------------------------------------------------------------
   bool _validateStep1() {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
@@ -114,10 +280,12 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
     }
   }
 
+  void _onStep2Continue() {
+    _goToStep(2);
+  }
+
   void _validateAndSubmit() async {
-    // Validate both steps
-    final isStep1Valid = _validateStep1();
-    if (!isStep1Valid) {
+    if (!_validateStep1()) {
       _goToStep(0);
       return;
     }
@@ -162,16 +330,69 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
 
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
-    final roleTitle = widget.initialRole == UserRole.host
-        ? 'Host & Turf Owner'
-        : 'Tenant & Player';
+    final phone = _phoneController.text.trim();
+
+    // Step 2: Present Address
+    final presentStreet = _presentStreetController.text.trim();
+    final presentCity = _presentCityController.text.trim();
+    final presentState = _presentStateController.text.trim();
+    final presentZip = _presentZipController.text.trim();
+
+    AddressModel? presentAddress;
+    if (presentStreet.isNotEmpty || presentCity.isNotEmpty || presentState.isNotEmpty || presentZip.isNotEmpty) {
+      presentAddress = AddressModel(
+        street: presentStreet.isNotEmpty ? presentStreet : null,
+        city: presentCity.isNotEmpty ? presentCity : null,
+        state: presentState.isNotEmpty ? presentState : null,
+        zipCode: presentZip.isNotEmpty ? presentZip : null,
+      );
+    }
+
+    // Step 2: Permanent Address
+    AddressModel? permanentAddress;
+    if (_sameAsPresent) {
+      permanentAddress = presentAddress;
+    } else {
+      final permStreet = _permanentStreetController.text.trim();
+      final permCity = _permanentCityController.text.trim();
+      final permState = _permanentStateController.text.trim();
+      final permZip = _permanentZipController.text.trim();
+      if (permStreet.isNotEmpty || permCity.isNotEmpty || permState.isNotEmpty || permZip.isNotEmpty) {
+        permanentAddress = AddressModel(
+          street: permStreet.isNotEmpty ? permStreet : null,
+          city: permCity.isNotEmpty ? permCity : null,
+          state: permState.isNotEmpty ? permState : null,
+          zipCode: permZip.isNotEmpty ? permZip : null,
+        );
+      }
+    }
+
+    // Step 2: Referral Code
+    final referralCode = _referralCodeController.text.trim();
+
+    // Profile photo conversion
+    String? profileImageBase64;
+    if (_profilePhoto != null) {
+      try {
+        final bytes = await _profilePhoto!.readAsBytes();
+        final ext = _profilePhoto!.name.split('.').last.toLowerCase();
+        final mime = (ext == 'png') ? 'image/png' : 'image/jpeg';
+        profileImageBase64 = 'data:$mime;base64,${base64Encode(bytes)}';
+      } catch (_) {
+        profileImageBase64 = _profilePhoto!.path;
+      }
+    }
 
     final success = await ref.read(authControllerProvider.notifier).register(
       name: name,
       email: email,
       password: password,
-      phone: _phoneController.text.trim(),
-      role: roleTitle,
+      phone: phone.isNotEmpty ? phone : null,
+      role: 'USER',
+      profileImage: profileImageBase64,
+      presentAddress: (presentAddress != null && !presentAddress.isEmpty) ? presentAddress : null,
+      permanentAddress: (permanentAddress != null && !permanentAddress.isEmpty) ? permanentAddress : null,
+      referredBy: referralCode.isNotEmpty ? referralCode : null,
     );
 
     if (!mounted) return;
@@ -191,10 +412,25 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
       );
     } else {
       final error = ref.read(authErrorProvider);
+      HapticFeedback.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(error ?? 'Registration failed. Please try again.'),
+          content: Text(
+            error ?? 'Registration failed. Please check your data and try again.',
+            style: GoogleFonts.plusJakartaSans(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'OK',
+            textColor: Colors.white,
+            onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+          ),
         ),
       );
     }
@@ -216,7 +452,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
       canPop: _currentStep == 0,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && _currentStep > 0) {
-          _goToStep(0);
+          _goToStep(_currentStep - 1);
         }
       },
       child: Scaffold(
@@ -232,7 +468,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
             ),
             onPressed: () {
               if (_currentStep > 0) {
-                _goToStep(0);
+                _goToStep(_currentStep - 1);
               } else {
                 Navigator.of(context).pop();
               }
@@ -251,17 +487,18 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              // Visual Step Indicator
+              // Top Step Progress Indicator (3 Steps)
               _buildStepIndicator(),
 
-              // 2-Step PageView
+              // 3-Step PageView
               Expanded(
                 child: PageView(
                   controller: _pageController,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     _buildStep1Personal(),
-                    _buildStep2Security(),
+                    _buildStep2AddressAndReferral(),
+                    _buildStep3Security(),
                   ],
                 ),
               ),
@@ -273,7 +510,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // Top Step Progress Indicator
+  // Top Step Progress Indicator (3 Steps)
   // ---------------------------------------------------------------------------
   Widget _buildStepIndicator() {
     return Padding(
@@ -284,21 +521,34 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
             children: [
               _buildStepNode(
                 stepIndex: 0,
-                title: 'Personal Info',
+                title: 'Personal',
                 isActive: _currentStep == 0,
                 isCompleted: _currentStep > 0,
               ),
               Expanded(
                 child: Container(
                   height: 2,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   color: _currentStep > 0 ? AppColors.primary : AppColors.border,
                 ),
               ),
               _buildStepNode(
                 stepIndex: 1,
-                title: 'Security',
+                title: 'Address',
                 isActive: _currentStep == 1,
+                isCompleted: _currentStep > 1,
+              ),
+              Expanded(
+                child: Container(
+                  height: 2,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  color: _currentStep > 1 ? AppColors.primary : AppColors.border,
+                ),
+              ),
+              _buildStepNode(
+                stepIndex: 2,
+                title: 'Security',
+                isActive: _currentStep == 2,
                 isCompleted: false,
               ),
             ],
@@ -308,7 +558,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: _currentStep == 0 ? 0.5 : 1.0,
+              value: (_currentStep + 1) / 3.0,
               minHeight: 4,
               backgroundColor: AppColors.surface,
               valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -360,7 +610,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
                   : Text(
                       '${stepIndex + 1}',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12.5,
+                        fontSize: 12,
                         fontWeight: FontWeight.w800,
                         color: isActive
                             ? AppColors.primary
@@ -369,11 +619,11 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
                     ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           Text(
             title,
             style: GoogleFonts.plusJakartaSans(
-              fontSize: 12.5,
+              fontSize: 12,
               fontWeight: (isActive || isCompleted)
                   ? FontWeight.w700
                   : FontWeight.w500,
@@ -388,152 +638,234 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // STEP 1: Personal & Contact Information
+  // STEP 1: Personal Details (Profile Photo, Name, Email, Phone)
   // ---------------------------------------------------------------------------
   Widget _buildStep1Personal() {
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+                decoration: BoxDecoration(
+                  color: AppColors.accentLight,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Text(
+                  'Step 1 of 3 • Personal Details',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              Text(
+                'Create your account',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 27,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                'Join FindBookStay with 0% broker fee across stays, rentals, and sports turfs.',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Photo Upload Avatar Component
+              Center(
+                child: Stack(
                   children: [
-                    // Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 5.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentLight,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppColors.accent.withValues(alpha: 0.25),
-                        ),
-                      ),
-                      child: Text(
-                        'Step 1 of 2 • Basic Information',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    Text(
-                      'Create your account',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 27,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.6,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Text(
-                      'Join FindBookStay to discover verified rentals, booking stays, and sports turfs with zero broker fee.',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondary,
-                        height: 1.45,
-                      ),
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    // 1. Full Name (Required)
-                    CustomAuthInput(
-                      label: 'Full Name',
-                      hint: 'e.g. John Doe or Sarah Jenkins',
-                      prefixIcon: Icons.person_outline_rounded,
-                      isRequired: true,
-                      controller: _nameController,
-                      errorMessage: _nameError,
-                      onChanged: (_) {
-                        if (_nameError != null) setState(() => _nameError = null);
-                      },
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    // 2. Email Address (Required)
-                    CustomAuthInput(
-                      label: 'Email Address',
-                      hint: 'name@example.com',
-                      prefixIcon: Icons.mail_outline_rounded,
-                      keyboardType: TextInputType.emailAddress,
-                      isRequired: true,
-                      controller: _emailController,
-                      errorMessage: _emailError,
-                      onChanged: (_) {
-                        if (_emailError != null) setState(() => _emailError = null);
-                      },
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    // 3. Phone Number (Optional)
-                    CustomAuthInput(
-                      label: 'Phone Number (Optional)',
-                      hint: '+1 (555) 000-0000 or +880 1712-345678',
-                      prefixIcon: Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                      controller: _phoneController,
-                    ),
-
-                    const Spacer(),
-                    const SizedBox(height: 24),
-
-                    // Step 1 CTA: Next Button
-                    CustomAuthButton(
-                      text: 'Continue to Step 2',
-                      icon: Icons.arrow_forward_rounded,
-                      onPressed: _onStep1Continue,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Sign In Link
-                    Center(
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: RichText(
-                          text: TextSpan(
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 13.5,
-                              color: AppColors.textSecondary,
+                    GestureDetector(
+                      onTap: _showPhotoOptions,
+                      child: Container(
+                        width: 94,
+                        height: 94,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.surface,
+                          border: Border.all(
+                            color: _profilePhoto != null
+                                ? AppColors.primary
+                                : AppColors.border,
+                            width: 2.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                            children: const [
-                              TextSpan(text: 'Already have an account? '),
-                              TextSpan(
-                                text: 'Sign In',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: _profilePhoto != null
+                                ? Image.file(
+                                  File(_profilePhoto!.path),
+                                  fit: BoxFit.cover,
+                                  width: 94,
+                                  height: 94,
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.person_rounded,
+                                      size: 44,
+                                      color: AppColors.textMuted.withValues(alpha: 0.6),
+                                    ),
+                                  ],
                                 ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _showPhotoOptions,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.35),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
                               ),
                             ],
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt_rounded,
+                            size: 16,
+                            color: Colors.white,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
                   ],
                 ),
               ),
-            ),
+
+              const SizedBox(height: 8),
+              Center(
+                child: Text(
+                  _profilePhoto != null ? 'Tap to change photo' : 'Add Profile Photo (Optional)',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Full Name
+              CustomAuthInput(
+                label: 'Full Name',
+                hint: 'John Doe',
+                prefixIcon: Icons.person_outline_rounded,
+                isRequired: true,
+                controller: _nameController,
+                errorMessage: _nameError,
+                onChanged: (_) {
+                  if (_nameError != null) setState(() => _nameError = null);
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Email Address
+              CustomAuthInput(
+                label: 'Email Address',
+                hint: 'name@example.com',
+                prefixIcon: Icons.mail_outline_rounded,
+                keyboardType: TextInputType.emailAddress,
+                isRequired: true,
+                controller: _emailController,
+                errorMessage: _emailError,
+                onChanged: (_) {
+                  if (_emailError != null) setState(() => _emailError = null);
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Phone Number
+              CustomAuthInput(
+                label: 'Phone Number (Optional)',
+                hint: '+1 234 567 8900',
+                prefixIcon: Icons.phone_outlined,
+                keyboardType: TextInputType.phone,
+                controller: _phoneController,
+              ),
+
+              const SizedBox(height: 28),
+
+              // Continue to Step 2 Button
+              CustomAuthButton(
+                text: 'Continue to Step 2',
+                icon: Icons.arrow_forward_rounded,
+                onPressed: _onStep1Continue,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Sign In Link
+              Center(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13.5,
+                        color: AppColors.textSecondary,
+                      ),
+                      children: const [
+                        TextSpan(text: 'Already have an account? '),
+                        TextSpan(
+                          text: 'Sign In',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         );
       },
@@ -541,294 +873,602 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // STEP 2: Account Security (Password & Terms)
+  // STEP 2: Addresses & Referral (Present, Permanent, Referral Code)
   // ---------------------------------------------------------------------------
-  Widget _buildStep2Security() {
+  Widget _buildStep2AddressAndReferral() {
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+                decoration: BoxDecoration(
+                  color: AppColors.accentLight,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Text(
+                  'Step 2 of 3 • Addresses & Referral',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              Text(
+                'Where are you located?',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 27,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                'Add your present and permanent address details to streamline your stay and booking verifications.',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // ---------------------------------------------------------------
+              // Present Address
+              // ---------------------------------------------------------------
+              Row(
+                children: [
+                  const Icon(Icons.location_on_rounded, size: 20, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Present Address',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              CustomAuthInput(
+                label: 'Street Address',
+                hint: '123 Main St, Apt 4B',
+                prefixIcon: Icons.home_outlined,
+                controller: _presentStreetController,
+              ),
+
+              const SizedBox(height: 14),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomAuthInput(
+                      label: 'City',
+                      hint: 'City',
+                      prefixIcon: Icons.location_city_outlined,
+                      controller: _presentCityController,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomAuthInput(
+                      label: 'State / Region',
+                      hint: 'State',
+                      prefixIcon: Icons.map_outlined,
+                      controller: _presentStateController,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              CustomAuthInput(
+                label: 'Postal / Zip Code',
+                hint: '10001',
+                prefixIcon: Icons.markunread_mailbox_outlined,
+                controller: _presentZipController,
+              ),
+
+              const SizedBox(height: 24),
+
+              // ---------------------------------------------------------------
+              // Permanent Address Toggle ("Same as Present")
+              // ---------------------------------------------------------------
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
                   children: [
-                    // Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 5.0,
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Checkbox(
+                        value: _sameAsPresent,
+                        activeColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        onChanged: (val) {
+                          setState(() {
+                            _sameAsPresent = val ?? false;
+                          });
+                        },
                       ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentLight,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppColors.accent.withValues(alpha: 0.25),
-                        ),
-                      ),
-                      child: Text(
-                        'Step 2 of 2 • Security & Password',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
-                          letterSpacing: 0.5,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() => _sameAsPresent = !_sameAsPresent);
+                        },
+                        child: Text(
+                          'Permanent address is the same as present',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
 
-                    const SizedBox(height: 14),
+              const SizedBox(height: 18),
 
+              // ---------------------------------------------------------------
+              // Permanent Address Inputs (if not same)
+              // ---------------------------------------------------------------
+              if (!_sameAsPresent) ...[
+                Row(
+                  children: [
+                    const Icon(Icons.home_work_rounded, size: 20, color: AppColors.primary),
+                    const SizedBox(width: 8),
                     Text(
-                      'Secure your account',
+                      'Permanent Address',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 27,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
-                        letterSpacing: -0.6,
                       ),
                     ),
-
-                    const SizedBox(height: 8),
-
-                    Text(
-                      'Set a strong password to protect your bookings, listings, and personal information.',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondary,
-                        height: 1.45,
+                  ],
+                ),
+                const SizedBox(height: 14),
+                CustomAuthInput(
+                  label: 'Permanent Street Address',
+                  hint: 'Village/Road, House No.',
+                  prefixIcon: Icons.home_outlined,
+                  controller: _permanentStreetController,
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomAuthInput(
+                        label: 'Permanent City',
+                        hint: 'City',
+                        prefixIcon: Icons.location_city_outlined,
+                        controller: _permanentCityController,
                       ),
                     ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: CustomAuthInput(
+                        label: 'Permanent State',
+                        hint: 'State / Region',
+                        prefixIcon: Icons.map_outlined,
+                        controller: _permanentStateController,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                CustomAuthInput(
+                  label: 'Permanent Postal / Zip Code',
+                  hint: 'Postal Code',
+                  prefixIcon: Icons.markunread_mailbox_outlined,
+                  controller: _permanentZipController,
+                ),
+                const SizedBox(height: 24),
+              ],
 
-                    const SizedBox(height: 16),
+              // ---------------------------------------------------------------
+              // Optional Referral Code
+              // ---------------------------------------------------------------
+              Row(
+                children: [
+                  const Icon(Icons.card_giftcard_rounded, size: 20, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Referral Code (Optional)',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Have a friend on FindBookStay? Enter their referral code for signup rewards.',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12.5,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 14),
+              CustomAuthInput(
+                label: 'Referral Code',
+                hint: 'e.g. F7GC1YX7',
+                prefixIcon: Icons.confirmation_number_outlined,
+                controller: _referralCodeController,
+              ),
 
-                    // User Identity Summary Card
+              const SizedBox(height: 28),
+
+              // Action Buttons: Back + Continue
+              Row(
+                children: [
+                  OutlinedButton(
+                    onPressed: () => _goToStep(0),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+                      side: const BorderSide(color: AppColors.border),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                    child: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomAuthButton(
+                      text: 'Continue to Step 3',
+                      icon: Icons.arrow_forward_rounded,
+                      onPressed: _onStep2Continue,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // STEP 3: Security & Password (Password, Strength, Confirm, Terms)
+  // ---------------------------------------------------------------------------
+  Widget _buildStep3Security() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+                decoration: BoxDecoration(
+                  color: AppColors.accentLight,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Text(
+                  'Step 3 of 3 • Security & Password',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              Text(
+                'Secure your account',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 27,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                'Set a strong password to protect your bookings, listings, and personal information.',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              // User Identity Summary Card
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.border),
+                        shape: BoxShape.circle,
+                        color: AppColors.accentLight,
+                        border: Border.all(color: AppColors.primary, width: 1.5),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.account_circle_outlined,
-                            size: 22,
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _nameController.text.isNotEmpty
-                                      ? _nameController.text.trim()
-                                      : 'Account Holder',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                Text(
-                                  _emailController.text.isNotEmpty
-                                      ? _emailController.text.trim()
-                                      : 'email@example.com',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => _goToStep(0),
-                            style: TextButton.styleFrom(
-                              visualDensity: VisualDensity.compact,
-                              foregroundColor: AppColors.primary,
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            child: const Text('Edit'),
-                          ),
-                        ],
+                      child: ClipOval(
+                        child: _profilePhoto != null
+                            ? Image.file(
+                                File(_profilePhoto!.path),
+                                fit: BoxFit.cover,
+                                width: 44,
+                                height: 44,
+                              )
+                            : const Icon(
+                                Icons.person_rounded,
+                                size: 24,
+                                color: AppColors.primary,
+                              ),
                       ),
                     ),
-
-                    const SizedBox(height: 20),
-
-                    // Password Input
-                    CustomAuthInput(
-                      label: 'Password',
-                      hint: 'Create password (min. 8 chars, 1 number)',
-                      prefixIcon: Icons.lock_outline_rounded,
-                      isPassword: true,
-                      isRequired: true,
-                      controller: _passwordController,
-                      errorMessage: _passwordError,
-                      onChanged: (_) {
-                        setState(() {
-                          if (_passwordError != null) _passwordError = null;
-                        });
-                      },
-                    ),
-
-                    // Real-time password strength meter
-                    PasswordStrengthMeter(password: _passwordController.text),
-
-                    const SizedBox(height: 16),
-
-                    // Confirm Password Input
-                    CustomAuthInput(
-                      label: 'Confirm Password',
-                      hint: 'Re-enter your password',
-                      prefixIcon: Icons.lock_reset_rounded,
-                      isPassword: true,
-                      isRequired: true,
-                      controller: _confirmPasswordController,
-                      errorMessage: _confirmPasswordError,
-                      onChanged: (_) {
-                        if (_confirmPasswordError != null) {
-                          setState(() => _confirmPasswordError = null);
-                        }
-                      },
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Terms & Policy Checkbox
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _termsAccepted = !_termsAccepted;
-                          if (_termsAccepted) _termsError = null;
-                        });
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: Row(
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: Checkbox(
-                              value: _termsAccepted,
-                              activeColor: AppColors.primary,
-                              checkColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              side: BorderSide(
-                                color: _termsError != null
-                                    ? AppColors.error
-                                    : AppColors.border,
-                                width: 1.5,
-                              ),
-                              onChanged: (val) {
-                                setState(() {
-                                  _termsAccepted = val ?? false;
-                                  if (_termsAccepted) _termsError = null;
-                                });
-                              },
+                          Text(
+                            _nameController.text.isNotEmpty
+                                ? _nameController.text.trim()
+                                : 'Account Holder',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 13,
-                                  color: _termsError != null
-                                      ? AppColors.error
-                                      : AppColors.textSecondary,
-                                  height: 1.4,
-                                ),
-                                children: [
-                                  const TextSpan(text: 'I accept the '),
-                                  TextSpan(
-                                    text: 'Terms of Service',
-                                    recognizer: _termsRecognizer,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primary,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: AppColors.primary,
-                                    ),
-                                  ),
-                                  const TextSpan(text: ' and acknowledge the '),
-                                  TextSpan(
-                                    text: 'Privacy Policy',
-                                    recognizer: _privacyRecognizer,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primary,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: AppColors.primary,
-                                    ),
-                                  ),
-                                  const TextSpan(text: '.'),
-                                ],
-                              ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _emailController.text.isNotEmpty
+                                ? _emailController.text.trim()
+                                : 'email@example.com',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
                             ),
                           ),
+                          if (_presentCityController.text.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              _presentCityController.text.trim(),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11.5,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
+                    TextButton(
+                      onPressed: () => _goToStep(0),
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                      ),
+                      child: const Text('Edit'),
+                    ),
+                  ],
+                ),
+              ),
 
-                    if (_termsError != null) ...[
-                      const SizedBox(height: 6),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 34.0),
-                        child: Text(
-                          _termsError!,
+              const SizedBox(height: 22),
+
+              // Password Input
+              CustomAuthInput(
+                label: 'Password',
+                hint: '••••••••',
+                prefixIcon: Icons.lock_outline_rounded,
+                isPassword: true,
+                isRequired: true,
+                controller: _passwordController,
+                errorMessage: _passwordError,
+                onChanged: (_) {
+                  setState(() {
+                    if (_passwordError != null) _passwordError = null;
+                  });
+                },
+              ),
+
+              // Real-time password strength meter
+              PasswordStrengthMeter(password: _passwordController.text),
+
+              const SizedBox(height: 16),
+
+              // Confirm Password Input
+              CustomAuthInput(
+                label: 'Confirm Password',
+                hint: '••••••••',
+                prefixIcon: Icons.lock_reset_rounded,
+                isPassword: true,
+                isRequired: true,
+                controller: _confirmPasswordController,
+                errorMessage: _confirmPasswordError,
+                onChanged: (_) {
+                  if (_confirmPasswordError != null) {
+                    setState(() => _confirmPasswordError = null);
+                  }
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // Terms & Policy Checkbox
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _termsAccepted = !_termsAccepted;
+                    if (_termsAccepted) _termsError = null;
+                  });
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Checkbox(
+                        value: _termsAccepted,
+                        activeColor: AppColors.primary,
+                        checkColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        side: BorderSide(
+                          color: _termsError != null
+                              ? AppColors.error
+                              : AppColors.border,
+                          width: 1.5,
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            _termsAccepted = val ?? false;
+                            if (_termsAccepted) _termsError = null;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
                           style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.error,
+                            fontSize: 13,
+                            color: _termsError != null
+                                ? AppColors.error
+                                : AppColors.textSecondary,
+                            height: 1.4,
                           ),
+                          children: [
+                            const TextSpan(text: 'I accept the '),
+                            TextSpan(
+                              text: 'Terms of Service',
+                              recognizer: _termsRecognizer,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                                decoration: TextDecoration.underline,
+                                decorationColor: AppColors.primary,
+                              ),
+                            ),
+                            const TextSpan(text: ' and acknowledge the '),
+                            TextSpan(
+                              text: 'Privacy Policy',
+                              recognizer: _privacyRecognizer,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                                decoration: TextDecoration.underline,
+                                decorationColor: AppColors.primary,
+                              ),
+                            ),
+                            const TextSpan(text: '.'),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
 
-                    const Spacer(),
-                    const SizedBox(height: 24),
+              if (_termsError != null) ...[
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 34.0),
+                  child: Text(
+                    _termsError!,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.error,
+                    ),
+                  ),
+                ),
+              ],
 
-                    // Submit CTA Button
-                    CustomAuthButton(
+              const SizedBox(height: 28),
+
+              // Action Buttons: Back + Submit
+              Row(
+                children: [
+                  OutlinedButton(
+                    onPressed: () => _goToStep(1),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+                      side: const BorderSide(color: AppColors.border),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                    child: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomAuthButton(
                       text: 'Create Account',
                       icon: Icons.check_circle_outline_rounded,
                       isLoading: _isLoading,
                       onPressed: _validateAndSubmit,
                     ),
-
-                    const SizedBox(height: 12),
-
-                    // Back to Step 1 Button
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: () => _goToStep(0),
-                        icon: const Icon(Icons.arrow_back_rounded, size: 16),
-                        label: const Text('Back to Personal Info'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.textSecondary,
-                          textStyle: GoogleFonts.plusJakartaSans(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
+              const SizedBox(height: 16),
+            ],
           ),
         );
       },
@@ -915,71 +1555,38 @@ class _LegalModalSheet extends StatelessWidget {
                   ],
                 ),
               ),
-              Divider(
-                height: 1,
-                color: AppColors.border,
-                indent: 24,
-                endIndent: 24,
-              ),
+              const Divider(height: 1, color: AppColors.border),
               Expanded(
                 child: ListView.separated(
                   controller: scrollController,
-                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
+                  padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
                   itemCount: sections.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 20),
-                  itemBuilder: (_, index) {
-                    final section = sections[index];
+                  separatorBuilder: (_, __) => const SizedBox(height: 18),
+                  itemBuilder: (ctx, i) {
+                    final item = sections[i];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          section['heading']!,
+                          item.title,
                           style: GoogleFonts.plusJakartaSans(
-                            fontSize: 14,
+                            fontSize: 14.5,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          section['body']!,
+                          item.body,
                           style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w400,
+                            fontSize: 13,
                             color: AppColors.textSecondary,
-                            height: 1.6,
+                            height: 1.5,
                           ),
                         ),
                       ],
                     );
                   },
-                ),
-              ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 54,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Got it',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ],
@@ -988,80 +1595,45 @@ class _LegalModalSheet extends StatelessWidget {
       },
     );
   }
-
-  static const List<Map<String, String>> _termsSections = [
-    {
-      'heading': '1. Acceptance of Terms',
-      'body':
-          'By registering for or using FindBookStay, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our platform.',
-    },
-    {
-      'heading': '2. Use of the Platform',
-      'body':
-          'FindBookStay provides a marketplace connecting tenants, guests, players, landlords, hosts, and turf owners. Users are responsible for ensuring all information they provide is accurate and up to date.',
-    },
-    {
-      'heading': '3. User Accounts',
-      'body':
-          'You must create an account to access most features. You are responsible for maintaining the confidentiality of your credentials and for all activities that occur under your account.',
-    },
-    {
-      'heading': '4. Listings & Bookings',
-      'body':
-          'Hosts and landlords are solely responsible for the accuracy of their listings. FindBookStay does not guarantee the availability, quality, safety, or legality of any listed property or turf.',
-    },
-    {
-      'heading': '5. Fees & Payments',
-      'body':
-          'FindBookStay charges zero broker fees. Payment terms between hosts and guests are subject to individual listing conditions. All transactions are processed securely.',
-    },
-    {
-      'heading': '6. Prohibited Conduct',
-      'body':
-          'Users may not post false listings, engage in fraudulent activity, harass other users, or use the platform for any unlawful purpose.',
-    },
-    {
-      'heading': '7. Changes to Terms',
-      'body':
-          'We reserve the right to modify these terms at any time. Continued use of the platform after changes constitutes acceptance of the revised terms.',
-    },
-  ];
-
-  static const List<Map<String, String>> _privacySections = [
-    {
-      'heading': '1. Information We Collect',
-      'body':
-          'We collect information you provide directly (name, email, phone), usage data, and device information to deliver and improve our services.',
-    },
-    {
-      'heading': '2. How We Use Your Information',
-      'body':
-          'Your data is used to operate the platform, process bookings, send confirmation notifications, and personalise your experience. We do not sell your personal data to third parties.',
-    },
-    {
-      'heading': '3. Data Sharing',
-      'body':
-          'We may share necessary information with hosts, landlords, or turf owners to facilitate bookings. We may also share data with service providers who help us operate FindBookStay under strict confidentiality agreements.',
-    },
-    {
-      'heading': '4. Data Security',
-      'body':
-          'We implement industry-standard security measures including encryption in transit and at rest to protect your personal information.',
-    },
-    {
-      'heading': '5. Cookies & Analytics',
-      'body':
-          'We use cookies and analytics tools to understand how users interact with our platform, enabling us to improve features and performance.',
-    },
-    {
-      'heading': '6. Your Rights',
-      'body':
-          'You have the right to access, correct, or delete your personal data at any time by contacting us at privacy@findbookstay.com.',
-    },
-    {
-      'heading': '7. Contact Us',
-      'body':
-          'For any privacy-related questions or requests, please reach out to our Data Protection team at privacy@findbookstay.com.',
-    },
-  ];
 }
+
+class _LegalSection {
+  final String title;
+  final String body;
+
+  const _LegalSection(this.title, this.body);
+}
+
+const List<_LegalSection> _termsSections = [
+  _LegalSection(
+    '1. Agreement to Terms',
+    'By registering for, accessing, or using the FindBookStay platform, you agree to be bound by these Terms of Service. If you do not agree with any part, please refrain from creating an account.',
+  ),
+  _LegalSection(
+    '2. 0% Broker Fee Policy',
+    'FindBookStay operates on a strictly zero-percent broker commission model for standard rentals, stays, and sports turfs. Any attempt by hosts or users to solicit offline broker commissions violates our Community Standards.',
+  ),
+  _LegalSection(
+    '3. Account Accuracy',
+    'You represent and warrant that the name, email, phone number, and address provided are accurate and belong to you. Providing fraudulent or stolen credentials will lead to immediate suspension.',
+  ),
+  _LegalSection(
+    '4. Booking & Cancellation Policies',
+    'Bookings made on FindBookStay are subject to the specific cancellation window defined on the property or turf listing at checkout time.',
+  ),
+];
+
+const List<_LegalSection> _privacySections = [
+  _LegalSection(
+    '1. Information We Collect',
+    'We collect details you provide during registration including full name, email address, phone number, physical address details, and profile photos to facilitate seamless booking experiences.',
+  ),
+  _LegalSection(
+    '2. How We Protect Your Data',
+    'Passwords and sensitive security credentials are encrypted using industry-standard hashing before storage. We will never sell your personal information to third parties.',
+  ),
+  _LegalSection(
+    '3. Location & Address Usage',
+    'Your address details are utilized exclusively to match nearby verified properties, turfs, and stays, and to verify account authenticity.',
+  ),
+];

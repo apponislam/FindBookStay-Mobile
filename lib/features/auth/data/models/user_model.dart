@@ -1,11 +1,17 @@
-/// Strongly typed immutable domain model for a registered or guest user.
+import 'register_request.dart';
+
+/// Strongly typed immutable domain model for a registered or guest user,
+/// matching FindBookStay-Backend schema exactly.
 class UserModel {
   final String id;
   final String name;
   final String email;
   final String role;
   final String? phone;
+  final String? profileImage;
   final String? avatarUrl;
+  final AddressModel? presentAddress;
+  final AddressModel? permanentAddress;
   final bool isEmailVerified;
   final DateTime? createdAt;
 
@@ -15,7 +21,10 @@ class UserModel {
     required this.email,
     required this.role,
     this.phone,
+    this.profileImage,
     this.avatarUrl,
+    this.presentAddress,
+    this.permanentAddress,
     this.isEmailVerified = false,
     this.createdAt,
   });
@@ -25,7 +34,7 @@ class UserModel {
     id: 'usr_default_01',
     name: 'Alex Tan',
     email: 'alex.tan@example.com',
-    role: 'Tenant & Player',
+    role: 'USER',
     phone: '+880 1712-345678',
     isEmailVerified: true,
   );
@@ -42,13 +51,24 @@ class UserModel {
   bool get isGuest => id == 'usr_guest' || email.isEmpty;
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    final image = json['profileImage'] as String? ??
+        json['avatarUrl'] as String? ??
+        json['avatar'] as String?;
+
     return UserModel(
       id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
       name: json['name'] as String? ?? 'User',
       email: json['email'] as String? ?? '',
-      role: json['role'] as String? ?? 'Tenant & Player',
+      role: json['role'] as String? ?? 'USER',
       phone: json['phone'] as String?,
-      avatarUrl: json['avatarUrl'] as String? ?? json['avatar'] as String?,
+      profileImage: image,
+      avatarUrl: image,
+      presentAddress: json['presentAddress'] is Map<String, dynamic>
+          ? AddressModel.fromJson(json['presentAddress'] as Map<String, dynamic>)
+          : null,
+      permanentAddress: json['permanentAddress'] is Map<String, dynamic>
+          ? AddressModel.fromJson(json['permanentAddress'] as Map<String, dynamic>)
+          : null,
       isEmailVerified: json['isEmailVerified'] as bool? ?? false,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
@@ -62,8 +82,13 @@ class UserModel {
       'name': name,
       'email': email,
       'role': role,
-      'phone': phone,
-      'avatarUrl': avatarUrl,
+      if (phone != null) 'phone': phone,
+      if (profileImage != null) 'profileImage': profileImage,
+      if (avatarUrl != null) 'avatarUrl': avatarUrl,
+      if (presentAddress != null && !presentAddress!.isEmpty)
+        'presentAddress': presentAddress!.toJson(),
+      if (permanentAddress != null && !permanentAddress!.isEmpty)
+        'permanentAddress': permanentAddress!.toJson(),
       'isEmailVerified': isEmailVerified,
       'createdAt': createdAt?.toIso8601String(),
     };
@@ -75,7 +100,10 @@ class UserModel {
     String? email,
     String? role,
     String? phone,
+    String? profileImage,
     String? avatarUrl,
+    AddressModel? presentAddress,
+    AddressModel? permanentAddress,
     bool? isEmailVerified,
     DateTime? createdAt,
   }) {
@@ -85,7 +113,10 @@ class UserModel {
       email: email ?? this.email,
       role: role ?? this.role,
       phone: phone ?? this.phone,
+      profileImage: profileImage ?? this.profileImage,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      presentAddress: presentAddress ?? this.presentAddress,
+      permanentAddress: permanentAddress ?? this.permanentAddress,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
       createdAt: createdAt ?? this.createdAt,
     );

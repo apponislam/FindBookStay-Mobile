@@ -9,7 +9,7 @@ import '../../../core/theme/app_colors.dart';
 /// animated password visibility toggle, and an upper-side custom error badge with a downward triangle pointer.
 class CustomAuthInput extends StatefulWidget {
   final String label;
-  final String hint;
+  final String? hint;
   final IconData prefixIcon;
   final TextEditingController? controller;
   final bool isPassword;
@@ -24,7 +24,7 @@ class CustomAuthInput extends StatefulWidget {
   const CustomAuthInput({
     super.key,
     required this.label,
-    required this.hint,
+    this.hint,
     required this.prefixIcon,
     this.controller,
     this.isPassword = false,

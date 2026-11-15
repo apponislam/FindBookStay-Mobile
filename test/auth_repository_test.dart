@@ -38,7 +38,10 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
         id: 'usr_002',
         name: request.name,
         email: request.email,
-        role: request.role ?? 'Tenant & Player',
+        role: request.role,
+        phone: request.phone,
+        profileImage: request.profileImage,
+        presentAddress: request.presentAddress,
       ),
       tokens: const AuthTokensModel(
         accessToken: 'mock_reg_access_jwt',
@@ -212,6 +215,31 @@ void main() {
 
       expect(user.name, equals('John Doe'));
       expect(user.role, equals('Host & Turf Owner'));
+      expect(await repository.isAuthenticated(), isTrue);
+    });
+
+    test('Successful register with address and profileImage persists profile', () async {
+      const address = AddressModel(
+        street: '456 Green Road',
+        city: 'Sylhet',
+        state: 'Sylhet',
+        zipCode: '3100',
+      );
+
+      final user = await repository.register(
+        name: 'Sarah Connor',
+        email: 'sarah.c@example.com',
+        password: 'securePass123',
+        phone: '+8801712345678',
+        role: 'USER',
+        profileImage: 'data:image/jpeg;base64,...',
+        presentAddress: address,
+      );
+
+      expect(user.name, equals('Sarah Connor'));
+      expect(user.role, equals('USER'));
+      expect(user.presentAddress?.city, equals('Sylhet'));
+      expect(user.profileImage, isNotNull);
       expect(await repository.isAuthenticated(), isTrue);
     });
 

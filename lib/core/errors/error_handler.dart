@@ -102,6 +102,15 @@ class ErrorHandler {
 
     if (data is Map<String, dynamic>) {
       serverMessage = data['message'] as String? ?? data['error'] as String?;
+      if ((serverMessage == null || serverMessage.isEmpty) && data['errorSources'] is List) {
+        final list = data['errorSources'] as List;
+        if (list.isNotEmpty) {
+          final first = list.first;
+          if (first is Map && first['message'] != null) {
+            serverMessage = first['message'].toString();
+          }
+        }
+      }
       if (data['errors'] is Map<String, dynamic>) {
         errors = data['errors'] as Map<String, dynamic>;
       }
@@ -170,7 +179,9 @@ class ErrorHandler {
       case 504:
         return ServerException(
           message: serverMessage ?? 'Server error ($statusCode)',
-          userMessage: 'Our servers are experiencing issues. Please try again in a few moments.',
+          userMessage:
+              serverMessage ??
+              'Server error ($statusCode). Please try again in a few moments.',
           statusCode: statusCode,
         );
 

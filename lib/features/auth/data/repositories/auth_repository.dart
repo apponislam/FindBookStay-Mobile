@@ -18,6 +18,10 @@ abstract class AuthRepository {
     required String password,
     String? phone,
     String? role,
+    String? profileImage,
+    AddressModel? presentAddress,
+    AddressModel? permanentAddress,
+    String? referredBy,
   });
 
   Future<void> logout();
@@ -88,6 +92,10 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     String? phone,
     String? role,
+    String? profileImage,
+    AddressModel? presentAddress,
+    AddressModel? permanentAddress,
+    String? referredBy,
   }) async {
     try {
       final authResponse = await remoteDataSource.register(
@@ -96,7 +104,11 @@ class AuthRepositoryImpl implements AuthRepository {
           email: email,
           password: password,
           phone: phone,
-          role: role,
+          role: role ?? 'USER',
+          profileImage: profileImage,
+          presentAddress: presentAddress,
+          permanentAddress: permanentAddress,
+          referredBy: referredBy,
         ),
       );
 

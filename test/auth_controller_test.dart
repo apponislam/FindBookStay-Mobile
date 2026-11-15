@@ -1,4 +1,5 @@
 import 'package:findbookstay/core/errors/app_exception.dart';
+import 'package:findbookstay/features/auth/data/models/register_request.dart';
 import 'package:findbookstay/features/auth/data/models/user_model.dart';
 import 'package:findbookstay/features/auth/data/repositories/auth_repository.dart';
 import 'package:findbookstay/features/auth/domain/auth_state.dart';
@@ -40,14 +41,20 @@ class MockTestAuthRepository implements AuthRepository {
     required String password,
     String? phone,
     String? role,
+    String? profileImage,
+    AddressModel? presentAddress,
+    AddressModel? permanentAddress,
+    String? referredBy,
   }) async {
     isAuthed = true;
     cachedUser = UserModel(
       id: 'usr_test_200',
       name: name,
       email: email,
-      role: role ?? 'Tenant & Player',
+      role: role ?? 'USER',
       phone: phone,
+      profileImage: profileImage,
+      presentAddress: presentAddress,
     );
     return cachedUser!;
   }
@@ -135,6 +142,44 @@ void main() {
         expect(state.user?.email, equals('alex@findbookstay.com'));
         expect(container.read(isAuthenticatedProvider), isTrue);
         expect(container.read(currentUserProvider)?.name, equals('Alex Tan'));
+      },
+    );
+
+    test(
+      'Successful register transitions to Authenticated with full backend payload',
+      () async {
+        final mockRepo = MockTestAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
+        );
+        addTearDown(container.dispose);
+
+        final notifier = container.read(authControllerProvider.notifier);
+        const address = AddressModel(
+          street: '123 Main St',
+          city: 'Dhaka',
+          state: 'Dhaka',
+          zipCode: '1205',
+        );
+
+        final success = await notifier.register(
+          name: 'Jane Doe',
+          email: 'jane@findbookstay.com',
+          password: 'password123',
+          phone: '+1 555-0100',
+          role: 'USER',
+          profileImage: 'data:image/jpeg;base64,...',
+          presentAddress: address,
+        );
+
+        expect(success, isTrue);
+
+        final state = container.read(authControllerProvider);
+        expect(state.status, equals(AuthStatus.authenticated));
+        expect(state.user?.email, equals('jane@findbookstay.com'));
+        expect(state.user?.role, equals('USER'));
+        expect(state.user?.presentAddress?.city, equals('Dhaka'));
+        expect(container.read(isAuthenticatedProvider), isTrue);
       },
     );
 

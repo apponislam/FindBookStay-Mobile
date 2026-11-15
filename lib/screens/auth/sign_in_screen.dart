@@ -172,7 +172,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         // Email Input (Required)
                         CustomAuthInput(
                           label: 'Email Address',
-                          hint: 'Enter your email address',
+                          hint: 'name@example.com',
                           prefixIcon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
                           isRequired: true,
@@ -188,7 +188,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         // Password Input (Required)
                         CustomAuthInput(
                           label: 'Password',
-                          hint: 'Enter your password',
+                          hint: '••••••••',
                           prefixIcon: Icons.lock_outline_rounded,
                           isPassword: true,
                           isRequired: true,

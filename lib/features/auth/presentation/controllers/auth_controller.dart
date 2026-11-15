@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/services/auth_service.dart';
+import '../../data/models/register_request.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../domain/auth_state.dart';
@@ -70,13 +71,17 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
-  /// User registration
+  /// User registration matching FindBookStay-Backend
   Future<bool> register({
     required String name,
     required String email,
     required String password,
     String? phone,
     String? role,
+    String? profileImage,
+    AddressModel? presentAddress,
+    AddressModel? permanentAddress,
+    String? referredBy,
   }) async {
     state = AuthState.loading(state.user);
     try {
@@ -86,6 +91,10 @@ class AuthController extends Notifier<AuthState> {
         password: password,
         phone: phone,
         role: role,
+        profileImage: profileImage,
+        presentAddress: presentAddress,
+        permanentAddress: permanentAddress,
+        referredBy: referredBy,
       );
 
       if (!ref.mounted) return true;

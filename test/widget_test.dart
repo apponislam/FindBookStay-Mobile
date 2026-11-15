@@ -103,7 +103,7 @@ void main() {
     expect(find.text('Continue to Step 2'), findsOneWidget);
   });
 
-  testWidgets('Register Form validates required fields across 2 steps', (
+  testWidgets('Register Form validates required fields across 3 steps', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(1080, 2400);
@@ -136,7 +136,15 @@ void main() {
     await tester.tap(find.text('Continue to Step 2'));
     await tester.pumpAndSettle();
 
-    // Verify transitioned to Step 2 (Security)
+    // Verify transitioned to Step 2 (Addresses & Referral)
+    expect(find.text('Where are you located?'), findsOneWidget);
+    expect(find.text('Continue to Step 3'), findsOneWidget);
+
+    // Tap Continue to Step 3
+    await tester.tap(find.text('Continue to Step 3'));
+    await tester.pumpAndSettle();
+
+    // Verify transitioned to Step 3 (Security)
     expect(find.text('Secure your account'), findsOneWidget);
     expect(find.text('Create Account'), findsOneWidget);
 
@@ -144,7 +152,7 @@ void main() {
     await tester.tap(find.text('Create Account'));
     await tester.pumpAndSettle();
 
-    // Verify Step 2 error badges appear
+    // Verify Step 3 error badges appear
     expect(find.text('Password is required'), findsOneWidget);
     expect(find.text('Please accept the Terms to continue'), findsOneWidget);
   });
