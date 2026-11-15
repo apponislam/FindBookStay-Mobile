@@ -1,8 +1,8 @@
-import 'package:findbookstay_mobile/core/errors/app_exception.dart';
-import 'package:findbookstay_mobile/features/auth/data/models/user_model.dart';
-import 'package:findbookstay_mobile/features/auth/data/repositories/auth_repository.dart';
-import 'package:findbookstay_mobile/features/auth/domain/auth_state.dart';
-import 'package:findbookstay_mobile/features/auth/presentation/providers/auth_providers.dart';
+import 'package:findbookstay/core/errors/app_exception.dart';
+import 'package:findbookstay/features/auth/data/models/user_model.dart';
+import 'package:findbookstay/features/auth/data/repositories/auth_repository.dart';
+import 'package:findbookstay/features/auth/domain/auth_state.dart';
+import 'package:findbookstay/features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';

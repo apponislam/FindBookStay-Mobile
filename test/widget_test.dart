@@ -3,16 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:findbookstay_mobile/main.dart';
-import 'package:findbookstay_mobile/screens/splash/splash_screen.dart';
-import 'package:findbookstay_mobile/screens/onboarding/onboarding_screen.dart';
-import 'package:findbookstay_mobile/screens/auth/register_role_screen.dart';
-import 'package:findbookstay_mobile/screens/auth/register_form_screen.dart';
-import 'package:findbookstay_mobile/screens/auth/forgot_password_screen.dart';
-import 'package:findbookstay_mobile/screens/auth/otp_verification_screen.dart';
-import 'package:findbookstay_mobile/screens/auth/reset_password_screen.dart';
-import 'package:findbookstay_mobile/screens/home/home_screen.dart';
-import 'package:findbookstay_mobile/core/services/auth_service.dart';
+import 'package:findbookstay/main.dart';
+import 'package:findbookstay/screens/splash/splash_screen.dart';
+import 'package:findbookstay/screens/onboarding/onboarding_screen.dart';
+import 'package:findbookstay/screens/auth/register_role_screen.dart';
+import 'package:findbookstay/screens/auth/register_form_screen.dart';
+import 'package:findbookstay/screens/auth/forgot_password_screen.dart';
+import 'package:findbookstay/screens/auth/otp_verification_screen.dart';
+import 'package:findbookstay/screens/auth/reset_password_screen.dart';
+import 'package:findbookstay/screens/home/home_screen.dart';
+import 'package:findbookstay/core/services/auth_service.dart';
 
 void main() {
   setUp(() {

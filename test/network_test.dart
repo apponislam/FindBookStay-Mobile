@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:findbookstay_mobile/core/errors/app_exception.dart';
-import 'package:findbookstay_mobile/core/errors/error_handler.dart';
-import 'package:findbookstay_mobile/core/network/api_response.dart';
+import 'package:findbookstay/core/errors/app_exception.dart';
+import 'package:findbookstay/core/errors/error_handler.dart';
+import 'package:findbookstay/core/network/api_response.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

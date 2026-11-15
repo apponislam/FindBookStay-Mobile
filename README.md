@@ -176,8 +176,8 @@ lib/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/findbookstay_mobile.git
-cd findbookstay_mobile
+git clone https://github.com/your-org/findbookstay.git
+cd findbookstay
 
 # Copy environment variables template
 cp .env.example .env
