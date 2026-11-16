@@ -17,6 +17,7 @@ abstract class ApiEndpoints {
   static const String authResendVerification = '$apiVersion/auth/resend-verification';
   static const String authResetPassword = '$apiVersion/auth/reset-password';
   static const String authUpdateProfile = '$apiVersion/auth/profile';
+  static const String authFcmToken = '$apiVersion/auth/fcm-token';
 
   // Properties & Stays
   static const String properties = '$apiVersion/properties';

@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/services/auth_service.dart';
+import '../../../../services/notification_service.dart';
 import '../../data/models/register_request.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
@@ -31,6 +33,13 @@ class AuthController extends Notifier<AuthState> {
         if (cachedUser != null) {
           state = AuthState.authenticated(cachedUser);
           _syncWithAuthService(cachedUser, isLoggedIn: true);
+
+          // Synchronize FCM token in background if user is returning
+          NotificationService.instance.getFcmToken().then((token) {
+            if (token != null && token.isNotEmpty) {
+              _authRepository.registerFcmToken(token).catchError((_) {});
+            }
+          }).catchError((_) {});
           return;
         }
       }
@@ -44,21 +53,40 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
-  /// User login with email and password
+  /// User login with email and password, sending FCM token to backend
   Future<bool> login({
     required String email,
     required String password,
   }) async {
     state = AuthState.loading(state.user);
     try {
+      // 1. Fetch current FCM token
+      String? fcmToken;
+      try {
+        fcmToken = await NotificationService.instance.getFcmToken();
+        debugPrint('🔔 [FCM] Device token captured for login: $fcmToken');
+      } catch (e) {
+        debugPrint('⚠️ [FCM] Token retrieval before login notice: $e');
+      }
+
+      // 2. Authenticate user with credentials and optional fcmToken
       final user = await _authRepository.login(
         email: email,
         password: password,
+        fcmToken: fcmToken,
       );
 
       if (!ref.mounted) return true;
       state = AuthState.authenticated(user);
       _syncWithAuthService(user, isLoggedIn: true);
+
+      // 3. Ensure token is registered on the dedicated endpoint as well
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        _authRepository.registerFcmToken(fcmToken).catchError((e) {
+          debugPrint('⚠️ [FCM] Secondary token registration notice: $e');
+        });
+      }
+
       return true;
     } on AppException catch (e) {
       if (!ref.mounted) return false;
@@ -112,11 +140,15 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
-  /// Sign out
+  /// Sign out, cleaning up device token on backend
   Future<void> logout() async {
     state = AuthState.loading(state.user);
     try {
-      await _authRepository.logout();
+      final fcmToken = NotificationService.instance.fcmToken;
+      await _authRepository.logout(fcmToken: fcmToken);
+      try {
+        await NotificationService.instance.deleteToken();
+      } catch (_) {}
     } finally {
       if (ref.mounted) {
         state = AuthState.unauthenticated();

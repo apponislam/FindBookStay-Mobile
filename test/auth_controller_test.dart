@@ -17,6 +17,7 @@ class MockTestAuthRepository implements AuthRepository {
   Future<UserModel> login({
     required String email,
     required String password,
+    String? fcmToken,
   }) async {
     if (throwErrorOnLogin) {
       throw const UnauthorizedException(
@@ -60,10 +61,16 @@ class MockTestAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> logout() async {
+  Future<void> logout({String? fcmToken}) async {
     isAuthed = false;
     cachedUser = null;
   }
+
+  @override
+  Future<void> registerFcmToken(String fcmToken) async {}
+
+  @override
+  Future<void> removeFcmToken(String fcmToken) async {}
 
   @override
   Future<UserModel?> getCachedUser() async => cachedUser;

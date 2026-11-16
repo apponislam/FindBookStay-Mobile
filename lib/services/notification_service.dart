@@ -57,17 +57,27 @@ class NotificationService {
         sound: true,
       );
 
-      // 4. Listen for device registration and token updates
-      _messaging.onRegistered.listen((String token) {
-        _fcmToken = token;
-        debugPrint('🔔 [FCM TOKEN REGISTERED/UPDATED]: $token');
-      });
+      // 4. Listen for token refresh and registration events
+      try {
+        _messaging.onTokenRefresh.listen((String token) {
+          _fcmToken = token;
+          debugPrint('🔔 [FCM TOKEN REFRESHED]: $token');
+        });
+      } catch (_) {}
 
-      // 5. Listen for unregistration events
-      _messaging.onUnregistered.listen((String token) {
-        _fcmToken = null;
-        debugPrint('🔔 [FCM TOKEN UNREGISTERED]: $token');
-      });
+      try {
+        _messaging.onRegistered.listen((String token) {
+          _fcmToken = token;
+          debugPrint('🔔 [FCM TOKEN REGISTERED/UPDATED]: $token');
+        });
+      } catch (_) {}
+
+      try {
+        _messaging.onUnregistered.listen((String token) {
+          _fcmToken = null;
+          debugPrint('🔔 [FCM TOKEN UNREGISTERED]: $token');
+        });
+      } catch (_) {}
 
       // 6. Register device and print token
       await getFcmToken();
@@ -123,21 +133,31 @@ class NotificationService {
         return _fcmToken;
       }
 
-      final Future<String> tokenFuture = _messaging.onRegistered.first;
-      await _messaging.register();
+      // 1. Primary method: official getToken()
+      try {
+        _fcmToken = await _messaging.getToken();
+      } catch (e) {
+        debugPrint('⚠️ [FCM] _messaging.getToken() notice: $e');
+      }
 
-      _fcmToken = await tokenFuture.timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => '',
-      );
+      // 2. Secondary fallback
+      if (_fcmToken == null || _fcmToken!.isEmpty) {
+        try {
+          final Future<String> tokenFuture = _messaging.onRegistered.first;
+          await _messaging.register();
+          _fcmToken = await tokenFuture.timeout(
+            const Duration(seconds: 4),
+            onTimeout: () => '',
+          );
+        } catch (_) {}
+      }
 
       if (_fcmToken != null && _fcmToken!.isEmpty) {
         _fcmToken = null;
       }
 
       debugPrint('==================================================');
-      debugPrint('🔔 [FCM DEVICE TOKEN]:');
-      debugPrint('$_fcmToken');
+      debugPrint('🔔 [FCM DEVICE TOKEN]: $_fcmToken');
       debugPrint('==================================================');
       return _fcmToken;
     } catch (e) {
@@ -149,7 +169,12 @@ class NotificationService {
   /// Unregisters the current app instance from Firebase Cloud Messaging.
   Future<void> unregisterDevice() async {
     try {
-      await _messaging.unregister();
+      try {
+        await _messaging.deleteToken();
+      } catch (_) {}
+      try {
+        await _messaging.unregister();
+      } catch (_) {}
       _fcmToken = null;
       debugPrint('🔔 [FCM] Device unregistered and token removed.');
     } catch (e) {

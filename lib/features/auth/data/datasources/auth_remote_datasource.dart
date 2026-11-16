@@ -11,7 +11,9 @@ abstract class AuthRemoteDataSource {
   Future<AuthResponseModel> login(LoginRequest request);
   Future<AuthResponseModel> register(RegisterRequest request);
   Future<AuthTokensModel> refreshToken(String refreshToken);
-  Future<void> logout();
+  Future<void> logout([String? fcmToken]);
+  Future<void> registerFcmToken(String fcmToken);
+  Future<void> removeFcmToken(String fcmToken);
   Future<UserModel> getCurrentUser();
   Future<void> forgotPassword(String email);
   Future<bool> verifyOtp({required String email, required String otp});
@@ -67,11 +69,42 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> logout() async {
+  Future<void> logout([String? fcmToken]) async {
     try {
-      await dioClient.post(ApiEndpoints.authLogout);
+      final data = <String, dynamic>{};
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        data['fcmToken'] = fcmToken;
+      }
+      await dioClient.post(
+        ApiEndpoints.authLogout,
+        data: data.isNotEmpty ? data : null,
+      );
     } catch (_) {
       // Best effort logout - server error does not prevent local cleanup
+    }
+  }
+
+  @override
+  Future<void> registerFcmToken(String fcmToken) async {
+    try {
+      await dioClient.post(
+        ApiEndpoints.authFcmToken,
+        data: {'fcmToken': fcmToken.trim()},
+      );
+    } catch (_) {
+      // Best effort - do not fail if notification endpoint error occurs
+    }
+  }
+
+  @override
+  Future<void> removeFcmToken(String fcmToken) async {
+    try {
+      await dioClient.delete(
+        ApiEndpoints.authFcmToken,
+        data: {'fcmToken': fcmToken.trim()},
+      );
+    } catch (_) {
+      // Best effort
     }
   }
 

@@ -10,7 +10,11 @@ abstract class AuthRepository {
   Future<UserModel> login({
     required String email,
     required String password,
+    String? fcmToken,
   });
+
+  Future<void> registerFcmToken(String fcmToken);
+  Future<void> removeFcmToken(String fcmToken);
 
   Future<UserModel> register({
     required String name,
@@ -24,7 +28,7 @@ abstract class AuthRepository {
     String? referredBy,
   });
 
-  Future<void> logout();
+  Future<void> logout({String? fcmToken});
 
   Future<UserModel?> getCachedUser();
 
@@ -69,10 +73,15 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserModel> login({
     required String email,
     required String password,
+    String? fcmToken,
   }) async {
     try {
       final authResponse = await remoteDataSource.login(
-        LoginRequest(email: email, password: password),
+        LoginRequest(
+          email: email,
+          password: password,
+          fcmToken: fcmToken,
+        ),
       );
 
       // Persist tokens
@@ -92,6 +101,16 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       rethrow;
     }
+  }
+
+  @override
+  Future<void> registerFcmToken(String fcmToken) async {
+    await remoteDataSource.registerFcmToken(fcmToken);
+  }
+
+  @override
+  Future<void> removeFcmToken(String fcmToken) async {
+    await remoteDataSource.removeFcmToken(fcmToken);
   }
 
   @override
@@ -143,9 +162,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> logout() async {
+  Future<void> logout({String? fcmToken}) async {
     try {
-      await remoteDataSource.logout();
+      await remoteDataSource.logout(fcmToken);
     } catch (_) {
       // Ignore network failures on logout
     } finally {
