@@ -121,11 +121,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<bool> verifyEmail({required String email, required String otp}) async {
+    final cleanEmail = email.trim();
+    final cleanOtp = otp.trim();
     final response = await dioClient.post(
       ApiEndpoints.authVerifyEmail,
       data: {
-        'email': email.trim(),
-        'otp': otp.trim(),
+        'email': cleanEmail,
+        'otp': cleanOtp,
+      },
+      queryParameters: {
+        'email': cleanEmail,
+        'otp': cleanOtp,
       },
     );
 
@@ -139,9 +145,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> resendVerificationEmail(String email) async {
+    final cleanEmail = email.trim();
     await dioClient.post(
       ApiEndpoints.authResendVerification,
-      data: {'email': email.trim()},
+      data: {'email': cleanEmail},
+      queryParameters: {'email': cleanEmail},
     );
   }
 

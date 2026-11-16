@@ -34,7 +34,12 @@ class AuthInterceptor extends QueuedInterceptor {
         path.contains(ApiEndpoints.authLogin) ||
         path.contains(ApiEndpoints.authRegister) ||
         path.contains(ApiEndpoints.authRefreshToken) ||
-        path.contains(ApiEndpoints.authForgotPassword);
+        path.contains(ApiEndpoints.authForgotPassword) ||
+        path.contains(ApiEndpoints.authVerifyEmail) ||
+        path.contains(ApiEndpoints.authResendVerification) ||
+        path.contains(ApiEndpoints.authVerifyOtp) ||
+        path.contains(ApiEndpoints.authResendOtp) ||
+        path.contains(ApiEndpoints.authResetPassword);
 
     if (!isPublicAuthEndpoint) {
       final token = await tokenStorage.getAccessToken();

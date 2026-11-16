@@ -111,14 +111,14 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
   }
 
   void _goToStep(int step) {
-    HapticFeedback.selectionClick();
+    HapticFeedback.lightImpact();
     setState(() {
       _currentStep = step;
     });
     _pageController.animateToPage(
       step,
-      duration: const Duration(milliseconds: 320),
-      curve: Curves.easeInOutCubic,
+      duration: const Duration(milliseconds: 380),
+      curve: Curves.fastOutSlowIn,
     );
   }
 
@@ -402,6 +402,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
     });
 
     if (success) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => OtpVerificationScreen(
@@ -413,6 +414,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
     } else {
       final error = ref.read(authErrorProvider);
       HapticFeedback.heavyImpact();
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -425,12 +427,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          duration: const Duration(seconds: 5),
-          action: SnackBarAction(
-            label: 'OK',
-            textColor: Colors.white,
-            onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-          ),
+          duration: const Duration(seconds: 4),
         ),
       );
     }
@@ -510,129 +507,213 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // Top Step Progress Indicator (3 Steps)
+  // Top Step Progress Indicator (Segmented Capsule Bar + Interactive Pills)
   // ---------------------------------------------------------------------------
   Widget _buildStepIndicator() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.border.withValues(alpha: 0.5),
+            width: 1,
+          ),
+        ),
+      ),
       child: Column(
         children: [
+          // 1. Sleek Segmented Capsule Progress Bar
+          Row(
+            children: List.generate(3, (index) {
+              final isCompleted = _currentStep > index;
+              final isActive = _currentStep == index;
+
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: index == 0 ? 0 : 3.5,
+                    right: index == 2 ? 0 : 3.5,
+                  ),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeOutCubic,
+                    height: 4.5,
+                    decoration: BoxDecoration(
+                      color: isCompleted
+                          ? AppColors.accent
+                          : (isActive ? AppColors.primary : AppColors.border.withValues(alpha: 0.6)),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: isActive
+                          ? [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.25),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1.5),
+                              ),
+                            ]
+                          : null,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+
+          const SizedBox(height: 12),
+
+          // 2. Interactive Step Pills Row (Personal • Address • Security)
           Row(
             children: [
-              _buildStepNode(
+              _buildStepPill(
                 stepIndex: 0,
-                title: 'Personal',
+                icon: Icons.person_rounded,
+                label: 'Personal',
                 isActive: _currentStep == 0,
                 isCompleted: _currentStep > 0,
               ),
-              Expanded(
-                child: Container(
-                  height: 2,
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  color: _currentStep > 0 ? AppColors.primary : AppColors.border,
-                ),
-              ),
-              _buildStepNode(
+              const SizedBox(width: 8),
+              _buildStepPill(
                 stepIndex: 1,
-                title: 'Address',
+                icon: Icons.location_on_rounded,
+                label: 'Address',
                 isActive: _currentStep == 1,
                 isCompleted: _currentStep > 1,
               ),
-              Expanded(
-                child: Container(
-                  height: 2,
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  color: _currentStep > 1 ? AppColors.primary : AppColors.border,
-                ),
-              ),
-              _buildStepNode(
+              const SizedBox(width: 8),
+              _buildStepPill(
                 stepIndex: 2,
-                title: 'Security',
+                icon: Icons.shield_rounded,
+                label: 'Security',
                 isActive: _currentStep == 2,
                 isCompleted: false,
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          // Animated Progress Bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: (_currentStep + 1) / 3.0,
-              minHeight: 4,
-              backgroundColor: AppColors.surface,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStepNode({
+  Widget _buildStepPill({
     required int stepIndex,
-    required String title,
+    required IconData icon,
+    required String label,
     required bool isActive,
     required bool isCompleted,
   }) {
-    return GestureDetector(
-      onTap: () {
-        if (stepIndex < _currentStep) {
-          _goToStep(stepIndex);
-        }
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: isCompleted
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          if (stepIndex < _currentStep) {
+            _goToStep(stepIndex);
+          }
+        },
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+          decoration: BoxDecoration(
+            color: isActive
+                ? AppColors.primary
+                : (isCompleted
+                    ? AppColors.accentLight
+                    : AppColors.surface),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isActive
                   ? AppColors.primary
-                  : (isActive ? AppColors.accentLight : AppColors.surface),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: (isActive || isCompleted)
-                    ? AppColors.primary
-                    : AppColors.border,
-                width: 1.6,
+                  : (isCompleted
+                      ? AppColors.accent.withValues(alpha: 0.4)
+                      : AppColors.border),
+              width: isActive ? 1.5 : 1.0,
+            ),
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.22),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isCompleted ? Icons.check_circle_rounded : icon,
+                size: 14,
+                color: isActive
+                    ? Colors.white
+                    : (isCompleted ? AppColors.primary : AppColors.textSecondary),
+              ),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: isActive
+                        ? FontWeight.w800
+                        : (isCompleted ? FontWeight.w700 : FontWeight.w600),
+                    color: isActive
+                        ? Colors.white
+                        : (isCompleted ? AppColors.primary : AppColors.textSecondary),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackButton({required VoidCallback onPressed}) {
+    return InkWell(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onPressed();
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        height: 54,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border, width: 1.3),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.arrow_back_rounded,
+              size: 18,
+              color: AppColors.textPrimary,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Back',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
               ),
             ),
-            child: Center(
-              child: isCompleted
-                  ? const Icon(
-                      Icons.check_rounded,
-                      size: 16,
-                      color: Colors.white,
-                    )
-                  : Text(
-                      '${stepIndex + 1}',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: isActive
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            title,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 12,
-              fontWeight: (isActive || isCompleted)
-                  ? FontWeight.w700
-                  : FontWeight.w500,
-              color: (isActive || isCompleted)
-                  ? AppColors.textPrimary
-                  : AppColors.textSecondary,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -649,29 +730,6 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
-                decoration: BoxDecoration(
-                  color: AppColors.accentLight,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.25),
-                  ),
-                ),
-                child: Text(
-                  'Step 1 of 3 • Personal Details',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
               Text(
                 'Create your account',
                 style: GoogleFonts.plusJakartaSans(
@@ -833,7 +891,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
 
               // Continue to Step 2 Button
               CustomAuthButton(
-                text: 'Continue to Step 2',
+                text: 'Continue',
                 icon: Icons.arrow_forward_rounded,
                 onPressed: _onStep1Continue,
               ),
@@ -884,29 +942,6 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
-                decoration: BoxDecoration(
-                  color: AppColors.accentLight,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.25),
-                  ),
-                ),
-                child: Text(
-                  'Step 2 of 3 • Addresses & Referral',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
               Text(
                 'Where are you located?',
                 style: GoogleFonts.plusJakartaSans(
@@ -1136,19 +1171,11 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
               // Action Buttons: Back + Continue
               Row(
                 children: [
-                  OutlinedButton(
-                    onPressed: () => _goToStep(0),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
-                      side: const BorderSide(color: AppColors.border),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                    child: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
-                  ),
+                  _buildBackButton(onPressed: () => _goToStep(0)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomAuthButton(
-                      text: 'Continue to Step 3',
+                      text: 'Continue',
                       icon: Icons.arrow_forward_rounded,
                       onPressed: _onStep2Continue,
                     ),
@@ -1175,29 +1202,6 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
-                decoration: BoxDecoration(
-                  color: AppColors.accentLight,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.25),
-                  ),
-                ),
-                child: Text(
-                  'Step 3 of 3 • Security & Password',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
               Text(
                 'Secure your account',
                 style: GoogleFonts.plusJakartaSans(
@@ -1220,94 +1224,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
                 ),
               ),
 
-              const SizedBox(height: 18),
-
-              // User Identity Summary Card
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.accentLight,
-                        border: Border.all(color: AppColors.primary, width: 1.5),
-                      ),
-                      child: ClipOval(
-                        child: _profilePhoto != null
-                            ? Image.file(
-                                File(_profilePhoto!.path),
-                                fit: BoxFit.cover,
-                                width: 44,
-                                height: 44,
-                              )
-                            : const Icon(
-                                Icons.person_rounded,
-                                size: 24,
-                                color: AppColors.primary,
-                              ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _nameController.text.isNotEmpty
-                                ? _nameController.text.trim()
-                                : 'Account Holder',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _emailController.text.isNotEmpty
-                                ? _emailController.text.trim()
-                                : 'email@example.com',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          if (_presentCityController.text.isNotEmpty) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              _presentCityController.text.trim(),
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11.5,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => _goToStep(0),
-                      style: TextButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                        foregroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                      ),
-                      child: const Text('Edit'),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 22),
+              const SizedBox(height: 20),
 
               // Password Input
               CustomAuthInput(
@@ -1447,15 +1364,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen> {
               // Action Buttons: Back + Submit
               Row(
                 children: [
-                  OutlinedButton(
-                    onPressed: () => _goToStep(1),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
-                      side: const BorderSide(color: AppColors.border),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                    child: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
-                  ),
+                  _buildBackButton(onPressed: () => _goToStep(1)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomAuthButton(

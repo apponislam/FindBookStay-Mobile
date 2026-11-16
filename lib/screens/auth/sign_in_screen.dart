@@ -73,16 +73,20 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     if (!mounted) return;
 
     if (success) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
         (route) => false,
       );
     } else {
       final error = ref.read(authErrorProvider);
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error ?? 'Invalid email or password.'),
           backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }

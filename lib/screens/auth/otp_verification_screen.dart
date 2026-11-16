@@ -146,6 +146,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     });
 
     if (success) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       if (widget.isRegistrationFlow) {
         await AuthService.instance.signIn(email: widget.email);
         final prefs = await SharedPreferences.getInstance();
@@ -169,11 +170,13 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       setState(() {
         _otpError = error ?? 'Invalid or expired verification code';
       });
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          duration: const Duration(seconds: 4),
           content: Text(
             error ?? 'Verification failed. Please check the code and try again.',
             style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
@@ -295,7 +298,6 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                               _otpCode = code;
                               _otpError = null;
                             });
-                            _onVerifyCode();
                           },
                           onChanged: (code) {
                             setState(() {
@@ -307,39 +309,45 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
                         // Error Banner
                         if (_otpError != null) ...[
-                          const SizedBox(height: 16),
-                          Center(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
+                          const SizedBox(height: 18),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.error.withValues(alpha: 0.3),
+                                width: 1,
                               ),
-                              decoration: BoxDecoration(
-                                color: AppColors.error.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: AppColors.error.withValues(alpha: 0.25),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.warning_amber_rounded,
-                                    size: 15,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 1.5),
+                                  child: Icon(
+                                    Icons.error_outline_rounded,
+                                    size: 18,
                                     color: AppColors.error,
                                   ),
-                                  const SizedBox(width: 6),
-                                  Text(
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
                                     _otpError!,
                                     style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 12,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.error,
+                                      height: 1.4,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ],

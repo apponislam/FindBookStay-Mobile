@@ -4,7 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-/// 6-digit squircle OTP code input with auto-advance and backspace handling.
+/// 6-digit squircle OTP code input with auto-advance, backspace, and full paste support.
 class OtpDigitInput extends StatefulWidget {
   final int length;
   final ValueChanged<String> onCompleted;
@@ -18,10 +18,10 @@ class OtpDigitInput extends StatefulWidget {
   });
 
   @override
-  State<OtpDigitInput> createState() => _OtpDigitInputState();
+  State<OtpDigitInput> createState() => OtpDigitInputState();
 }
 
-class _OtpDigitInputState extends State<OtpDigitInput> {
+class OtpDigitInputState extends State<OtpDigitInput> {
   late List<TextEditingController> _controllers;
   late List<FocusNode> _focusNodes;
 
@@ -43,18 +43,71 @@ class _OtpDigitInputState extends State<OtpDigitInput> {
     super.dispose();
   }
 
-  void _onDigitChanged(int index, String value) {
-    if (value.isNotEmpty) {
-      HapticFeedback.lightImpact();
-      if (value.length > 1) {
-        // Handle paste or multiple chars
-        _controllers[index].text = value.substring(value.length - 1);
+  /// Programmatically paste or fill code across all boxes
+  void pasteCode(String rawCode) {
+    _fillDigits(rawCode);
+  }
+
+  void _fillDigits(String rawDigits) {
+    final digits = rawDigits.replaceAll(RegExp(r'\D'), '');
+    if (digits.isEmpty) return;
+
+    HapticFeedback.mediumImpact();
+
+    // Distribute digits into all boxes
+    for (int i = 0; i < widget.length; i++) {
+      if (i < digits.length) {
+        _controllers[i].text = digits[i];
+      } else {
+        _controllers[i].clear();
       }
+    }
+
+    final filledCount = digits.length.clamp(0, widget.length);
+    if (filledCount == widget.length) {
+      _focusNodes.last.unfocus();
+    } else {
+      _focusNodes[filledCount].requestFocus();
+    }
+
+    final fullCode = _controllers.map((c) => c.text).join();
+    widget.onChanged?.call(fullCode);
+    if (fullCode.length == widget.length) {
+      widget.onCompleted(fullCode);
+    }
+  }
+
+  void _onDigitChanged(int index, String value) {
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+
+    // Case 1: Multi-digit paste detected (pasting 6-digit OTP into any box)
+    if (digits.length >= 4 || digits.length >= widget.length) {
+      _fillDigits(digits);
+      return;
+    }
+
+    // Case 2: User typed over an existing digit (value has 2 digits)
+    if (digits.length > 1) {
+      HapticFeedback.lightImpact();
+      final newChar = digits.substring(digits.length - 1);
+      _controllers[index].text = newChar;
       if (index < widget.length - 1) {
         _focusNodes[index + 1].requestFocus();
       } else {
         _focusNodes[index].unfocus();
       }
+    } else if (digits.length == 1) {
+      // Case 3: Single digit typed
+      HapticFeedback.lightImpact();
+      _controllers[index].text = digits;
+      if (index < widget.length - 1) {
+        _focusNodes[index + 1].requestFocus();
+      } else {
+        _focusNodes[index].unfocus();
+      }
+    } else {
+      // Case 4: Cleared
+      _controllers[index].clear();
     }
 
     final fullCode = _controllers.map((c) => c.text).join();
@@ -72,74 +125,81 @@ class _OtpDigitInputState extends State<OtpDigitInput> {
         final controller = _controllers[index];
         final focusNode = _focusNodes[index];
 
-        return Focus(
-          onKeyEvent: (node, event) {
-            if (event is KeyDownEvent &&
-                event.logicalKey == LogicalKeyboardKey.backspace &&
-                controller.text.isEmpty &&
-                index > 0) {
-              _focusNodes[index - 1].requestFocus();
-              _controllers[index - 1].selection = TextSelection.fromPosition(
-                TextPosition(offset: _controllers[index - 1].text.length),
-              );
-            }
-            return KeyEventResult.ignored;
-          },
-          child: AnimatedBuilder(
-            animation: Listenable.merge([focusNode, controller]),
-            builder: (context, _) {
-              final bool isFocused = focusNode.hasFocus;
-              final bool hasValue = controller.text.isNotEmpty;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: index == 0 ? 0 : 3.5,
+              right: index == widget.length - 1 ? 0 : 3.5,
+            ),
+            child: Focus(
+              onKeyEvent: (node, event) {
+                if (event is KeyDownEvent &&
+                    event.logicalKey == LogicalKeyboardKey.backspace &&
+                    controller.text.isEmpty &&
+                    index > 0) {
+                  _focusNodes[index - 1].requestFocus();
+                  _controllers[index - 1].selection = TextSelection.fromPosition(
+                    TextPosition(offset: _controllers[index - 1].text.length),
+                  );
+                }
+                return KeyEventResult.ignored;
+              },
+              child: AnimatedBuilder(
+                animation: Listenable.merge([focusNode, controller]),
+                builder: (context, _) {
+                  final bool isFocused = focusNode.hasFocus;
+                  final bool hasValue = controller.text.isNotEmpty;
 
-              return Container(
-                width: 48.0,
-                height: 56.0,
-                decoration: BoxDecoration(
-                  color: isFocused
-                      ? AppColors.background
-                      : (hasValue ? AppColors.accentLight : AppColors.surface),
-                  borderRadius: BorderRadius.circular(15.0),
-                  border: Border.all(
-                    color: isFocused
-                        ? AppColors.accent
-                        : (hasValue ? AppColors.primary : AppColors.border),
-                    width: isFocused ? 2.0 : 1.2,
-                  ),
-                  boxShadow: isFocused
-                      ? [
-                          BoxShadow(
-                            color: AppColors.accent.withValues(alpha: 0.18),
-                            blurRadius: 8.0,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Center(
-                  child: TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    maxLength: 1,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                    onChanged: (val) => _onDigitChanged(index, val),
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                  return Container(
+                    height: 56.0,
+                    decoration: BoxDecoration(
+                      color: isFocused
+                          ? AppColors.background
+                          : (hasValue ? AppColors.accentLight : AppColors.surface),
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(
+                        color: isFocused
+                            ? AppColors.accent
+                            : (hasValue ? AppColors.primary : AppColors.border),
+                        width: isFocused ? 2.0 : 1.2,
+                      ),
+                      boxShadow: isFocused
+                          ? [
+                              BoxShadow(
+                                color: AppColors.accent.withValues(alpha: 0.18),
+                                blurRadius: 8.0,
+                                offset: const Offset(0, 3),
+                              ),
+                            ]
+                          : null,
                     ),
-                    decoration: const InputDecoration(
-                      counterText: '',
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
+                    child: Center(
+                      child: TextField(
+                        controller: controller,
+                        focusNode: focusNode,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        enableInteractiveSelection: true,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        onChanged: (val) => _onDigitChanged(index, val),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                        decoration: const InputDecoration(
+                          counterText: '',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            },
+                  );
+                },
+              ),
+            ),
           ),
         );
       }),
