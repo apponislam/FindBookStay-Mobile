@@ -59,7 +59,13 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> logout() async {}
+  Future<void> logout([String? fcmToken]) async {}
+
+  @override
+  Future<void> registerFcmToken(String fcmToken) async {}
+
+  @override
+  Future<void> removeFcmToken(String fcmToken) async {}
 
   @override
   Future<UserModel> getCurrentUser() async {

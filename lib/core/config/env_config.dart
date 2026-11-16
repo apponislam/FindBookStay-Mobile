@@ -7,7 +7,7 @@ class EnvConfig {
   EnvConfig._();
 
   /// Default fallback API Base URL
-  static const String _defaultApiBaseUrl = 'http://localhost:5075/';
+  static const String _defaultApiBaseUrl = 'https://findbookstayapi.apponislam.top/';
 
   /// Default timeout in milliseconds
   static const int _defaultTimeoutMs = 15000;

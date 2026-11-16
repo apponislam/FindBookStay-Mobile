@@ -31,9 +31,7 @@ abstract class AuthRemoteDataSource {
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final DioClient dioClient;
 
-  AuthRemoteDataSourceImpl({
-    required this.dioClient,
-  });
+  AuthRemoteDataSourceImpl({required this.dioClient});
 
   @override
   Future<AuthResponseModel> login(LoginRequest request) async {
@@ -130,10 +128,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<bool> verifyOtp({required String email, required String otp}) async {
     final response = await dioClient.post(
       ApiEndpoints.authVerifyOtp,
-      data: {
-        'email': email.trim(),
-        'otp': otp.trim(),
-      },
+      data: {'email': email.trim(), 'otp': otp.trim()},
     );
 
     final data = response.data;
@@ -158,14 +153,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final cleanOtp = otp.trim();
     final response = await dioClient.post(
       ApiEndpoints.authVerifyEmail,
-      data: {
-        'email': cleanEmail,
-        'otp': cleanOtp,
-      },
-      queryParameters: {
-        'email': cleanEmail,
-        'otp': cleanOtp,
-      },
+      data: {'email': cleanEmail, 'otp': cleanOtp},
+      queryParameters: {'email': cleanEmail, 'otp': cleanOtp},
     );
 
     final data = response.data;

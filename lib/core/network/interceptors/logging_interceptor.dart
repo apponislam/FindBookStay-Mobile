@@ -39,8 +39,11 @@ class LoggingInterceptor extends Interceptor {
         '❌ [DIO ERR] ${err.response?.statusCode ?? 'NO_STATUS'} ${err.requestOptions.uri}',
       );
       debugPrint('   Message: ${err.message}');
+      if (err.error != null) {
+        debugPrint('   Cause / Error: ${err.error}');
+      }
       if (err.response?.data != null) {
-        debugPrint('   Response Data: ${err.response?.data}');
+        debugPrint('   Server Response: ${err.response?.data}');
       }
     }
     super.onError(err, handler);

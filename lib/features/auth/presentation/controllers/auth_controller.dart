@@ -147,7 +147,7 @@ class AuthController extends Notifier<AuthState> {
       final fcmToken = NotificationService.instance.fcmToken;
       await _authRepository.logout(fcmToken: fcmToken);
       try {
-        await NotificationService.instance.deleteToken();
+        await NotificationService.instance.unregisterDevice();
       } catch (_) {}
     } finally {
       if (ref.mounted) {
@@ -185,12 +185,14 @@ class AuthController extends Notifier<AuthState> {
       }
       return true;
     } on AppException catch (e) {
+      debugPrint('❌ [resendCode Error]: ${e.message} | User Msg: ${e.userMessage}');
       if (!ref.mounted) return false;
       state = AuthState.error(e.userMessage, state.user);
       return false;
-    } catch (_) {
+    } catch (e, stack) {
+      debugPrint('❌ [resendCode Unknown Error]: $e\n$stack');
       if (!ref.mounted) return false;
-      state = AuthState.error('Failed to resend code. Please try again.', state.user);
+      state = AuthState.error('Failed to resend code: $e', state.user);
       return false;
     }
   }
@@ -207,12 +209,14 @@ class AuthController extends Notifier<AuthState> {
       state = state.copyWith(status: AuthStatus.unauthenticated);
       return isValid;
     } on AppException catch (e) {
+      debugPrint('❌ [verifyEmail Error]: ${e.message} | User Msg: ${e.userMessage}');
       if (!ref.mounted) return false;
       state = AuthState.error(e.userMessage, state.user);
       return false;
-    } catch (_) {
+    } catch (e, stack) {
+      debugPrint('❌ [verifyEmail Unknown Error]: $e\n$stack');
       if (!ref.mounted) return false;
-      state = AuthState.error('Failed to verify code. Please try again.', state.user);
+      state = AuthState.error('Failed to verify code: $e', state.user);
       return false;
     }
   }

@@ -1610,7 +1610,7 @@ class _LegalModalSheet extends StatelessWidget {
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
                   itemCount: sections.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 18),
+                  separatorBuilder: (_, _) => const SizedBox(height: 18),
                   itemBuilder: (ctx, i) {
                     final item = sections[i];
                     return Column(

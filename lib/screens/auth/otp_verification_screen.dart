@@ -98,6 +98,8 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     } else {
       final error = ref.read(authErrorProvider);
       HapticFeedback.heavyImpact();
+      debugPrint('❌ [OTP RESEND CODE FAILED]: $error');
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.error,
@@ -167,6 +169,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     } else {
       final error = ref.read(authErrorProvider);
       HapticFeedback.heavyImpact();
+      debugPrint('❌ [OTP VERIFICATION FAILED]: $error');
       setState(() {
         _otpError = error ?? 'Invalid or expired verification code';
       });
