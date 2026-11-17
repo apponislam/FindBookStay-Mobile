@@ -94,11 +94,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await tokenStorage.saveUserRaw(authResponse.user.toJson());
 
       return authResponse.user;
-    } on AppException catch (e) {
-      // In development mode, if server is not reachable, provide fallback for smooth UI testing
-      if (e is NetworkException) {
-        return _simulateDevLogin(email: email);
-      }
+    } on AppException {
       rethrow;
     }
   }
@@ -148,15 +144,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await tokenStorage.saveUserRaw(authResponse.user.toJson());
 
       return authResponse.user;
-    } on AppException catch (e) {
-      if (e is NetworkException) {
-        return _simulateDevRegister(
-          name: name,
-          email: email,
-          phone: phone,
-          role: role,
-        );
-      }
+    } on AppException {
       rethrow;
     }
   }
@@ -274,51 +262,5 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserModel> saveUserProfile(UserModel user) async {
     await tokenStorage.saveUserRaw(user.toJson());
     return user;
-  }
-
-  // --- Development Mock Helpers ---
-  Future<UserModel> _simulateDevLogin({required String email}) async {
-    final mockUser = UserModel(
-      id: 'usr_${DateTime.now().millisecondsSinceEpoch}',
-      name: email.split('@').first.replaceAll('.', ' ').toUpperCase(),
-      email: email,
-      role: 'Tenant & Player',
-      phone: '+880 1712-345678',
-      isEmailVerified: true,
-      createdAt: DateTime.now(),
-    );
-
-    await tokenStorage.saveTokens(
-      accessToken: 'mock_access_jwt_token_${DateTime.now().millisecondsSinceEpoch}',
-      refreshToken: 'mock_refresh_jwt_token_${DateTime.now().millisecondsSinceEpoch}',
-    );
-    await tokenStorage.saveUserRaw(mockUser.toJson());
-
-    return mockUser;
-  }
-
-  Future<UserModel> _simulateDevRegister({
-    required String name,
-    required String email,
-    String? phone,
-    String? role,
-  }) async {
-    final mockUser = UserModel(
-      id: 'usr_${DateTime.now().millisecondsSinceEpoch}',
-      name: name,
-      email: email,
-      role: role ?? 'Tenant & Player',
-      phone: phone ?? '+880 1712-345678',
-      isEmailVerified: false,
-      createdAt: DateTime.now(),
-    );
-
-    await tokenStorage.saveTokens(
-      accessToken: 'mock_access_jwt_token_${DateTime.now().millisecondsSinceEpoch}',
-      refreshToken: 'mock_refresh_jwt_token_${DateTime.now().millisecondsSinceEpoch}',
-    );
-    await tokenStorage.saveUserRaw(mockUser.toJson());
-
-    return mockUser;
   }
 }

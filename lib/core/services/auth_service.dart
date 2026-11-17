@@ -9,10 +9,10 @@ class AuthService extends ChangeNotifier {
   AuthService._internal();
 
   bool _isLoggedIn = false;
-  String _userName = 'Alex Tan';
-  String _userEmail = 'alex.tan@example.com';
-  String _userRole = 'Tenant & Player';
-  String _userPhone = '+880 1712-345678';
+  String _userName = '';
+  String _userEmail = '';
+  String _userRole = 'USER';
+  String _userPhone = '';
 
   bool get isLoggedIn => _isLoggedIn;
   String get userName => _userName;
@@ -24,10 +24,10 @@ class AuthService extends ChangeNotifier {
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    _userName = prefs.getString('userName') ?? 'Alex Tan';
-    _userEmail = prefs.getString('userEmail') ?? 'alex.tan@example.com';
-    _userRole = prefs.getString('userRole') ?? 'Tenant & Player';
-    _userPhone = prefs.getString('userPhone') ?? '+880 1712-345678';
+    _userName = prefs.getString('userName') ?? '';
+    _userEmail = prefs.getString('userEmail') ?? '';
+    _userRole = prefs.getString('userRole') ?? 'USER';
+    _userPhone = prefs.getString('userPhone') ?? '';
     notifyListeners();
   }
 
@@ -57,18 +57,15 @@ class AuthService extends ChangeNotifier {
   /// Sign out user back to Guest / Non-Signed-In mode
   Future<void> signOut() async {
     _isLoggedIn = false;
+    _userName = '';
+    _userEmail = '';
+    _userPhone = '';
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
+    await prefs.remove('userName');
+    await prefs.remove('userEmail');
+    await prefs.remove('userPhone');
     notifyListeners();
-  }
-
-  /// Toggle auth state (convenient for quick testing/demoing)
-  Future<void> toggleAuthState() async {
-    if (_isLoggedIn) {
-      await signOut();
-    } else {
-      await signIn();
-    }
   }
 
   /// Switch user role between Tenant and Host

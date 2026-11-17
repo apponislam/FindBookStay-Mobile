@@ -115,69 +115,58 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
     return AnimatedBuilder(
       animation: _glowAnimation,
       builder: (context, _) {
-        return InkWell(
-          onTap: () {
-            HapticFeedback.lightImpact();
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 14.0,
-              vertical: 6.5,
-            ),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFE8F8F3), Color(0xFFD6F3EA)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.lightImpact();
+            },
+            borderRadius: BorderRadius.circular(24),
+            splashColor: AppColors.accent.withValues(alpha: 0.25),
+            highlightColor: AppColors.accentLight.withValues(alpha: 0.15),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 7.0,
               ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.accent.withValues(alpha: 0.45),
-                width: 1.2,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFE8F8F3), Color(0xFFD6F3EA)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.accent.withValues(
+                    alpha: 0.40 + (_glowAnimation.value * 0.35),
+                  ),
+                  width: 1.3,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.accent.withValues(
+                      alpha: _glowAnimation.value * 0.70,
+                    ),
+                    blurRadius: 12 + (_glowAnimation.value * 8),
+                    spreadRadius: 1.2 + (_glowAnimation.value * 1.0),
+                  ),
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.06),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.accent.withValues(alpha: _glowAnimation.value * 0.7),
-                  blurRadius: 12 + (_glowAnimation.value * 6),
-                  spreadRadius: 1.5,
+              child: Text(
+                'Welcome Back',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13.0,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
+                  letterSpacing: 0.3,
                 ),
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.06),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 7.5,
-                  height: 7.5,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.accent,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.accent.withValues(alpha: _glowAnimation.value),
-                        blurRadius: 6,
-                        spreadRadius: 1.2,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Welcome Back',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         );
@@ -189,74 +178,84 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
   // Modern Glowing Sign In CTA Button
   // ---------------------------------------------------------------------------
   Widget _buildGlowingSignInButton({required bool isLoading}) {
-    return Container(
-      height: 54,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF073B35), Color(0xFF0E544B)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.38),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
+    return AnimatedBuilder(
+      animation: _glowAnimation,
+      builder: (context, _) {
+        return Container(
+          height: 54,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF073B35), Color(0xFF0E544B)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(
+                  alpha: 0.34 + (_glowAnimation.value * 0.12),
+                ),
+                blurRadius: 14 + (_glowAnimation.value * 4),
+                offset: const Offset(0, 5),
+              ),
+              BoxShadow(
+                color: AppColors.accent.withValues(
+                  alpha: 0.18 + (_glowAnimation.value * 0.22),
+                ),
+                blurRadius: 10 + (_glowAnimation.value * 6),
+                spreadRadius: _glowAnimation.value * 1.5,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          BoxShadow(
-            color: AppColors.accent.withValues(alpha: 0.16),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isLoading
-              ? null
-              : () {
-                  HapticFeedback.lightImpact();
-                  _onSignIn();
-                },
-          borderRadius: BorderRadius.circular(16),
-          splashColor: Colors.white.withValues(alpha: 0.12),
-          highlightColor: Colors.white.withValues(alpha: 0.06),
-          child: Center(
-            child: isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Sign In',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 0.2,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: isLoading
+                  ? null
+                  : () {
+                      HapticFeedback.lightImpact();
+                      _onSignIn();
+                    },
+              borderRadius: BorderRadius.circular(16),
+              splashColor: AppColors.accent.withValues(alpha: 0.25),
+              highlightColor: Colors.white.withValues(alpha: 0.08),
+              child: Center(
+                child: isLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Sign In',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 20,
+                            color: AppColors.accent,
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      const Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 20,
-                        color: AppColors.accent,
-                      ),
-                    ],
-                  ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -280,46 +279,62 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
       body: SafeArea(
         child: Stack(
           children: [
-            // Ambient glowing gradient orb (top-right)
+            // Ambient glowing gradient orb (top-right, breathing)
             Positioned(
-              top: -40,
-              right: -40,
+              top: -50,
+              right: -50,
               child: IgnorePointer(
-                child: Container(
-                  width: 260,
-                  height: 260,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.accent.withValues(alpha: 0.14),
-                        AppColors.accentLight.withValues(alpha: 0.05),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 0.55, 1.0],
-                    ),
-                  ),
+                child: AnimatedBuilder(
+                  animation: _glowAnimation,
+                  builder: (context, _) {
+                    return Container(
+                      width: 270 + (_glowAnimation.value * 25),
+                      height: 270 + (_glowAnimation.value * 25),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            AppColors.accent.withValues(
+                              alpha: 0.14 + (_glowAnimation.value * 0.08),
+                            ),
+                            AppColors.accentLight.withValues(
+                              alpha: 0.05 + (_glowAnimation.value * 0.03),
+                            ),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.55, 1.0],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
 
-            // Ambient glowing soft accent (bottom-left)
+            // Ambient glowing soft accent (bottom-left, breathing)
             Positioned(
-              bottom: -50,
-              left: -50,
+              bottom: -60,
+              left: -60,
               child: IgnorePointer(
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.04),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
+                child: AnimatedBuilder(
+                  animation: _glowAnimation,
+                  builder: (context, _) {
+                    return Container(
+                      width: 210 + (_glowAnimation.value * 20),
+                      height: 210 + (_glowAnimation.value * 20),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            AppColors.primary.withValues(
+                              alpha: 0.05 + (_glowAnimation.value * 0.03),
+                            ),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

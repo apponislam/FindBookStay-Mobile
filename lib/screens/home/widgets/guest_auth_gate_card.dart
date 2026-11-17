@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/register_form_screen.dart';
 import '../../auth/sign_in_screen.dart';
@@ -52,11 +51,7 @@ class GuestAuthGateCard extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Icon(
-                icon,
-                size: 42,
-                color: AppColors.primary,
-              ),
+              child: Icon(icon, size: 42, color: AppColors.primary),
             ),
 
             const SizedBox(height: 24),
@@ -131,9 +126,7 @@ class GuestAuthGateCard extends StatelessWidget {
                 onPressed: () {
                   HapticFeedback.lightImpact();
                   Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const SignInScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const SignInScreen()),
                   );
                 },
                 icon: const Icon(Icons.login_rounded, size: 18),
@@ -162,9 +155,7 @@ class GuestAuthGateCard extends StatelessWidget {
               onPressed: () {
                 HapticFeedback.lightImpact();
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const RegisterFormScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const RegisterFormScreen()),
                 );
               },
               style: OutlinedButton.styleFrom(
@@ -183,47 +174,9 @@ class GuestAuthGateCard extends StatelessWidget {
                 ),
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            // Quick Demo Mode Switcher (1-tap testing for review)
-            TextButton.icon(
-              onPressed: () async {
-                HapticFeedback.selectionClick();
-                await AuthService.instance.signIn();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: AppColors.primary,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      content: Text(
-                        'Signed in as Alex Tan (Demo Account)',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              },
-              icon: const Icon(Icons.bolt_rounded, size: 17, color: AppColors.accent),
-              label: Text(
-                '⚡ One-Tap Sign In (Demo Mode)',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.accent,
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 }
-
