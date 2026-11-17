@@ -29,7 +29,7 @@ class UserModel {
     this.createdAt,
   });
 
-  /// Default demo/fallback profile for quick starts
+  /// Unit test fixture profile
   static const UserModel defaultUser = UserModel(
     id: 'usr_default_01',
     name: 'Alex Tan',

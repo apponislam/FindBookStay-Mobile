@@ -180,14 +180,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> forgotPassword(String email) async {
-    try {
-      await remoteDataSource.forgotPassword(email);
-    } on AppException catch (e) {
-      if (e is NetworkException) {
-        return;
-      }
-      rethrow;
-    }
+    await remoteDataSource.forgotPassword(email);
   }
 
   @override
@@ -195,24 +188,12 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String otp,
   }) async {
-    try {
-      return await remoteDataSource.verifyOtp(email: email, otp: otp);
-    } on AppException catch (e) {
-      if (e is NetworkException) {
-        return otp.length == 4;
-      }
-      rethrow;
-    }
+    return await remoteDataSource.verifyOtp(email: email, otp: otp);
   }
 
   @override
   Future<void> resendOtp(String email) async {
-    try {
-      await remoteDataSource.resendOtp(email);
-    } on AppException catch (e) {
-      if (e is NetworkException) return;
-      rethrow;
-    }
+    await remoteDataSource.resendOtp(email);
   }
 
   @override
@@ -220,22 +201,12 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String otp,
   }) async {
-    try {
-      return await remoteDataSource.verifyEmail(email: email, otp: otp);
-    } on AppException catch (e) {
-      if (e is NetworkException) return true;
-      rethrow;
-    }
+    return await remoteDataSource.verifyEmail(email: email, otp: otp);
   }
 
   @override
   Future<void> resendVerificationEmail(String email) async {
-    try {
-      await remoteDataSource.resendVerificationEmail(email);
-    } on AppException catch (e) {
-      if (e is NetworkException) return;
-      rethrow;
-    }
+    await remoteDataSource.resendVerificationEmail(email);
   }
 
   @override
@@ -244,18 +215,11 @@ class AuthRepositoryImpl implements AuthRepository {
     required String newPassword,
     required String otp,
   }) async {
-    try {
-      await remoteDataSource.resetPassword(
-        email: email,
-        newPassword: newPassword,
-        otp: otp,
-      );
-    } on AppException catch (e) {
-      if (e is NetworkException) {
-        return;
-      }
-      rethrow;
-    }
+    await remoteDataSource.resetPassword(
+      email: email,
+      newPassword: newPassword,
+      otp: otp,
+    );
   }
 
   @override

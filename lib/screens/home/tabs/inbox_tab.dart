@@ -10,32 +10,7 @@ import '../widgets/guest_auth_gate_card.dart';
 class InboxTab extends StatelessWidget {
   const InboxTab({super.key});
 
-  final List<Map<String, dynamic>> _threads = const [
-    {
-      'name': 'David Miller',
-      'role': 'Apartment Landlord',
-      'lastMessage': 'The apartment is ready for viewing tomorrow at 4 PM!',
-      'time': '10m ago',
-      'unreadCount': 2,
-      'avatar': 'DM',
-    },
-    {
-      'name': 'Green Arena Turf Manager',
-      'role': 'Sports Arena',
-      'lastMessage': 'Your slot on Pitch #1 (7v7) is locked in. See you tomorrow.',
-      'time': '2h ago',
-      'unreadCount': 0,
-      'avatar': 'GA',
-    },
-    {
-      'name': 'Ocean Breeze Concierge',
-      'role': 'Hotel Host',
-      'lastMessage': 'We have noted your early check-in request. Safe travels!',
-      'time': 'Yesterday',
-      'unreadCount': 0,
-      'avatar': 'OB',
-    },
-  ];
+  final List<Map<String, dynamic>> _threads = const [];
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +29,67 @@ class InboxTab extends StatelessWidget {
                 subtitle:
                     'Sign in to message verified property landlords, inquire about bachelor seats, and confirm turf reservations in real-time.',
                 ctaText: 'Sign In to Access Messages',
+              ),
+            ),
+          );
+        }
+
+        if (_threads.isEmpty) {
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              title: Text(
+                'Inbox & Inquiries',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: const Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        size: 32,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No conversations yet',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'When you message property owners, landlord representatives, or turf managers, your chats will appear here.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

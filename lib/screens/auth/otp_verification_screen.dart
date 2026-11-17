@@ -30,6 +30,7 @@ class OtpVerificationScreen extends ConsumerStatefulWidget {
 }
 
 class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
+  final TextEditingController _otpTextController = TextEditingController();
   String _otpCode = '';
   String? _otpError;
   bool _isLoading = false;
@@ -60,13 +61,25 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
   @override
   void dispose() {
+    _otpTextController.dispose();
     _resendTimer?.cancel();
     super.dispose();
   }
 
+  void _onClearCode() {
+    HapticFeedback.lightImpact();
+    _otpTextController.clear();
+    setState(() {
+      _otpCode = '';
+      _otpError = null;
+    });
+  }
+
   void _onResendCode() async {
     HapticFeedback.lightImpact();
+    _otpTextController.clear();
     setState(() {
+      _otpCode = '';
       _otpError = null;
       _isResending = true;
     });
@@ -162,7 +175,10 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       } else {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => ResetPasswordScreen(email: widget.email),
+            builder: (_) => ResetPasswordScreen(
+              email: widget.email,
+              otp: _otpCode,
+            ),
           ),
         );
       }
@@ -251,15 +267,57 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
                         const SizedBox(height: 14),
 
-                        // Title
-                        Text(
-                          'Enter 6-Digit Code',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                            letterSpacing: -0.6,
-                          ),
+                        // Title Row with Quick Clear Button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Enter 6-Digit Code',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -0.6,
+                              ),
+                            ),
+                            if (_otpCode.isNotEmpty)
+                              GestureDetector(
+                                onTap: _onClearCode,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surface,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: AppColors.border,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.backspace_outlined,
+                                        size: 13,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Clear',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
 
                         const SizedBox(height: 8),
@@ -296,6 +354,8 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                         // 6-Digit OTP Block Input
                         OtpDigitInput(
                           length: 6,
+                          controller: _otpTextController,
+                          hasError: _otpError != null,
                           onCompleted: (code) {
                             setState(() {
                               _otpCode = code;

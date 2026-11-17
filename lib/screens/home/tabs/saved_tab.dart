@@ -16,32 +16,7 @@ class SavedTab extends StatefulWidget {
 }
 
 class _SavedTabState extends State<SavedTab> {
-  final List<Map<String, dynamic>> _savedItems = [
-    {
-      'title': 'Furnished 2-Bed Apartment',
-      'location': 'Dhanmondi 27, Dhaka',
-      'price': '৳32,000 / month',
-      'type': 'Rent Space',
-      'rating': '4.92',
-      'icon': Icons.apartment_rounded,
-    },
-    {
-      'title': 'Green Arena 7v7 Football Turf',
-      'location': 'Banani, Dhaka',
-      'price': '৳2,000 / hr',
-      'type': 'Sports Turf',
-      'rating': '4.88',
-      'icon': Icons.sports_soccer_rounded,
-    },
-    {
-      'title': 'Sea Breeze Eco Resort Cottage',
-      'location': 'Inani Beach, Cox\'s Bazar',
-      'price': '৳5,800 / night',
-      'type': 'Hotel Stay',
-      'rating': '4.95',
-      'icon': Icons.hotel_rounded,
-    },
-  ];
+  final List<Map<String, dynamic>> _savedItems = [];
 
   @override
   Widget build(BuildContext context) {
@@ -102,11 +77,45 @@ class _SavedTabState extends State<SavedTab> {
           body: SafeArea(
             child: _savedItems.isEmpty
                 ? Center(
-                    child: Text(
-                      'No saved items yet',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 15,
-                        color: AppColors.textSecondary,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: const Icon(
+                              Icons.favorite_border_rounded,
+                              size: 32,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Your wishlist is empty',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Explore rental flats, stays, and sports turfs and tap the heart icon to save your favorites here.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                              height: 1.45,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   )

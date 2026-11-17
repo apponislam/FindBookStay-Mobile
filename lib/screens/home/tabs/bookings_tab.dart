@@ -18,35 +18,7 @@ class BookingsTab extends StatefulWidget {
 class _BookingsTabState extends State<BookingsTab> {
   int _activeFilter = 0;
 
-  final List<Map<String, dynamic>> _bookings = const [
-    {
-      'title': 'Green Arena 7v7 Football Turf',
-      'slot': 'Tomorrow · 06:00 PM - 07:00 PM',
-      'pitch': 'Pitch #1 (Floodlit)',
-      'status': 'Confirmed',
-      'bookingId': 'FBS-TRF-9021',
-      'icon': Icons.sports_soccer_rounded,
-      'accentColor': AppColors.accent,
-    },
-    {
-      'title': 'Ocean Breeze Resort Suite',
-      'slot': 'Dec 15 - Dec 18 · 3 Nights',
-      'pitch': 'Deluxe Sea View (Room 402)',
-      'status': 'Upcoming',
-      'bookingId': 'FBS-HTL-4810',
-      'icon': Icons.hotel_rounded,
-      'accentColor': Color(0xFF0284C7),
-    },
-    {
-      'title': 'Bachelor Studio Seat Visit',
-      'slot': 'Dec 22 · 03:30 PM Viewing',
-      'pitch': 'Flat 4B, Dhanmondi 27',
-      'status': 'Scheduled',
-      'bookingId': 'FBS-RNT-1102',
-      'icon': Icons.home_work_rounded,
-      'accentColor': AppColors.primary,
-    },
-  ];
+  final List<Map<String, dynamic>> _bookings = const [];
 
   @override
   Widget build(BuildContext context) {
@@ -95,19 +67,64 @@ class _BookingsTabState extends State<BookingsTab> {
                   physics: const BouncingScrollPhysics(),
                   child: Row(
                     children: [
-                      _buildFilterChip('Upcoming (${_bookings.length})', 0),
+                      _buildFilterChip('Upcoming (0)', 0),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Completed (4)', 1),
+                      _buildFilterChip('Completed (0)', 1),
                       const SizedBox(width: 8),
                       _buildFilterChip('Cancelled (0)', 2),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 18),
+                const SizedBox(height: 36),
 
-                // Booking Cards
-                ..._bookings.map((booking) {
+                // Empty state or Booking Cards
+                if (_bookings.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: const Icon(
+                              Icons.calendar_today_outlined,
+                              size: 32,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No reservations found',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'When you book turf slots, resort suites, or schedule rental viewings, your bookings will be shown here.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                              height: 1.45,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ..._bookings.map((booking) {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(18),

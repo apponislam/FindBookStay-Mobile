@@ -1,8 +1,10 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'sign_in_screen.dart';
 import 'widgets/custom_auth_button.dart';
 import 'widgets/custom_auth_input.dart';
@@ -10,16 +12,21 @@ import 'widgets/password_strength_meter.dart';
 
 /// Screen for entering new password and confirm password with real-time matching indicator.
 /// Vertically centered with warning badges and eye toggle animations.
-class ResetPasswordScreen extends StatefulWidget {
+class ResetPasswordScreen extends ConsumerStatefulWidget {
   final String email;
+  final String otp;
 
-  const ResetPasswordScreen({super.key, required this.email});
+  const ResetPasswordScreen({
+    super.key,
+    required this.email,
+    this.otp = '',
+  });
 
   @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
@@ -73,8 +80,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       _isLoading = true;
     });
 
-    // Simulate password update network call
-    await Future.delayed(const Duration(milliseconds: 1200));
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .resetPassword(
+          email: widget.email,
+          newPassword: p1,
+          otp: widget.otp,
+        );
 
     if (!mounted) return;
 
@@ -82,7 +94,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       _isLoading = false;
     });
 
-    _showSuccessDialog();
+    if (success) {
+      _showSuccessDialog();
+    } else {
+      HapticFeedback.heavyImpact();
+      final error = ref.read(authErrorProvider);
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error ?? 'Failed to update password. Please try again.'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _showSuccessDialog() {

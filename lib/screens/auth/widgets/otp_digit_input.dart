@@ -4,17 +4,27 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-/// 6-digit squircle OTP code input with auto-advance, backspace, and full paste support.
+/// Production-ready Squircle OTP code input with single-field architecture:
+/// - Smooth backwards backspace without needing to tap individual boxes
+/// - Auto-replace on typing when all digits are full or on error
+/// - Native SMS autofill & clipboard paste support
+/// - Visual squircle boxes with active glowing focus indicators & error states
 class OtpDigitInput extends StatefulWidget {
   final int length;
   final ValueChanged<String> onCompleted;
   final ValueChanged<String>? onChanged;
+  final TextEditingController? controller;
+  final bool hasError;
+  final bool autoFocus;
 
   const OtpDigitInput({
     super.key,
     this.length = 6,
     required this.onCompleted,
     this.onChanged,
+    this.controller,
+    this.hasError = false,
+    this.autoFocus = true,
   });
 
   @override
@@ -22,151 +32,163 @@ class OtpDigitInput extends StatefulWidget {
 }
 
 class OtpDigitInputState extends State<OtpDigitInput> {
-  late List<TextEditingController> _controllers;
-  late List<FocusNode> _focusNodes;
+  late TextEditingController _effectiveController;
+  late FocusNode _focusNode;
+  bool _isInternalController = false;
 
   @override
   void initState() {
     super.initState();
-    _controllers = List.generate(widget.length, (_) => TextEditingController());
-    _focusNodes = List.generate(widget.length, (_) => FocusNode());
+    if (widget.controller != null) {
+      _effectiveController = widget.controller!;
+    } else {
+      _effectiveController = TextEditingController();
+      _isInternalController = true;
+    }
+    _focusNode = FocusNode();
+    _effectiveController.addListener(_handleTextChange);
+
+    if (widget.autoFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _focusNode.requestFocus();
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(OtpDigitInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      _effectiveController.removeListener(_handleTextChange);
+      if (_isInternalController) {
+        _effectiveController.dispose();
+      }
+      if (widget.controller != null) {
+        _effectiveController = widget.controller!;
+        _isInternalController = false;
+      } else {
+        _effectiveController = TextEditingController();
+        _isInternalController = true;
+      }
+      _effectiveController.addListener(_handleTextChange);
+    }
+
+    // Auto-select text on error so next keystroke or backspace clears/replaces it immediately
+    if (widget.hasError && !oldWidget.hasError && _effectiveController.text.isNotEmpty) {
+      _effectiveController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _effectiveController.text.length,
+      );
+    }
   }
 
   @override
   void dispose() {
-    for (final c in _controllers) {
-      c.dispose();
+    _effectiveController.removeListener(_handleTextChange);
+    if (_isInternalController) {
+      _effectiveController.dispose();
     }
-    for (final f in _focusNodes) {
-      f.dispose();
-    }
+    _focusNode.dispose();
     super.dispose();
   }
 
-  /// Programmatically paste or fill code across all boxes
+  void _handleTextChange() {
+    final text = _effectiveController.text;
+    widget.onChanged?.call(text);
+    if (text.length == widget.length) {
+      widget.onCompleted(text);
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  /// Programmatically clear all digits and focus first box
+  void clear() {
+    _effectiveController.clear();
+    _focusNode.requestFocus();
+  }
+
+  /// Programmatically request focus
+  void requestFocus() {
+    _focusNode.requestFocus();
+  }
+
+  /// Programmatically paste code
   void pasteCode(String rawCode) {
-    _fillDigits(rawCode);
-  }
-
-  void _fillDigits(String rawDigits) {
-    final digits = rawDigits.replaceAll(RegExp(r'\D'), '');
+    final digits = rawCode.replaceAll(RegExp(r'\D'), '');
     if (digits.isEmpty) return;
-
     HapticFeedback.mediumImpact();
-
-    // Distribute digits into all boxes
-    for (int i = 0; i < widget.length; i++) {
-      if (i < digits.length) {
-        _controllers[i].text = digits[i];
-      } else {
-        _controllers[i].clear();
-      }
-    }
-
-    final filledCount = digits.length.clamp(0, widget.length);
-    if (filledCount == widget.length) {
-      _focusNodes.last.unfocus();
-    } else {
-      _focusNodes[filledCount].requestFocus();
-    }
-
-    final fullCode = _controllers.map((c) => c.text).join();
-    widget.onChanged?.call(fullCode);
-    if (fullCode.length == widget.length) {
-      widget.onCompleted(fullCode);
-    }
+    final capped = digits.length > widget.length ? digits.substring(0, widget.length) : digits;
+    _effectiveController.text = capped;
+    _effectiveController.selection = TextSelection.collapsed(offset: capped.length);
   }
 
-  void _onDigitChanged(int index, String value) {
-    final digits = value.replaceAll(RegExp(r'\D'), '');
-
-    // Case 1: Multi-digit paste detected (pasting 6-digit OTP into any box)
-    if (digits.length >= 4 || digits.length >= widget.length) {
-      _fillDigits(digits);
-      return;
-    }
-
-    // Case 2: User typed over an existing digit (value has 2 digits)
-    if (digits.length > 1) {
-      HapticFeedback.lightImpact();
-      final newChar = digits.substring(digits.length - 1);
-      _controllers[index].text = newChar;
-      if (index < widget.length - 1) {
-        _focusNodes[index + 1].requestFocus();
-      } else {
-        _focusNodes[index].unfocus();
-      }
-    } else if (digits.length == 1) {
-      // Case 3: Single digit typed
-      HapticFeedback.lightImpact();
-      _controllers[index].text = digits;
-      if (index < widget.length - 1) {
-        _focusNodes[index + 1].requestFocus();
-      } else {
-        _focusNodes[index].unfocus();
-      }
+  void _handleTap() {
+    _focusNode.requestFocus();
+    if (widget.hasError && _effectiveController.text.isNotEmpty) {
+      _effectiveController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _effectiveController.text.length,
+      );
     } else {
-      // Case 4: Cleared
-      _controllers[index].clear();
-    }
-
-    final fullCode = _controllers.map((c) => c.text).join();
-    widget.onChanged?.call(fullCode);
-    if (fullCode.length == widget.length) {
-      widget.onCompleted(fullCode);
+      _effectiveController.selection = TextSelection.collapsed(
+        offset: _effectiveController.text.length,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(widget.length, (index) {
-        final controller = _controllers[index];
-        final focusNode = _focusNodes[index];
+    return GestureDetector(
+      onTap: _handleTap,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
+        children: [
+          // ── Visible Squircle Boxes ─────────────────────────────
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(widget.length, (index) {
+              final text = _effectiveController.text;
+              final bool hasDigit = index < text.length;
+              final String digit = hasDigit ? text[index] : '';
 
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: index == 0 ? 0 : 3.5,
-              right: index == widget.length - 1 ? 0 : 3.5,
-            ),
-            child: Focus(
-              onKeyEvent: (node, event) {
-                if (event is KeyDownEvent &&
-                    event.logicalKey == LogicalKeyboardKey.backspace &&
-                    controller.text.isEmpty &&
-                    index > 0) {
-                  _focusNodes[index - 1].requestFocus();
-                  _controllers[index - 1].selection = TextSelection.fromPosition(
-                    TextPosition(offset: _controllers[index - 1].text.length),
-                  );
-                }
-                return KeyEventResult.ignored;
-              },
-              child: AnimatedBuilder(
-                animation: Listenable.merge([focusNode, controller]),
-                builder: (context, _) {
-                  final bool isFocused = focusNode.hasFocus;
-                  final bool hasValue = controller.text.isNotEmpty;
+              // Active focused box is the box awaiting input or the last box if full
+              final bool isFocused = _focusNode.hasFocus &&
+                  ((index == text.length) ||
+                      (index == widget.length - 1 && text.length == widget.length));
 
-                  return Container(
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: index == 0 ? 0 : 3.5,
+                    right: index == widget.length - 1 ? 0 : 3.5,
+                  ),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
                     height: 56.0,
                     decoration: BoxDecoration(
-                      color: isFocused
-                          ? AppColors.background
-                          : (hasValue ? AppColors.accentLight : AppColors.surface),
+                      color: widget.hasError
+                          ? AppColors.error.withValues(alpha: 0.05)
+                          : (isFocused
+                              ? AppColors.background
+                              : (hasDigit ? AppColors.accentLight : AppColors.surface)),
                       borderRadius: BorderRadius.circular(15.0),
                       border: Border.all(
-                        color: isFocused
-                            ? AppColors.accent
-                            : (hasValue ? AppColors.primary : AppColors.border),
-                        width: isFocused ? 2.0 : 1.2,
+                        color: widget.hasError
+                            ? AppColors.error
+                            : (isFocused
+                                ? AppColors.accent
+                                : (hasDigit ? AppColors.primary : AppColors.border)),
+                        width: isFocused || widget.hasError ? 2.0 : 1.2,
                       ),
                       boxShadow: isFocused
                           ? [
                               BoxShadow(
-                                color: AppColors.accent.withValues(alpha: 0.18),
+                                color: widget.hasError
+                                    ? AppColors.error.withValues(alpha: 0.20)
+                                    : AppColors.accent.withValues(alpha: 0.20),
                                 blurRadius: 8.0,
                                 offset: const Offset(0, 3),
                               ),
@@ -174,35 +196,86 @@ class OtpDigitInputState extends State<OtpDigitInput> {
                           : null,
                     ),
                     child: Center(
-                      child: TextField(
-                        controller: controller,
-                        focusNode: focusNode,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        enableInteractiveSelection: true,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        onChanged: (val) => _onDigitChanged(index, val),
+                      child: Text(
+                        digit,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 22.0,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                        ),
-                        decoration: const InputDecoration(
-                          counterText: '',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
+                          color: widget.hasError ? AppColors.error : AppColors.textPrimary,
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
+              );
+            }),
+          ),
+
+          // ── Transparent Single Input Layer (Receives typing & backspace) ──
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.0,
+              child: TextField(
+                controller: _effectiveController,
+                focusNode: _focusNode,
+                keyboardType: TextInputType.number,
+                autofillHints: const [AutofillHints.oneTimeCode],
+                enableInteractiveSelection: true,
+                showCursor: false,
+                inputFormatters: [
+                  _OtpSmartInputFormatter(maxLength: widget.length),
+                ],
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  counterText: '',
+                  fillColor: Colors.transparent,
+                ),
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Smart formatter that supports continuous typing, rapid backspacing,
+/// paste distribution, and instant replacement when full.
+class _OtpSmartInputFormatter extends TextInputFormatter {
+  final int maxLength;
+
+  _OtpSmartInputFormatter({required this.maxLength});
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final cleanDigits = newValue.text.replaceAll(RegExp(r'\D'), '');
+
+    // Case 1: When user types another digit while code is already 6 digits full
+    if (cleanDigits.length > maxLength) {
+      final addedCount = newValue.text.length - oldValue.text.length;
+      if (addedCount >= 4) {
+        // Multi-digit paste into full field: replace with first maxLength characters
+        final pastePortion = cleanDigits.substring(0, maxLength);
+        return TextEditingValue(
+          text: pastePortion,
+          selection: TextSelection.collapsed(offset: pastePortion.length),
         );
-      }),
+      }
+
+      // Single digit typed into full field: start fresh with the newly typed digit!
+      final lastTyped = cleanDigits.substring(cleanDigits.length - 1);
+      return TextEditingValue(
+        text: lastTyped,
+        selection: const TextSelection.collapsed(offset: 1),
+      );
+    }
+
+    return TextEditingValue(
+      text: cleanDigits,
+      selection: TextSelection.collapsed(offset: cleanDigits.length),
     );
   }
 }

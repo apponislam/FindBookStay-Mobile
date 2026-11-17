@@ -25,52 +25,7 @@ class _ExploreTabState extends State<ExploreTab> {
     {'title': 'Buy Property', 'icon': Icons.real_estate_agent_rounded},
   ];
 
-  final List<Map<String, dynamic>> _featuredListings = const [
-    {
-      'type': 'RENT',
-      'title': 'Luxury 3-Bed Family Flat',
-      'location': 'Gulshan 2, Dhaka',
-      'price': '৳45,000 / mo',
-      'tag': '0% Broker Fee',
-      'rating': '4.95',
-      'reviews': '28',
-      'icon': Icons.apartment_rounded,
-      'accentColor': AppColors.primary,
-    },
-    {
-      'type': 'BOOK',
-      'title': 'Skyline Oceanview Suite',
-      'location': 'Marine Drive, Cox\'s Bazar',
-      'price': '৳6,200 / night',
-      'tag': 'Instant Book',
-      'rating': '4.90',
-      'reviews': '54',
-      'icon': Icons.pool_rounded,
-      'accentColor': AppColors.accent,
-    },
-    {
-      'type': 'SPORTS',
-      'title': 'Green Arena 7v7 Turf (Pitch 1)',
-      'location': 'Banani, Dhaka',
-      'price': '৳2,000 / hr',
-      'tag': 'Floodlit Arena',
-      'rating': '4.88',
-      'reviews': '42',
-      'icon': Icons.sports_soccer_rounded,
-      'accentColor': Color(0xFF059669),
-    },
-    {
-      'type': 'BUY',
-      'title': 'Lakefront Luxury Penthouse',
-      'location': 'Baridhara DOHS, Dhaka',
-      'price': '৳2.8 Crore',
-      'tag': 'Verified Title',
-      'rating': '5.0',
-      'reviews': '12',
-      'icon': Icons.villa_rounded,
-      'accentColor': Color(0xFF0284C7),
-    },
-  ];
+  final List<Map<String, dynamic>> _featuredListings = const [];
 
   @override
   Widget build(BuildContext context) {
@@ -440,15 +395,15 @@ class _ExploreTabState extends State<ExploreTab> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'See All (42)',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.accent,
+                        if (_featuredListings.isNotEmpty)
+                          Text(
+                            'See All (${_featuredListings.length})',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.accent,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -456,121 +411,165 @@ class _ExploreTabState extends State<ExploreTab> {
 
                 const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-                // ── Featured Cards List ────────────────────────────────
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final item = _featuredListings[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 14),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Row(
-                            children: [
-                              // Visual Illustration Box
-                              Container(
-                                width: 72,
-                                height: 72,
-                                decoration: BoxDecoration(
-                                  color: (item['accentColor'] as Color)
-                                      .withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Icon(
-                                  item['icon'] as IconData,
-                                  size: 32,
-                                  color: item['accentColor'] as Color,
-                                ),
+                // ── Featured Cards List / Empty State ─────────────────
+                if (_featuredListings.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.border),
                               ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 7,
-                                            vertical: 2.5,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.accentLight,
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          child: Text(
-                                            item['tag'] as String,
-                                            style:
-                                                GoogleFonts.plusJakartaSans(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w800,
-                                              color: AppColors.primary,
+                              child: const Icon(
+                                Icons.travel_explore_rounded,
+                                size: 28,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'No listings available yet',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Check back soon or explore different categories.',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12.5,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final item = _featuredListings[index];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 14),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                // Visual Illustration Box
+                                Container(
+                                  width: 72,
+                                  height: 72,
+                                  decoration: BoxDecoration(
+                                    color: (item['accentColor'] as Color)
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Icon(
+                                    item['icon'] as IconData,
+                                    size: 32,
+                                    color: item['accentColor'] as Color,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 7,
+                                              vertical: 2.5,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.accentLight,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              item['tag'] as String,
+                                              style:
+                                                  GoogleFonts.plusJakartaSans(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppColors.primary,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        const Spacer(),
-                                        const Icon(
-                                          Icons.star_rounded,
-                                          size: 14,
-                                          color: Color(0xFFF59E0B),
-                                        ),
-                                        const SizedBox(width: 2),
-                                        Text(
-                                          item['rating'] as String,
-                                          style:
-                                              GoogleFonts.plusJakartaSans(
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColors.textPrimary,
+                                          const Spacer(),
+                                          const Icon(
+                                            Icons.star_rounded,
+                                            size: 14,
+                                            color: Color(0xFFF59E0B),
                                           ),
+                                          const SizedBox(width: 2),
+                                          Text(
+                                            item['rating'] as String,
+                                            style:
+                                                GoogleFonts.plusJakartaSans(
+                                              fontSize: 11.5,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        item['title'] as String,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 14.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.textPrimary,
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      item['title'] as String,
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 14.5,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.textPrimary,
                                       ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      item['location'] as String,
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 12,
-                                        color: AppColors.textSecondary,
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        item['location'] as String,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      item['price'] as String,
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w800,
-                                        color: AppColors.primary,
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        item['price'] as String,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.primary,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      childCount: _featuredListings.length,
+                              ],
+                            ),
+                          );
+                        },
+                        childCount: _featuredListings.length,
+                      ),
                     ),
                   ),
-                ),
 
                 const SliverToBoxAdapter(child: SizedBox(height: 30)),
               ],

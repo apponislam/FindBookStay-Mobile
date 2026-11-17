@@ -1,22 +1,24 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'otp_verification_screen.dart';
 import 'widgets/custom_auth_button.dart';
 import 'widgets/custom_auth_input.dart';
 
 /// Screen for initiating password reset with registered email address only.
 /// Centered layout, clean email placeholder, and upper warning badge.
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
   String? _emailError;
   bool _isLoading = false;
@@ -51,8 +53,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       _isLoading = true;
     });
 
-    // Simulate API request to send reset code
-    await Future.delayed(const Duration(milliseconds: 1000));
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .forgotPassword(email);
 
     if (!mounted) return;
 
@@ -60,15 +63,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       _isLoading = false;
     });
 
-    // Navigate to OTP verification screen with email
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => OtpVerificationScreen(
-          email: email,
-          isRegistrationFlow: false,
+    if (success) {
+      HapticFeedback.lightImpact();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => OtpVerificationScreen(
+            email: email,
+            isRegistrationFlow: false,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      HapticFeedback.heavyImpact();
+      final error = ref.read(authErrorProvider);
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error ?? 'Failed to send reset code. Please try again.'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   @override
