@@ -138,6 +138,7 @@ class NotificationService {
 
       // Fallback to getToken() if register() did not complete
       if (_fcmToken == null || _fcmToken!.isEmpty) {
+        // ignore: deprecated_member_use
         _fcmToken = await _messaging.getToken();
       }
 

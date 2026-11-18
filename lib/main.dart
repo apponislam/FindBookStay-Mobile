@@ -1,4 +1,8 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' as fm
+    show DefaultMaterialLocalizations, DefaultWidgetsLocalizations;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -56,6 +60,15 @@ class FindBookStayApp extends StatelessWidget {
     return MaterialApp(
       title: 'FindBookStay',
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        fm.DefaultMaterialLocalizations.delegate,
+        fm.DefaultWidgetsLocalizations.delegate,
+        CountryLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('bn', 'BD'),
+      ],
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: AppColors.background,

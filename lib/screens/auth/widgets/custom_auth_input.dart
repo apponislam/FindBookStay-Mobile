@@ -1,3 +1,5 @@
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' as fm show Material, MaterialType;
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
@@ -10,7 +12,8 @@ import '../../../core/theme/app_colors.dart';
 class CustomAuthInput extends StatefulWidget {
   final String label;
   final String? hint;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
+  final Widget? prefixWidget;
   final TextEditingController? controller;
   final bool isPassword;
   final bool isRequired;
@@ -25,7 +28,8 @@ class CustomAuthInput extends StatefulWidget {
     super.key,
     required this.label,
     this.hint,
-    required this.prefixIcon,
+    this.prefixIcon,
+    this.prefixWidget,
     this.controller,
     this.isPassword = false,
     this.isRequired = false,
@@ -35,7 +39,8 @@ class CustomAuthInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.focusNode,
-  });
+  }) : assert(prefixIcon != null || prefixWidget != null,
+            'Either prefixIcon or prefixWidget must be provided');
 
   @override
   State<CustomAuthInput> createState() => _CustomAuthInputState();
@@ -229,13 +234,23 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
                   fontWeight: FontWeight.w400,
                   color: AppColors.textMuted,
                 ),
-                prefixIcon: Icon(
-                  widget.prefixIcon,
-                  size: 20,
-                  color: hasError
-                      ? AppColors.error
-                      : (_isFocused ? AppColors.accent : AppColors.textSecondary),
-                ),
+                prefixIconConstraints: widget.prefixWidget != null
+                    ? const BoxConstraints(minWidth: 0, minHeight: 0)
+                    : null,
+                prefixIcon: widget.prefixWidget != null
+                    ? fm.Material(
+                        type: fm.MaterialType.transparency,
+                        child: widget.prefixWidget!,
+                      )
+                    : (widget.prefixIcon != null
+                        ? Icon(
+                            widget.prefixIcon,
+                            size: 20,
+                            color: hasError
+                                ? AppColors.error
+                                : (_isFocused ? AppColors.accent : AppColors.textSecondary),
+                          )
+                        : null),
                 suffixIcon: widget.isPassword
                     ? IconButton(
                         splashRadius: 20,

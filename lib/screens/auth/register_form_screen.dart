@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/gestures.dart';
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' as fm show InputDecoration, OutlineInputBorder;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -49,6 +52,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  String _selectedDialCode = '+880';
 
   // Step 2 Controllers: Present Address
   final TextEditingController _presentStreetController = TextEditingController();
@@ -340,7 +344,18 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
 
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
-    final phone = _phoneController.text.trim();
+    final rawPhone = _phoneController.text.trim();
+    String? fullPhone;
+    if (rawPhone.isNotEmpty) {
+      final cleanDigits = rawPhone.replaceAll(RegExp(r'[\s-]'), '');
+      if (cleanDigits.startsWith('+')) {
+        fullPhone = cleanDigits;
+      } else {
+        final normalizedDigits =
+            cleanDigits.startsWith('0') ? cleanDigits.substring(1) : cleanDigits;
+        fullPhone = '$_selectedDialCode$normalizedDigits';
+      }
+    }
 
     // Step 2: Present Address
     final presentStreet = _presentStreetController.text.trim();
@@ -397,7 +412,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
       name: name,
       email: email,
       password: password,
-      phone: phone.isNotEmpty ? phone : null,
+      phone: fullPhone,
       role: 'USER',
       profileImage: profileImageBase64,
       presentAddress: (presentAddress != null && !presentAddress.isEmpty) ? presentAddress : null,
@@ -1060,13 +1075,116 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
 
               const SizedBox(height: 16),
 
-              // Phone Number
+              // Phone Number with Country Code Picker (Bangladesh +880 default)
               CustomAuthInput(
                 label: 'Phone Number (Optional)',
-                hint: '+1 234 567 8900',
-                prefixIcon: Icons.phone_outlined,
+                hint: '1712-345678',
+                prefixWidget: CountryCodePicker(
+                  onChanged: (country) {
+                    setState(() {
+                      _selectedDialCode = country.dialCode ?? '+880';
+                    });
+                  },
+                  initialSelection: 'BD',
+                  favorite: const ['+880', 'BD'],
+                  showCountryOnly: false,
+                  showOnlyCountryWhenClosed: false,
+                  alignLeft: false,
+                  dialogBackgroundColor: AppColors.background,
+                  dialogTextStyle: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                  searchStyle: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
+                  ),
+                  searchDecoration: fm.InputDecoration(
+                    hintText: 'Search country or code',
+                    hintStyle: GoogleFonts.plusJakartaSans(
+                      fontSize: 13.5,
+                      color: AppColors.textMuted,
+                    ),
+                    prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.textSecondary),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    filled: true,
+                    fillColor: AppColors.surface,
+                    border: const fm.OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: const fm.OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                    focusedBorder: const fm.OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide(color: AppColors.accent, width: 1.5),
+                    ),
+                  ),
+                  boxDecoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  builder: (countryCode) {
+                    final dialCode = countryCode?.dialCode ?? _selectedDialCode;
+                    final flagUri = countryCode?.flagUri;
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 14, right: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (flagUri != null)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(3),
+                              child: Image.asset(
+                                flagUri,
+                                package: 'country_code_picker',
+                                width: 22,
+                                height: 15,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          const SizedBox(width: 6),
+                          Text(
+                            dialCode,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 18,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 1,
+                            height: 22,
+                            color: AppColors.border,
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                      ),
+                    );
+                  },
+                ),
                 keyboardType: TextInputType.phone,
                 controller: _phoneController,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9\s-]')),
+                ],
               ),
 
               const SizedBox(height: 24),
