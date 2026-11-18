@@ -213,23 +213,28 @@ class OtpDigitInputState extends State<OtpDigitInput> {
 
           // ── Transparent Single Input Layer (Receives typing & backspace) ──
           Positioned.fill(
-            child: Opacity(
-              opacity: 0.0,
-              child: TextField(
-                controller: _effectiveController,
-                focusNode: _focusNode,
-                keyboardType: TextInputType.number,
-                autofillHints: const [AutofillHints.oneTimeCode],
-                enableInteractiveSelection: true,
-                showCursor: false,
-                inputFormatters: [
-                  _OtpSmartInputFormatter(maxLength: widget.length),
-                ],
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  counterText: '',
-                  fillColor: Colors.transparent,
-                ),
+            child: TextField(
+              controller: _effectiveController,
+              focusNode: _focusNode,
+              keyboardType: TextInputType.number,
+              autofillHints: const [AutofillHints.oneTimeCode],
+              enableInteractiveSelection: false,
+              showCursor: false,
+              cursorColor: Colors.transparent,
+              style: const TextStyle(
+                color: Colors.transparent,
+                fontSize: 1,
+                height: 1,
+              ),
+              inputFormatters: [
+                _OtpSmartInputFormatter(maxLength: widget.length),
+              ],
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                counterText: '',
+                fillColor: Colors.transparent,
+                filled: true,
+                contentPadding: EdgeInsets.zero,
               ),
             ),
           ),

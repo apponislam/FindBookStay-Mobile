@@ -85,6 +85,13 @@ class AuthController extends Notifier<AuthState> {
         _authRepository.registerFcmToken(fcmToken).catchError((e) {
           debugPrint('⚠️ [FCM] Secondary token registration notice: $e');
         });
+      } else {
+        // Retry capturing FCM token in background if not ready before login
+        NotificationService.instance.getFcmToken().then((lateToken) {
+          if (lateToken != null && lateToken.isNotEmpty) {
+            _authRepository.registerFcmToken(lateToken).catchError((_) {});
+          }
+        }).catchError((_) {});
       }
 
       return true;

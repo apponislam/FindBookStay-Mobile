@@ -123,14 +123,23 @@ class NotificationService {
         return _fcmToken;
       }
 
-      // Modern API in firebase_messaging 17+: register() and onRegistered
-      final Future<String> tokenFuture = _messaging.onRegistered.first;
-      await _messaging.register();
+      // Try modern API (register + onRegistered)
+      try {
+        final Future<String> tokenFuture = _messaging.onRegistered.first;
+        await _messaging.register();
 
-      _fcmToken = await tokenFuture.timeout(
-        const Duration(seconds: 8),
-        onTimeout: () => _fcmToken ?? '',
-      );
+        _fcmToken = await tokenFuture.timeout(
+          const Duration(seconds: 4),
+          onTimeout: () => '',
+        );
+      } catch (inner) {
+        debugPrint('⚠️ [FCM] register/onRegistered notice: $inner');
+      }
+
+      // Fallback to getToken() if register() did not complete
+      if (_fcmToken == null || _fcmToken!.isEmpty) {
+        _fcmToken = await _messaging.getToken();
+      }
 
       if (_fcmToken != null && _fcmToken!.isEmpty) {
         _fcmToken = null;
