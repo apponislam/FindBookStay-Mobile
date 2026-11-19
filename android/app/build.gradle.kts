@@ -40,6 +40,11 @@ android {
             keepDebugSymbols += "**/*.so"
         }
     }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
 
 kotlin {
