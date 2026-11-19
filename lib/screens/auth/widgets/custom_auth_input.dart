@@ -1,5 +1,3 @@
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart' as fm show Material, MaterialType;
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
@@ -237,12 +235,8 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
                 prefixIconConstraints: widget.prefixWidget != null
                     ? const BoxConstraints(minWidth: 0, minHeight: 0)
                     : null,
-                prefixIcon: widget.prefixWidget != null
-                    ? fm.Material(
-                        type: fm.MaterialType.transparency,
-                        child: widget.prefixWidget!,
-                      )
-                    : (widget.prefixIcon != null
+                prefixIcon: widget.prefixWidget ??
+                    (widget.prefixIcon != null
                         ? Icon(
                             widget.prefixIcon,
                             size: 20,

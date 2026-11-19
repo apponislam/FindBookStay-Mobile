@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/gestures.dart';
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart' as fm show InputDecoration, OutlineInputBorder;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +13,7 @@ import '../../features/auth/data/models/register_request.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'otp_verification_screen.dart';
 import 'register_role_screen.dart';
+import 'widgets/country_code_selector.dart';
 import 'widgets/custom_auth_input.dart';
 import 'widgets/password_strength_meter.dart';
 
@@ -1079,105 +1077,12 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
               CustomAuthInput(
                 label: 'Phone Number (Optional)',
                 hint: '1712-345678',
-                prefixWidget: CountryCodePicker(
+                prefixWidget: CountryCodeSelector(
+                  initialCountryCode: 'BD',
                   onChanged: (country) {
                     setState(() {
-                      _selectedDialCode = country.dialCode ?? '+880';
+                      _selectedDialCode = country['dial_code'] ?? '+880';
                     });
-                  },
-                  initialSelection: 'BD',
-                  favorite: const ['+880', 'BD'],
-                  showCountryOnly: false,
-                  showOnlyCountryWhenClosed: false,
-                  alignLeft: false,
-                  dialogBackgroundColor: AppColors.background,
-                  dialogTextStyle: GoogleFonts.plusJakartaSans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
-                  searchStyle: GoogleFonts.plusJakartaSans(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                  ),
-                  searchDecoration: fm.InputDecoration(
-                    hintText: 'Search country or code',
-                    hintStyle: GoogleFonts.plusJakartaSans(
-                      fontSize: 13.5,
-                      color: AppColors.textMuted,
-                    ),
-                    prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.textSecondary),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    border: const fm.OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: const fm.OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    focusedBorder: const fm.OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                      borderSide: BorderSide(color: AppColors.accent, width: 1.5),
-                    ),
-                  ),
-                  boxDecoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  builder: (countryCode) {
-                    final dialCode = countryCode?.dialCode ?? _selectedDialCode;
-                    final flagUri = countryCode?.flagUri;
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 14, right: 8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (flagUri != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(3),
-                              child: Image.asset(
-                                flagUri,
-                                package: 'country_code_picker',
-                                width: 22,
-                                height: 15,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          const SizedBox(width: 6),
-                          Text(
-                            dialCode,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 2),
-                          const Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 18,
-                            color: AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            width: 1,
-                            height: 22,
-                            color: AppColors.border,
-                          ),
-                          const SizedBox(width: 4),
-                        ],
-                      ),
-                    );
                   },
                 ),
                 keyboardType: TextInputType.phone,

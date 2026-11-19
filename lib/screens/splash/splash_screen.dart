@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,11 +53,18 @@ class _SplashScreenState extends State<SplashScreen>
     // Artificial minimum delay for smooth branding impression (like Facebook)
     final startTime = DateTime.now();
 
-    final prefs = await SharedPreferences.getInstance();
-    final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    bool hasSeenOnboarding = false;
+    try {
+      final prefs = await SharedPreferences.getInstance().timeout(
+        const Duration(seconds: 2),
+      );
+      hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    } catch (e) {
+      debugPrint('SplashScreen: Error reading preferences: $e');
+    }
 
     final elapsedTime = DateTime.now().difference(startTime);
-    final remainingDelay = const Duration(milliseconds: 2100) - elapsedTime;
+    final remainingDelay = const Duration(milliseconds: 1800) - elapsedTime;
     if (remainingDelay > Duration.zero) {
       await Future.delayed(remainingDelay);
     }
