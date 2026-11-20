@@ -32,13 +32,15 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
   @override
   Widget build(BuildContext context) {
     ref.watch(themeModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListenableBuilder(
       listenable: AuthService.instance,
       builder: (context, _) {
         final isLoggedIn = AuthService.instance.isLoggedIn;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
           body: SafeArea(
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
@@ -63,12 +65,12 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                   width: 34,
                                   height: 34,
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary,
+                                    color: isDark ? AppColors.accent : AppColors.primary,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.holiday_village_rounded,
-                                    color: AppColors.accent,
+                                    color: isDark ? AppColors.primaryDark : AppColors.accent,
                                     size: 20,
                                   ),
                                 ),
@@ -80,7 +82,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
-                                  color: AppColors.primary,
+                                  color: isDark ? Colors.white : AppColors.primary,
                                   letterSpacing: -0.4,
                                 ),
                                 children: const [
@@ -116,13 +118,13 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                             ),
                             decoration: BoxDecoration(
                               color: isLoggedIn
-                                  ? AppColors.accentLight
-                                  : AppColors.surface,
+                                  ? (isDark ? AppColors.darkAccentLight : AppColors.accentLight)
+                                  : (isDark ? AppColors.darkCard : AppColors.surface),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isLoggedIn
                                     ? AppColors.accent.withValues(alpha: 0.3)
-                                    : AppColors.border,
+                                    : (isDark ? AppColors.darkBorder : AppColors.border),
                               ),
                             ),
                             child: Row(
@@ -147,8 +149,8 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                     color: isLoggedIn
-                                        ? AppColors.primary
-                                        : AppColors.textPrimary,
+                                        ? (isDark ? AppColors.accent : AppColors.primary)
+                                        : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
                                   ),
                                 ),
                               ],
@@ -170,12 +172,12 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: isDark ? AppColors.darkCard : AppColors.surface,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.03),
+                            color: isDark ? Colors.black.withValues(alpha: 0.25) : AppColors.primary.withValues(alpha: 0.03),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -183,9 +185,9 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.search_rounded,
-                            color: AppColors.primary,
+                            color: isDark ? AppColors.accent : AppColors.primary,
                             size: 22,
                           ),
                           const SizedBox(width: 12),
@@ -198,14 +200,14 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
+                                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                   ),
                                 ),
                                 Text(
                                   'Flats · Bachelor seats · Hotels · Sports turfs',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 11.5,
-                                    color: AppColors.textSecondary,
+                                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -214,14 +216,14 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.background,
+                              color: isDark ? AppColors.darkSurface : AppColors.background,
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.border),
+                              border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.tune_rounded,
                               size: 16,
-                              color: AppColors.primary,
+                              color: isDark ? AppColors.accent : AppColors.primary,
                             ),
                           ),
                         ],
@@ -255,13 +257,13 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                             ),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? AppColors.primary
-                                  : AppColors.surface,
+                                  ? (isDark ? AppColors.accent : AppColors.primary)
+                                  : (isDark ? AppColors.darkCard : AppColors.surface),
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
                                 color: isSelected
-                                    ? AppColors.primary
-                                    : AppColors.border,
+                                    ? (isDark ? AppColors.accent : AppColors.primary)
+                                    : (isDark ? AppColors.darkBorder : AppColors.border),
                               ),
                             ),
                             child: Row(
@@ -270,8 +272,8 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                   cat['icon'] as IconData,
                                   size: 16,
                                   color: isSelected
-                                      ? Colors.white
-                                      : AppColors.textSecondary,
+                                      ? (isDark ? AppColors.primaryDark : Colors.white)
+                                      : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
@@ -282,8 +284,8 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                         ? FontWeight.w700
                                         : FontWeight.w600,
                                     color: isSelected
-                                        ? Colors.white
-                                        : AppColors.textPrimary,
+                                        ? (isDark ? AppColors.primaryDark : Colors.white)
+                                        : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
                                   ),
                                 ),
                               ],
@@ -304,11 +306,11 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                     child: Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        gradient: AppColors.primaryGradient,
+                        gradient: isDark ? AppColors.darkPrimaryGradient : AppColors.primaryGradient,
                         borderRadius: BorderRadius.circular(22),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.22),
+                            color: (isDark ? AppColors.accent : AppColors.primary).withValues(alpha: isDark ? 0.3 : 0.22),
                             blurRadius: 18,
                             offset: const Offset(0, 8),
                           ),
@@ -394,7 +396,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                               letterSpacing: -0.3,
                             ),
                           ),
@@ -427,14 +429,14 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                               width: 64,
                               height: 64,
                               decoration: BoxDecoration(
-                                color: AppColors.surface,
+                                color: isDark ? AppColors.darkCard : AppColors.surface,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.border),
+                                border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.travel_explore_rounded,
                                 size: 28,
-                                color: AppColors.textSecondary,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -443,7 +445,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
+                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -451,7 +453,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                               'Check back soon or explore different categories.',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 12.5,
-                                color: AppColors.textSecondary,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -470,9 +472,9 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                             margin: const EdgeInsets.only(bottom: 14),
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
+                              color: isDark ? AppColors.darkCard : AppColors.surface,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: AppColors.border),
+                              border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                             ),
                             child: Row(
                               children: [
@@ -505,7 +507,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                               vertical: 2.5,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: AppColors.accentLight,
+                                              color: isDark ? AppColors.darkAccentLight : AppColors.accentLight,
                                               borderRadius:
                                                   BorderRadius.circular(6),
                                             ),
@@ -515,7 +517,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                                   GoogleFonts.plusJakartaSans(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w800,
-                                                color: AppColors.primary,
+                                                color: isDark ? AppColors.accent : AppColors.primary,
                                               ),
                                             ),
                                           ),
@@ -532,7 +534,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                                 GoogleFonts.plusJakartaSans(
                                               fontSize: 11.5,
                                               fontWeight: FontWeight.w700,
-                                              color: AppColors.textPrimary,
+                                              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                             ),
                                           ),
                                         ],
@@ -543,7 +545,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 14.5,
                                           fontWeight: FontWeight.w700,
-                                          color: AppColors.textPrimary,
+                                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                         ),
                                       ),
                                       const SizedBox(height: 2),
@@ -551,7 +553,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                         item['location'] as String,
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 12,
-                                          color: AppColors.textSecondary,
+                                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                         ),
                                       ),
                                       const SizedBox(height: 6),
@@ -560,7 +562,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 13.5,
                                           fontWeight: FontWeight.w800,
-                                          color: AppColors.primary,
+                                          color: isDark ? AppColors.accent : AppColors.primary,
                                         ),
                                       ),
                                     ],

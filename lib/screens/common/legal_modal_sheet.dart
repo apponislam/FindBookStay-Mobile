@@ -21,6 +21,7 @@ class LegalModalSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final title = isTerms ? 'Terms of Service' : 'Privacy Policy';
     final sections = isTerms ? _termsSections : _privacySections;
 
@@ -31,9 +32,9 @@ class LegalModalSheet extends StatelessWidget {
       expand: false,
       builder: (_, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkCard : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Column(
             children: [
@@ -43,7 +44,7 @@ class LegalModalSheet extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border,
+                  color: isDark ? AppColors.darkBorder : AppColors.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -57,7 +58,7 @@ class LegalModalSheet extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.accentLight,
+                        color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -65,7 +66,7 @@ class LegalModalSheet extends StatelessWidget {
                             ? Icons.gavel_rounded
                             : Icons.shield_outlined,
                         size: 20,
-                        color: AppColors.primary,
+                        color: isDark ? AppColors.accent : AppColors.primary,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -75,7 +76,7 @@ class LegalModalSheet extends StatelessWidget {
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -83,9 +84,9 @@ class LegalModalSheet extends StatelessWidget {
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close_rounded),
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                       style: IconButton.styleFrom(
-                        backgroundColor: AppColors.surface,
+                        backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -97,7 +98,7 @@ class LegalModalSheet extends StatelessWidget {
 
               Divider(
                 height: 1,
-                color: AppColors.border,
+                color: isDark ? AppColors.darkBorder : AppColors.border,
                 indent: 24,
                 endIndent: 24,
               ),
@@ -119,7 +120,7 @@ class LegalModalSheet extends StatelessWidget {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -128,7 +129,7 @@ class LegalModalSheet extends StatelessWidget {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w400,
-                            color: AppColors.textSecondary,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                             height: 1.6,
                           ),
                         ),
@@ -148,8 +149,8 @@ class LegalModalSheet extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        backgroundColor: isDark ? AppColors.accent : AppColors.primary,
+                        foregroundColor: isDark ? AppColors.primaryDark : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),

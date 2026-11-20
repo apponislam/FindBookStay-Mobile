@@ -11,8 +11,8 @@ class CustomAuthButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
   final IconData? icon;
-  final Color backgroundColor;
-  final Color textColor;
+  final Color? backgroundColor;
+  final Color? textColor;
 
   const CustomAuthButton({
     super.key,
@@ -20,12 +20,16 @@ class CustomAuthButton extends StatelessWidget {
     required this.onPressed,
     this.isLoading = false,
     this.icon,
-    this.backgroundColor = AppColors.primary,
-    this.textColor = AppColors.textWhite,
+    this.backgroundColor,
+    this.textColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveBg = backgroundColor ?? (isDark ? AppColors.accent : AppColors.primary);
+    final effectiveText = textColor ?? (isDark ? AppColors.primaryDark : AppColors.textWhite);
+
     return SizedBox(
       width: double.infinity,
       height: 54.0,
@@ -37,13 +41,13 @@ class CustomAuthButton extends StatelessWidget {
                 onPressed?.call();
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          disabledBackgroundColor: backgroundColor.withValues(alpha: 0.65),
+          backgroundColor: effectiveBg,
+          disabledBackgroundColor: effectiveBg.withValues(alpha: 0.65),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
-          shadowColor: AppColors.primary.withValues(alpha: 0.3),
+          shadowColor: effectiveBg.withValues(alpha: isDark ? 0.4 : 0.3),
         ),
         child: isLoading
             ? const SizedBox(
@@ -62,13 +66,17 @@ class CustomAuthButton extends StatelessWidget {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w700,
-                      color: textColor,
+                      color: effectiveText,
                       letterSpacing: 0.2,
                     ),
                   ),
                   if (icon != null) ...[
                     const SizedBox(width: 8.0),
-                    Icon(icon, size: 19.0, color: AppColors.accent),
+                    Icon(
+                      icon,
+                      size: 19.0,
+                      color: isDark ? AppColors.primaryDark : AppColors.accent,
+                    ),
                   ],
                 ],
               ),

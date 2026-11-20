@@ -86,4 +86,28 @@ class AppColors {
   /// Helper returning dynamic secondary text color based on active brightness
   static Color txtSecondary(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark ? darkTextSecondary : textSecondary;
+
+  /// Helper checking if dark mode is active
+  static bool isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  /// Helper returning dynamic muted text color based on active brightness
+  static Color txtMuted(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? darkTextMuted : textMuted;
+
+  /// Helper returning dynamic primary brand color (accent mint in dark, deep forest green in light)
+  static Color primaryBrand(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? accent : primary;
+
+  /// Helper returning dynamic soft accent background tint
+  static Color accentLightDyn(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? darkAccentLight : accentLight;
+
+  /// Helper returning dynamic subtle border color
+  static Color borderSubtleDyn(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? darkBorderSubtle : borderSubtle;
+
+  /// Helper returning dynamic primary gradient
+  static LinearGradient gradient(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? darkPrimaryGradient : primaryGradient;
 }

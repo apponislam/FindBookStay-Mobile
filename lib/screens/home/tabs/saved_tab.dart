@@ -20,15 +20,17 @@ class _SavedTabState extends State<SavedTab> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListenableBuilder(
       listenable: AuthService.instance,
       builder: (context, _) {
         final isLoggedIn = AuthService.instance.isLoggedIn;
 
         if (!isLoggedIn) {
-          return const Scaffold(
-            backgroundColor: AppColors.background,
-            body: SafeArea(
+          return Scaffold(
+            backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+            body: const SafeArea(
               child: GuestAuthGateCard(
                 icon: Icons.favorite_rounded,
                 title: 'Save your favorite spots',
@@ -41,16 +43,16 @@ class _SavedTabState extends State<SavedTab> {
         }
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
           appBar: AppBar(
-            backgroundColor: AppColors.background,
+            backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
             elevation: 0,
             title: Text(
               'Saved Wishlist',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
             actions: [
@@ -59,17 +61,19 @@ class _SavedTabState extends State<SavedTab> {
                   HapticFeedback.lightImpact();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: isDark ? AppColors.accent : AppColors.primary,
                       content: Text(
                         'Wishlist synced with your account',
-                        style: GoogleFonts.plusJakartaSans(color: Colors.white),
+                        style: GoogleFonts.plusJakartaSans(
+                          color: isDark ? AppColors.primaryDark : Colors.white,
+                        ),
                       ),
                     ),
                   );
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.sync_rounded,
-                  color: AppColors.textSecondary,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                 ),
               ),
             ],
@@ -86,14 +90,14 @@ class _SavedTabState extends State<SavedTab> {
                             width: 72,
                             height: 72,
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
+                              color: isDark ? AppColors.darkCard : AppColors.surface,
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.border),
+                              border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.favorite_border_rounded,
                               size: 32,
-                              color: AppColors.textSecondary,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -102,7 +106,7 @@ class _SavedTabState extends State<SavedTab> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
+                              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -111,7 +115,7 @@ class _SavedTabState extends State<SavedTab> {
                             textAlign: TextAlign.center,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,
-                              color: AppColors.textSecondary,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                               height: 1.45,
                             ),
                           ),
@@ -129,9 +133,9 @@ class _SavedTabState extends State<SavedTab> {
                       return Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
+                          color: isDark ? AppColors.darkCard : AppColors.surface,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                         ),
                         child: Row(
                           children: [
@@ -139,12 +143,12 @@ class _SavedTabState extends State<SavedTab> {
                               width: 64,
                               height: 64,
                               decoration: BoxDecoration(
-                                color: AppColors.accentLight,
+                                color: isDark ? AppColors.darkAccentLight : AppColors.accentLight,
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Icon(
                                 item['icon'] as IconData,
-                                color: AppColors.primary,
+                                color: isDark ? AppColors.accent : AppColors.primary,
                                 size: 30,
                               ),
                             ),
@@ -159,16 +163,16 @@ class _SavedTabState extends State<SavedTab> {
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.background,
+                                      color: isDark ? AppColors.darkSurface : AppColors.background,
                                       borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: AppColors.border),
+                                      border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                                     ),
                                     child: Text(
                                       item['type'] as String,
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.w700,
-                                        color: AppColors.textSecondary,
+                                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                       ),
                                     ),
                                   ),
@@ -178,7 +182,7 @@ class _SavedTabState extends State<SavedTab> {
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 14.5,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.textPrimary,
+                                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -186,7 +190,7 @@ class _SavedTabState extends State<SavedTab> {
                                     item['location'] as String,
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                     ),
                                   ),
                                   const SizedBox(height: 6),
@@ -195,7 +199,7 @@ class _SavedTabState extends State<SavedTab> {
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 13.5,
                                       fontWeight: FontWeight.w800,
-                                      color: AppColors.primary,
+                                      color: isDark ? AppColors.accent : AppColors.primary,
                                     ),
                                   ),
                                 ],

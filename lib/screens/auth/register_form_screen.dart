@@ -138,6 +138,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   // Profile Photo Upload (Camera / Gallery)
   // ---------------------------------------------------------------------------
   void _showPhotoOptions() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     HapticFeedback.selectionClick();
     showModalBottomSheet<void>(
       context: context,
@@ -145,9 +146,9 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
       builder: (ctx) {
         return Container(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkCard : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -156,7 +157,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border,
+                  color: isDark ? AppColors.darkBorder : AppColors.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -166,24 +167,28 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 18),
               ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: AppColors.accentLight,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt_rounded, color: AppColors.primary),
+                  child: Icon(
+                    Icons.camera_alt_rounded,
+                    color: isDark ? AppColors.accent : AppColors.primary,
+                  ),
                 ),
                 title: Text(
                   'Take Photo with Camera',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   ),
                 ),
                 onTap: () {
@@ -194,17 +199,21 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
               ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: AppColors.accentLight,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.photo_library_rounded, color: AppColors.primary),
+                  child: Icon(
+                    Icons.photo_library_rounded,
+                    color: isDark ? AppColors.accent : AppColors.primary,
+                  ),
                 ),
                 title: Text(
                   'Choose from Gallery',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   ),
                 ),
                 onTap: () {
@@ -468,6 +477,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return PopScope(
       canPop: _currentStep == 0,
       onPopInvokedWithResult: (didPop, _) {
@@ -476,14 +486,14 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: AppColors.textPrimary,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               size: 20,
             ),
             onPressed: () {
@@ -499,7 +509,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
             style: GoogleFonts.plusJakartaSans(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           centerTitle: true,
@@ -537,13 +547,14 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   // Top Step Progress Indicator (Modern Round Nodes with Glowing Pulse)
   // ---------------------------------------------------------------------------
   Widget _buildModernRoundStepper() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.fromLTRB(28, 10, 28, 14),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: isDark ? AppColors.darkBackground : AppColors.background,
         border: Border(
           bottom: BorderSide(
-            color: AppColors.border.withValues(alpha: 0.6),
+            color: (isDark ? AppColors.darkBorder : AppColors.border).withValues(alpha: 0.6),
             width: 1,
           ),
         ),
@@ -578,6 +589,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
     required String label,
     required IconData icon,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isActive = _currentStep == stepIndex;
     final isCompleted = _currentStep > stepIndex;
 
@@ -603,11 +615,15 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                   shape: BoxShape.circle,
                   color: isActive
                       ? AppColors.primary
-                      : (isCompleted ? AppColors.primary : AppColors.surface),
+                      : (isCompleted
+                          ? AppColors.primary
+                          : (isDark ? AppColors.darkCard : AppColors.surface)),
                   border: Border.all(
                     color: isActive
                         ? AppColors.accent
-                        : (isCompleted ? AppColors.primary : AppColors.border),
+                        : (isCompleted
+                            ? AppColors.primary
+                            : (isDark ? AppColors.darkBorder : AppColors.border)),
                     width: isActive ? 2.2 : (isCompleted ? 2.0 : 1.5),
                   ),
                   boxShadow: isActive
@@ -645,7 +661,9 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 15,
                             fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                            color: isActive ? Colors.white : AppColors.textMuted,
+                            color: isActive
+                                ? Colors.white
+                                : (isDark ? AppColors.darkTextMuted : AppColors.textMuted),
                           ),
                         ),
                 ),
@@ -659,8 +677,10 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
               fontSize: 12,
               fontWeight: isActive ? FontWeight.w800 : (isCompleted ? FontWeight.w700 : FontWeight.w500),
               color: isActive
-                  ? AppColors.primary
-                  : (isCompleted ? AppColors.textPrimary : AppColors.textMuted),
+                  ? (isDark ? AppColors.accent : AppColors.primary)
+                  : (isCompleted
+                      ? (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)
+                      : (isDark ? AppColors.darkTextMuted : AppColors.textMuted)),
               letterSpacing: -0.1,
             ),
             child: Text(label),
@@ -671,6 +691,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   }
 
   Widget _buildConnectingLine(int fromIndex) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isCompleted = _currentStep > fromIndex;
     return Container(
       margin: const EdgeInsets.only(top: 19.5, left: 8, right: 8),
@@ -683,7 +704,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 width: constraints.maxWidth,
                 height: 3,
                 decoration: BoxDecoration(
-                  color: AppColors.border.withValues(alpha: 0.7),
+                  color: (isDark ? AppColors.darkBorder : AppColors.border).withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
@@ -719,19 +740,20 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   // Stationary Bottom Action Bar (Fixed, never slides with form)
   // ---------------------------------------------------------------------------
   Widget _buildFixedBottomBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.darkCard : Colors.white,
         border: Border(
           top: BorderSide(
-            color: AppColors.border.withValues(alpha: 0.7),
+            color: (isDark ? AppColors.darkBorder : AppColors.border).withValues(alpha: 0.7),
             width: 1,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
             offset: const Offset(0, -3),
             blurRadius: 12,
           ),
@@ -873,14 +895,15 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   }
 
   Widget _buildModernBackButton({required VoidCallback onPressed}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 54,
       height: 54,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.border,
+          color: isDark ? AppColors.darkBorder : AppColors.border,
           width: 1.5,
         ),
         boxShadow: [
@@ -901,10 +924,10 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
           borderRadius: BorderRadius.circular(16),
           splashColor: AppColors.primary.withValues(alpha: 0.08),
           highlightColor: AppColors.primary.withValues(alpha: 0.04),
-          child: const Center(
+          child: Center(
             child: Icon(
               Icons.arrow_back_rounded,
-              color: AppColors.textPrimary,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               size: 22,
             ),
           ),
@@ -917,6 +940,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   // STEP 1: Personal Details (Profile Photo, Name, Email, Phone)
   // ---------------------------------------------------------------------------
   Widget _buildStep1Personal() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -930,7 +954,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 27,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   letterSpacing: -0.6,
                 ),
               ),
@@ -942,7 +966,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -960,16 +984,16 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                         height: 94,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.surface,
+                          color: isDark ? AppColors.darkSurface : AppColors.surface,
                           border: Border.all(
                             color: _profilePhoto != null
                                 ? AppColors.primary
-                                : AppColors.border,
+                                : (isDark ? AppColors.darkBorder : AppColors.border),
                             width: 2.2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -989,7 +1013,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                                     Icon(
                                       Icons.person_rounded,
                                       size: 44,
-                                      color: AppColors.textMuted.withValues(alpha: 0.6),
+                                      color: (isDark ? AppColors.darkTextMuted : AppColors.textMuted).withValues(alpha: 0.6),
                                     ),
                                   ],
                                 ),
@@ -1007,7 +1031,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                           decoration: BoxDecoration(
                             color: AppColors.primary,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(color: isDark ? AppColors.darkCard : Colors.white, width: 2),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.primary.withValues(alpha: 0.35),
@@ -1035,7 +1059,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -1102,15 +1126,15 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                     text: TextSpan(
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13.5,
-                        color: AppColors.textSecondary,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                       ),
-                      children: const [
-                        TextSpan(text: 'Already have an account? '),
+                      children: [
+                        const TextSpan(text: 'Already have an account? '),
                         TextSpan(
                           text: 'Sign In',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
+                            color: isDark ? AppColors.accent : AppColors.primary,
                           ),
                         ),
                       ],
@@ -1130,6 +1154,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   // STEP 2: Addresses & Referral (Present, Permanent, Referral Code)
   // ---------------------------------------------------------------------------
   Widget _buildStep2AddressAndReferral() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -1143,7 +1168,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 27,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   letterSpacing: -0.6,
                 ),
               ),
@@ -1155,7 +1180,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -1167,14 +1192,14 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
               // ---------------------------------------------------------------
               Row(
                 children: [
-                  const Icon(Icons.location_on_rounded, size: 20, color: AppColors.primary),
+                  Icon(Icons.location_on_rounded, size: 20, color: isDark ? AppColors.accent : AppColors.primary),
                   const SizedBox(width: 8),
                   Text(
                     'Present Address',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -1230,9 +1255,9 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: isDark ? AppColors.darkCard : AppColors.surface,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                 ),
                 child: Row(
                   children: [
@@ -1241,7 +1266,8 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                       height: 24,
                       child: Checkbox(
                         value: _sameAsPresent,
-                        activeColor: AppColors.primary,
+                        activeColor: isDark ? AppColors.accent : AppColors.primary,
+                        checkColor: isDark ? AppColors.primaryDark : Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                         onChanged: (val) {
                           setState(() {
@@ -1261,7 +1287,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -1278,14 +1304,14 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
               if (!_sameAsPresent) ...[
                 Row(
                   children: [
-                    const Icon(Icons.home_work_rounded, size: 20, color: AppColors.primary),
+                    Icon(Icons.home_work_rounded, size: 20, color: isDark ? AppColors.accent : AppColors.primary),
                     const SizedBox(width: 8),
                     Text(
                       'Permanent Address',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
                   ],
@@ -1334,14 +1360,14 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
               // ---------------------------------------------------------------
               Row(
                 children: [
-                  const Icon(Icons.card_giftcard_rounded, size: 20, color: AppColors.primary),
+                  Icon(Icons.card_giftcard_rounded, size: 20, color: isDark ? AppColors.accent : AppColors.primary),
                   const SizedBox(width: 8),
                   Text(
                     'Referral Code (Optional)',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -1351,7 +1377,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 'Have a friend on FindBookStay? Enter their referral code for signup rewards.',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 12.5,
-                  color: AppColors.textSecondary,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 14),
@@ -1374,6 +1400,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   // STEP 3: Security & Password (Password, Strength, Confirm, Terms)
   // ---------------------------------------------------------------------------
   Widget _buildStep3Security() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -1387,7 +1414,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 27,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   letterSpacing: -0.6,
                 ),
               ),
@@ -1399,7 +1426,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -1462,15 +1489,15 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                       height: 24,
                       child: Checkbox(
                         value: _termsAccepted,
-                        activeColor: AppColors.primary,
-                        checkColor: Colors.white,
+                        activeColor: isDark ? AppColors.accent : AppColors.primary,
+                        checkColor: isDark ? AppColors.primaryDark : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
                         side: BorderSide(
                           color: _termsError != null
                               ? AppColors.error
-                              : AppColors.border,
+                              : (isDark ? AppColors.darkBorder : AppColors.border),
                           width: 1.5,
                         ),
                         onChanged: (val) {
@@ -1489,7 +1516,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                             fontSize: 13,
                             color: _termsError != null
                                 ? AppColors.error
-                                : AppColors.textSecondary,
+                                : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
                             height: 1.4,
                           ),
                           children: [
@@ -1497,22 +1524,22 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                             TextSpan(
                               text: 'Terms of Service',
                               recognizer: _termsRecognizer,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.primary,
+                                color: isDark ? AppColors.accent : AppColors.primary,
                                 decoration: TextDecoration.underline,
-                                decorationColor: AppColors.primary,
+                                decorationColor: isDark ? AppColors.accent : AppColors.primary,
                               ),
                             ),
                             const TextSpan(text: ' and acknowledge the '),
                             TextSpan(
                               text: 'Privacy Policy',
                               recognizer: _privacyRecognizer,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.primary,
+                                color: isDark ? AppColors.accent : AppColors.primary,
                                 decoration: TextDecoration.underline,
-                                decorationColor: AppColors.primary,
+                                decorationColor: isDark ? AppColors.accent : AppColors.primary,
                               ),
                             ),
                             const TextSpan(text: '.'),
@@ -1559,6 +1586,7 @@ class _LegalModalSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final title = isTerms ? 'Terms of Service' : 'Privacy Policy';
     final sections = isTerms ? _termsSections : _privacySections;
 
@@ -1569,9 +1597,9 @@ class _LegalModalSheet extends StatelessWidget {
       expand: false,
       builder: (_, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkCard : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Column(
             children: [
@@ -1580,7 +1608,7 @@ class _LegalModalSheet extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border,
+                  color: isDark ? AppColors.darkBorder : AppColors.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1592,13 +1620,13 @@ class _LegalModalSheet extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.accentLight,
+                        color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         isTerms ? Icons.gavel_rounded : Icons.shield_outlined,
                         size: 20,
-                        color: AppColors.primary,
+                        color: isDark ? AppColors.accent : AppColors.primary,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -1608,7 +1636,7 @@ class _LegalModalSheet extends StatelessWidget {
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -1616,9 +1644,9 @@ class _LegalModalSheet extends StatelessWidget {
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close_rounded),
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                       style: IconButton.styleFrom(
-                        backgroundColor: AppColors.surface,
+                        backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -1627,7 +1655,7 @@ class _LegalModalSheet extends StatelessWidget {
                   ],
                 ),
               ),
-              Divider(height: 1, color: AppColors.border),
+              Divider(height: 1, color: isDark ? AppColors.darkBorder : AppColors.border),
               Expanded(
                 child: ListView.separated(
                   controller: scrollController,
@@ -1644,7 +1672,7 @@ class _LegalModalSheet extends StatelessWidget {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -1652,7 +1680,7 @@ class _LegalModalSheet extends StatelessWidget {
                           item.body,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                             height: 1.5,
                           ),
                         ),

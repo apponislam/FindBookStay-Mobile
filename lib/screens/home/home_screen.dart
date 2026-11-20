@@ -53,6 +53,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final riverpodAuth = ref.watch(isAuthenticatedProvider);
     ref.watch(themeModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListenableBuilder(
       listenable: AuthService.instance,
@@ -60,23 +61,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final isLoggedIn = riverpodAuth || AuthService.instance.isLoggedIn;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
           body: IndexedStack(
             index: _currentIndex,
             children: _tabs,
           ),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
-              color: AppColors.surfaceCard,
+              color: isDark ? AppColors.darkCard : AppColors.surfaceCard,
               border: Border(
                 top: BorderSide(
-                  color: AppColors.border,
+                  color: isDark ? AppColors.darkBorder : AppColors.border,
                   width: 1.0,
                 ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryDark.withValues(alpha: 0.08),
+                  color: isDark
+                      ? Colors.black.withValues(alpha: 0.35)
+                      : AppColors.primaryDark.withValues(alpha: 0.08),
                   blurRadius: 18,
                   offset: const Offset(0, -4),
                 ),
@@ -176,6 +179,7 @@ class _NavBarItemState extends State<_NavBarItem> {
   @override
   Widget build(BuildContext context) {
     final bool isSelected = widget.isSelected;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Expanded(
       child: MouseRegion(
@@ -219,7 +223,8 @@ class _NavBarItemState extends State<_NavBarItem> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.28),
+                                  color: (isDark ? AppColors.accent : AppColors.primary)
+                                      .withValues(alpha: isDark ? 0.35 : 0.28),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -237,19 +242,19 @@ class _NavBarItemState extends State<_NavBarItem> {
                         height: isSelected ? 42 : 36,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary
+                              ? (isDark ? AppColors.accent : AppColors.primary)
                               : (_isHovered
-                                  ? AppColors.accentLight.withValues(alpha: 0.6)
+                                  ? (isDark ? AppColors.darkAccentLight : AppColors.accentLight.withValues(alpha: 0.6))
                                   : Colors.transparent),
                           shape: BoxShape.circle,
                           border: isSelected
                               ? Border.all(
-                                  color: AppColors.accent,
+                                  color: isDark ? Colors.white : AppColors.accent,
                                   width: 1.5,
                                 )
                               : (_isHovered
                                   ? Border.all(
-                                      color: AppColors.accent.withValues(alpha: 0.3),
+                                      color: AppColors.accent.withValues(alpha: isDark ? 0.4 : 0.3),
                                       width: 1.0,
                                     )
                                   : null),
@@ -259,10 +264,10 @@ class _NavBarItemState extends State<_NavBarItem> {
                             isSelected ? widget.activeIcon : widget.inactiveIcon,
                             size: isSelected ? 22 : 21,
                             color: isSelected
-                                ? Colors.white
+                                ? (isDark ? AppColors.primaryDark : Colors.white)
                                 : (_isHovered
-                                    ? AppColors.primary
-                                    : AppColors.textSecondary),
+                                    ? (isDark ? AppColors.accent : AppColors.primary)
+                                    : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
                           ),
                         ),
                       ),
@@ -281,7 +286,7 @@ class _NavBarItemState extends State<_NavBarItem> {
                               color: AppColors.accent,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white,
+                                color: isDark ? AppColors.darkCard : Colors.white,
                                 width: 1.5,
                               ),
                             ),
@@ -317,10 +322,10 @@ class _NavBarItemState extends State<_NavBarItem> {
                       fontSize: isSelected ? 11.5 : 10.5,
                       fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                       color: isSelected
-                          ? AppColors.primary
+                          ? (isDark ? AppColors.accent : AppColors.primary)
                           : (_isHovered
-                              ? AppColors.textPrimary
-                              : AppColors.textSecondary),
+                              ? (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)
+                              : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
                       letterSpacing: isSelected ? 0.2 : 0.0,
                     ),
                     child: Text(

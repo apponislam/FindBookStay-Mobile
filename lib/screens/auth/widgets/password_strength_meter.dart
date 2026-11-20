@@ -20,8 +20,8 @@ class PasswordStrengthMeter extends StatelessWidget {
     return score;
   }
 
-  Color _getSegmentColor(int index, int score) {
-    if (index >= score) return AppColors.borderSubtle;
+  Color _getSegmentColor(int index, int score, bool isDark) {
+    if (index >= score) return isDark ? AppColors.darkBorder : AppColors.borderSubtle;
     if (score <= 1) return AppColors.error;
     if (score == 2) return AppColors.warning;
     if (score == 3) return const Color(0xFF34D399); // Soft emerald
@@ -37,9 +37,9 @@ class PasswordStrengthMeter extends StatelessWidget {
     return 'Strong password';
   }
 
-  Color get _labelColor {
+  Color _labelColor(bool isDark) {
     final score = _score;
-    if (password.isEmpty) return AppColors.textMuted;
+    if (password.isEmpty) return isDark ? AppColors.darkTextMuted : AppColors.textMuted;
     if (score <= 1) return AppColors.error;
     if (score == 2) return AppColors.warning;
     return AppColors.accent;
@@ -48,6 +48,7 @@ class PasswordStrengthMeter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final score = _score;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +64,7 @@ class PasswordStrengthMeter extends StatelessWidget {
                   right: index < 3 ? 6.0 : 0.0,
                 ),
                 decoration: BoxDecoration(
-                  color: _getSegmentColor(index, score),
+                  color: _getSegmentColor(index, score, isDark),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -79,7 +80,7 @@ class PasswordStrengthMeter extends StatelessWidget {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w600,
-                color: _labelColor,
+                color: _labelColor(isDark),
               ),
             ),
             const SizedBox(width: 8),
@@ -90,7 +91,7 @@ class PasswordStrengthMeter extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 11,
-                  color: AppColors.textMuted,
+                  color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                 ),
               ),
             ),

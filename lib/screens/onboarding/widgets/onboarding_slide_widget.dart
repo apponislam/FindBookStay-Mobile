@@ -1,4 +1,4 @@
-﻿import 'package:material_ui/material_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -13,6 +13,7 @@ class OnboardingSlideWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return LayoutBuilder(
       builder: (context, constraints) {
         final availableHeight = constraints.maxHeight;
@@ -46,7 +47,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                       vertical: 6.0,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.accentLight,
+                      color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                       borderRadius: BorderRadius.circular(30.0),
                       border: Border.all(
                         color: AppColors.accent.withValues(alpha: 0.25),
@@ -59,7 +60,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
+                        color: isDark ? AppColors.accent : AppColors.primary,
                         letterSpacing: 1.4,
                       ),
                     ),
@@ -77,7 +78,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: isShortScreen ? 22.0 : 26.0,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       height: 1.25,
                       letterSpacing: -0.5,
                     ),
@@ -95,7 +96,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: isShortScreen ? 13.0 : 14.5,
                       fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                       height: 1.45,
                     ),
                   ),

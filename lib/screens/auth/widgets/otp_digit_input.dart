@@ -140,6 +140,8 @@ class OtpDigitInputState extends State<OtpDigitInput> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: _handleTap,
       behavior: HitTestBehavior.opaque,
@@ -170,17 +172,21 @@ class OtpDigitInputState extends State<OtpDigitInput> {
                     height: 56.0,
                     decoration: BoxDecoration(
                       color: widget.hasError
-                          ? AppColors.error.withValues(alpha: 0.05)
+                          ? AppColors.error.withValues(alpha: isDark ? 0.15 : 0.05)
                           : (isFocused
-                              ? AppColors.background
-                              : (hasDigit ? AppColors.accentLight : AppColors.surface)),
+                              ? (isDark ? AppColors.darkSurface : AppColors.background)
+                              : (hasDigit
+                                  ? (isDark ? AppColors.darkAccentLight : AppColors.accentLight)
+                                  : (isDark ? AppColors.darkCard : AppColors.surface))),
                       borderRadius: BorderRadius.circular(15.0),
                       border: Border.all(
                         color: widget.hasError
                             ? AppColors.error
                             : (isFocused
                                 ? AppColors.accent
-                                : (hasDigit ? AppColors.primary : AppColors.border)),
+                                : (hasDigit
+                                    ? (isDark ? AppColors.accent : AppColors.primary)
+                                    : (isDark ? AppColors.darkBorder : AppColors.border))),
                         width: isFocused || widget.hasError ? 2.0 : 1.2,
                       ),
                       boxShadow: isFocused
@@ -188,7 +194,7 @@ class OtpDigitInputState extends State<OtpDigitInput> {
                               BoxShadow(
                                 color: widget.hasError
                                     ? AppColors.error.withValues(alpha: 0.20)
-                                    : AppColors.accent.withValues(alpha: 0.20),
+                                    : AppColors.accent.withValues(alpha: isDark ? 0.28 : 0.20),
                                 blurRadius: 8.0,
                                 offset: const Offset(0, 3),
                               ),
@@ -201,7 +207,9 @@ class OtpDigitInputState extends State<OtpDigitInput> {
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 22.0,
                           fontWeight: FontWeight.w800,
-                          color: widget.hasError ? AppColors.error : AppColors.textPrimary,
+                          color: widget.hasError
+                              ? AppColors.error
+                              : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
                         ),
                       ),
                     ),

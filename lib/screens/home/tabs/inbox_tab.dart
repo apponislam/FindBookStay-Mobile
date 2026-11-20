@@ -14,15 +14,17 @@ class InboxTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListenableBuilder(
       listenable: AuthService.instance,
       builder: (context, _) {
         final isLoggedIn = AuthService.instance.isLoggedIn;
 
         if (!isLoggedIn) {
-          return const Scaffold(
-            backgroundColor: AppColors.background,
-            body: SafeArea(
+          return Scaffold(
+            backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+            body: const SafeArea(
               child: GuestAuthGateCard(
                 icon: Icons.chat_bubble_rounded,
                 title: 'Chat directly with owners',
@@ -36,16 +38,16 @@ class InboxTab extends StatelessWidget {
 
         if (_threads.isEmpty) {
           return Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
             appBar: AppBar(
-              backgroundColor: AppColors.background,
+              backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
               elevation: 0,
               title: Text(
                 'Inbox & Inquiries',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                 ),
               ),
             ),
@@ -59,14 +61,14 @@ class InboxTab extends StatelessWidget {
                       width: 72,
                       height: 72,
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: isDark ? AppColors.darkCard : AppColors.surface,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.chat_bubble_outline_rounded,
                         size: 32,
-                        color: AppColors.textSecondary,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -75,7 +77,7 @@ class InboxTab extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -84,7 +86,7 @@ class InboxTab extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                         height: 1.45,
                       ),
                     ),
@@ -96,16 +98,16 @@ class InboxTab extends StatelessWidget {
         }
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
           appBar: AppBar(
-            backgroundColor: AppColors.background,
+            backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
             elevation: 0,
             title: Text(
               'Inbox & Inquiries',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
           ),
@@ -122,12 +124,12 @@ class InboxTab extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: isDark ? AppColors.darkCard : AppColors.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: hasUnread
-                          ? AppColors.primary.withValues(alpha: 0.25)
-                          : AppColors.border,
+                          ? (isDark ? AppColors.accent : AppColors.primary).withValues(alpha: 0.35)
+                          : (isDark ? AppColors.darkBorder : AppColors.border),
                       width: hasUnread ? 1.5 : 1,
                     ),
                   ),
@@ -140,7 +142,7 @@ class InboxTab extends StatelessWidget {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: AppColors.accentLight,
+                              color: isDark ? AppColors.darkAccentLight : AppColors.accentLight,
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: AppColors.accent.withValues(alpha: 0.3),
@@ -152,7 +154,7 @@ class InboxTab extends StatelessWidget {
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w800,
-                                  color: AppColors.primary,
+                                  color: isDark ? AppColors.accent : AppColors.primary,
                                 ),
                               ),
                             ),
@@ -167,7 +169,7 @@ class InboxTab extends StatelessWidget {
                                 color: AppColors.accent,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white,
+                                  color: isDark ? AppColors.darkCard : Colors.white,
                                   width: 2,
                                 ),
                               ),
@@ -188,7 +190,7 @@ class InboxTab extends StatelessWidget {
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 14.5,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
+                                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                   ),
                                 ),
                                 Text(
@@ -199,8 +201,8 @@ class InboxTab extends StatelessWidget {
                                         ? FontWeight.w700
                                         : FontWeight.w400,
                                     color: hasUnread
-                                        ? AppColors.primary
-                                        : AppColors.textMuted,
+                                        ? (isDark ? AppColors.accent : AppColors.primary)
+                                        : (isDark ? AppColors.darkTextMuted : AppColors.textMuted),
                                   ),
                                 ),
                               ],
@@ -210,7 +212,7 @@ class InboxTab extends StatelessWidget {
                               thread['role'] as String,
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.5,
-                                color: AppColors.textSecondary,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -224,8 +226,8 @@ class InboxTab extends StatelessWidget {
                                     ? FontWeight.w600
                                     : FontWeight.w400,
                                 color: hasUnread
-                                    ? AppColors.textPrimary
-                                    : AppColors.textSecondary,
+                                    ? (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)
+                                    : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
                               ),
                             ),
                           ],
@@ -238,8 +240,8 @@ class InboxTab extends StatelessWidget {
                             horizontal: 8,
                             vertical: 3,
                           ),
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
+                          decoration: BoxDecoration(
+                            color: isDark ? AppColors.accent : AppColors.primary,
                             shape: BoxShape.circle,
                           ),
                           child: Text(
@@ -247,7 +249,7 @@ class InboxTab extends StatelessWidget {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: isDark ? AppColors.primaryDark : Colors.white,
                             ),
                           ),
                         ),

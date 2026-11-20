@@ -112,6 +112,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
   // Interactive Glowing "Welcome Back" Badge
   // ---------------------------------------------------------------------------
   Widget _buildGlowingWelcomeBadge() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AnimatedBuilder(
       animation: _glowAnimation,
       builder: (context, _) {
@@ -130,8 +132,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                 vertical: 7.0,
               ),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFE8F8F3), Color(0xFFD6F3EA)],
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? const [Color(0xFF132F28), Color(0xFF183D34)]
+                      : const [Color(0xFFE8F8F3), Color(0xFFD6F3EA)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -151,7 +155,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                     spreadRadius: 1.2 + (_glowAnimation.value * 1.0),
                   ),
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.06),
+                    color: (isDark ? AppColors.accent : AppColors.primary).withValues(alpha: 0.06),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -163,7 +167,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13.0,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
+                  color: isDark ? AppColors.accent : AppColors.primary,
                   letterSpacing: 0.3,
                 ),
               ),
@@ -178,6 +182,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
   // Modern Glowing Sign In CTA Button
   // ---------------------------------------------------------------------------
   Widget _buildGlowingSignInButton({required bool isLoading}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AnimatedBuilder(
       animation: _glowAnimation,
       builder: (context, _) {
@@ -186,14 +192,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF073B35), Color(0xFF0E544B)],
+            gradient: LinearGradient(
+              colors: isDark
+                  ? const [Color(0xFF10B981), Color(0xFF073B35)]
+                  : const [Color(0xFF073B35), Color(0xFF0E544B)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(
+                color: (isDark ? AppColors.accent : AppColors.primary).withValues(
                   alpha: 0.34 + (_glowAnimation.value * 0.12),
                 ),
                 blurRadius: 14 + (_glowAnimation.value * 4),
@@ -261,16 +269,17 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLoading = ref.watch(authStatusProvider) == AuthStatus.loading;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
@@ -363,7 +372,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 29,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                 letterSpacing: -0.7,
                               ),
                             ),
@@ -375,7 +384,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w400,
-                                color: AppColors.textSecondary,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                 height: 1.45,
                               ),
                             ),
@@ -435,7 +444,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.primary,
+                                      color: isDark ? AppColors.accent : AppColors.primary,
                                     ),
                                   ),
                                 ),
@@ -466,15 +475,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                                     text: TextSpan(
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 13.5,
-                                        color: AppColors.textSecondary,
+                                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                       ),
-                                      children: const [
-                                        TextSpan(text: "Don't have an account? "),
+                                      children: [
+                                        const TextSpan(text: "Don't have an account? "),
                                         TextSpan(
                                           text: 'Sign Up',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
-                                            color: AppColors.primary,
+                                            color: isDark ? AppColors.accent : AppColors.primary,
                                             decoration: TextDecoration.underline,
                                             decorationColor: AppColors.accent,
                                           ),

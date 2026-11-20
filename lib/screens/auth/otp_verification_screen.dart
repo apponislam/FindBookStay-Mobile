@@ -213,15 +213,16 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
@@ -248,7 +249,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                             vertical: 5.0,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.accentLight,
+                            color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: AppColors.accent.withValues(alpha: 0.25),
@@ -259,7 +260,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.primary,
+                              color: isDark ? AppColors.accent : AppColors.primary,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -276,7 +277,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                 letterSpacing: -0.6,
                               ),
                             ),
@@ -289,20 +290,20 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.surface,
+                                    color: isDark ? AppColors.darkCard : AppColors.surface,
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: AppColors.border,
+                                      color: isDark ? AppColors.darkBorder : AppColors.border,
                                       width: 1,
                                     ),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.backspace_outlined,
                                         size: 13,
-                                        color: AppColors.textSecondary,
+                                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
@@ -310,7 +311,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
-                                          color: AppColors.textSecondary,
+                                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                         ),
                                       ),
                                     ],
@@ -328,7 +329,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w400,
-                              color: AppColors.textSecondary,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                               height: 1.45,
                             ),
                             children: [
@@ -337,9 +338,9 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                               ),
                               TextSpan(
                                 text: widget.email,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
+                                  color: isDark ? AppColors.accent : AppColors.primary,
                                 ),
                               ),
                               const TextSpan(
@@ -424,7 +425,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                   text: TextSpan(
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 13.5,
-                                      color: AppColors.textSecondary,
+                                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                     ),
                                     children: [
                                       const TextSpan(
@@ -432,36 +433,38 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                       ),
                                       TextSpan(
                                         text: _formattedTimer,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          color: AppColors.primary,
+                                          color: isDark ? AppColors.accent : AppColors.primary,
                                         ),
                                       ),
                                     ],
                                   ),
                                 )
                               : _isResending
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       width: 24,
                                       height: 24,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2.2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          isDark ? AppColors.accent : AppColors.primary,
+                                        ),
                                       ),
                                     )
                                   : TextButton.icon(
                                       onPressed: _onResendCode,
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.refresh_rounded,
                                         size: 18,
-                                        color: AppColors.primary,
+                                        color: isDark ? AppColors.accent : AppColors.primary,
                                       ),
                                       label: Text(
                                         'Resend Code',
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
-                                          color: AppColors.primary,
+                                          color: isDark ? AppColors.accent : AppColors.primary,
                                           decoration: TextDecoration.underline,
                                           decorationColor: AppColors.accent,
                                         ),

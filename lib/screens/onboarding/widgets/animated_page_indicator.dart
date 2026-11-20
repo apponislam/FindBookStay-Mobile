@@ -1,4 +1,4 @@
-﻿import 'package:material_ui/material_ui.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../core/theme/app_colors.dart';
 
@@ -18,6 +18,8 @@ class AnimatedPageIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(count, (index) {
@@ -32,7 +34,9 @@ class AnimatedPageIndicator extends StatelessWidget {
             height: 8.0,
             width: isActive ? 28.0 : 8.0,
             decoration: BoxDecoration(
-              color: isActive ? AppColors.accent : AppColors.border,
+              color: isActive
+                  ? AppColors.accent
+                  : (isDark ? AppColors.darkBorder : AppColors.border),
               borderRadius: BorderRadius.circular(4.0),
               boxShadow: isActive
                   ? [

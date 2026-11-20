@@ -76,6 +76,7 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
   @override
   Widget build(BuildContext context) {
     final bool hasError = widget.errorMessage != null && widget.errorMessage!.isNotEmpty;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,7 +98,9 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
-                        color: hasError ? AppColors.error : AppColors.textPrimary,
+                        color: hasError
+                            ? AppColors.error
+                            : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
                         letterSpacing: 0.1,
                       ),
                     ),
@@ -185,12 +188,14 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
           curve: Curves.easeOutCubic,
           height: 52.0,
           decoration: BoxDecoration(
-            color: _isFocused ? AppColors.background : AppColors.surface,
+            color: _isFocused
+                ? (isDark ? AppColors.darkSurface : AppColors.background)
+                : (isDark ? AppColors.darkCard : AppColors.surface),
             borderRadius: BorderRadius.circular(16.0),
             border: Border.all(
               color: hasError
                   ? AppColors.error
-                  : (_isFocused ? AppColors.accent : AppColors.border),
+                  : (_isFocused ? AppColors.accent : (isDark ? AppColors.darkBorder : AppColors.border)),
               width: hasError ? 1.8 : (_isFocused ? 1.6 : 1.0),
             ),
             boxShadow: hasError
@@ -204,7 +209,7 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
                 : (_isFocused
                     ? [
                         BoxShadow(
-                          color: AppColors.accent.withValues(alpha: 0.12),
+                          color: AppColors.accent.withValues(alpha: isDark ? 0.20 : 0.12),
                           blurRadius: 8.0,
                           offset: const Offset(0, 2),
                         ),
@@ -223,14 +228,14 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: widget.hint,
                 hintStyle: GoogleFonts.plusJakartaSans(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textMuted,
+                  color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                 ),
                 prefixIconConstraints: widget.prefixWidget != null
                     ? const BoxConstraints(minWidth: 0, minHeight: 0)
@@ -242,7 +247,9 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
                             size: 20,
                             color: hasError
                                 ? AppColors.error
-                                : (_isFocused ? AppColors.accent : AppColors.textSecondary),
+                                : (_isFocused
+                                    ? AppColors.accent
+                                    : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
                           )
                         : null),
                 suffixIcon: widget.isPassword
@@ -264,7 +271,9 @@ class _CustomAuthInputState extends State<CustomAuthInput> {
                             size: 20,
                             color: hasError
                                 ? AppColors.error
-                                : (_isFocused ? AppColors.primary : AppColors.textSecondary),
+                                : (_isFocused
+                                    ? AppColors.accent
+                                    : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
                           ),
                         ),
                         onPressed: () {

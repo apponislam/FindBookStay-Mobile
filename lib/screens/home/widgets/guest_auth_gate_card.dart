@@ -24,6 +24,8 @@ class GuestAuthGateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -38,20 +40,24 @@ class GuestAuthGateCard extends StatelessWidget {
               height: 90,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.accentLight,
+                color: isDark ? AppColors.darkAccentLight : AppColors.accentLight,
                 border: Border.all(
-                  color: AppColors.accent.withValues(alpha: 0.35),
+                  color: AppColors.accent.withValues(alpha: isDark ? 0.45 : 0.35),
                   width: 2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.08),
+                    color: (isDark ? AppColors.accent : AppColors.primary).withValues(alpha: isDark ? 0.25 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: Icon(icon, size: 42, color: AppColors.primary),
+              child: Icon(
+                icon,
+                size: 42,
+                color: isDark ? AppColors.accent : AppColors.primary,
+              ),
             ),
 
             const SizedBox(height: 24),
@@ -60,9 +66,9 @@ class GuestAuthGateCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: isDark ? AppColors.darkCard : AppColors.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -81,7 +87,7 @@ class GuestAuthGateCard extends StatelessWidget {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -97,7 +103,7 @@ class GuestAuthGateCard extends StatelessWidget {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                 letterSpacing: -0.4,
               ),
             ),
@@ -111,7 +117,7 @@ class GuestAuthGateCard extends StatelessWidget {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: AppColors.textSecondary,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -138,8 +144,8 @@ class GuestAuthGateCard extends StatelessWidget {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  backgroundColor: isDark ? AppColors.accent : AppColors.primary,
+                  foregroundColor: isDark ? AppColors.primaryDark : Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -160,7 +166,10 @@ class GuestAuthGateCard extends StatelessWidget {
               },
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
-                side: BorderSide(color: AppColors.border, width: 1.2),
+                side: BorderSide(
+                  color: isDark ? AppColors.darkBorder : AppColors.border,
+                  width: 1.2,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -170,7 +179,7 @@ class GuestAuthGateCard extends StatelessWidget {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.primary,
                 ),
               ),
             ),

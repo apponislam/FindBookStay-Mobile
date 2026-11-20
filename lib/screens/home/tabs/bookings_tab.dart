@@ -22,15 +22,17 @@ class _BookingsTabState extends State<BookingsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListenableBuilder(
       listenable: AuthService.instance,
       builder: (context, _) {
         final isLoggedIn = AuthService.instance.isLoggedIn;
 
         if (!isLoggedIn) {
-          return const Scaffold(
-            backgroundColor: AppColors.background,
-            body: SafeArea(
+          return Scaffold(
+            backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+            body: const SafeArea(
               child: GuestAuthGateCard(
                 icon: Icons.calendar_month_rounded,
                 title: 'Manage your reservations',
@@ -43,16 +45,16 @@ class _BookingsTabState extends State<BookingsTab> {
         }
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
           appBar: AppBar(
-            backgroundColor: AppColors.background,
+            backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
             elevation: 0,
             title: Text(
               'My Bookings & Stays',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
           ),
@@ -67,11 +69,11 @@ class _BookingsTabState extends State<BookingsTab> {
                   physics: const BouncingScrollPhysics(),
                   child: Row(
                     children: [
-                      _buildFilterChip('Upcoming (0)', 0),
+                      _buildFilterChip('Upcoming (0)', 0, isDark),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Completed (0)', 1),
+                      _buildFilterChip('Completed (0)', 1, isDark),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Cancelled (0)', 2),
+                      _buildFilterChip('Cancelled (0)', 2, isDark),
                     ],
                   ),
                 ),
@@ -90,14 +92,14 @@ class _BookingsTabState extends State<BookingsTab> {
                             width: 72,
                             height: 72,
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
+                              color: isDark ? AppColors.darkCard : AppColors.surface,
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.border),
+                              border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.calendar_today_outlined,
                               size: 32,
-                              color: AppColors.textSecondary,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -106,7 +108,7 @@ class _BookingsTabState extends State<BookingsTab> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
+                              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -115,7 +117,7 @@ class _BookingsTabState extends State<BookingsTab> {
                             textAlign: TextAlign.center,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,
-                              color: AppColors.textSecondary,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                               height: 1.45,
                             ),
                           ),
@@ -129,12 +131,12 @@ class _BookingsTabState extends State<BookingsTab> {
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
+                      color: isDark ? AppColors.darkCard : AppColors.surface,
                       borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.03),
+                          color: isDark ? Colors.black.withValues(alpha: 0.25) : AppColors.primary.withValues(alpha: 0.03),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -246,7 +248,7 @@ class _BookingsTabState extends State<BookingsTab> {
     );
   }
 
-  Widget _buildFilterChip(String label, int index) {
+  Widget _buildFilterChip(String label, int index, bool isDark) {
     final isSelected = _activeFilter == index;
     return GestureDetector(
       onTap: () {
@@ -256,10 +258,14 @@ class _BookingsTabState extends State<BookingsTab> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surface,
+          color: isSelected
+              ? (isDark ? AppColors.accent : AppColors.primary)
+              : (isDark ? AppColors.darkCard : AppColors.surface),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected
+                ? (isDark ? AppColors.accent : AppColors.primary)
+                : (isDark ? AppColors.darkBorder : AppColors.border),
           ),
         ),
         child: Text(
@@ -267,7 +273,9 @@ class _BookingsTabState extends State<BookingsTab> {
           style: GoogleFonts.plusJakartaSans(
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: isSelected ? Colors.white : AppColors.textSecondary,
+            color: isSelected
+                ? (isDark ? AppColors.primaryDark : Colors.white)
+                : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
           ),
         ),
       ),

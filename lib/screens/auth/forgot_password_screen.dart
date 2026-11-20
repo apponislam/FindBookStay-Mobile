@@ -89,15 +89,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
@@ -127,7 +128,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             vertical: 5.0,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.accentLight,
+                            color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: AppColors.accent.withValues(alpha: 0.25),
@@ -138,7 +139,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.primary,
+                              color: isDark ? AppColors.accent : AppColors.primary,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -152,7 +153,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                             letterSpacing: -0.6,
                           ),
                         ),
@@ -165,7 +166,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w400,
-                            color: AppColors.textSecondary,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                             height: 1.45,
                           ),
                         ),
@@ -212,15 +213,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                 text: TextSpan(
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 13.5,
-                                    color: AppColors.textSecondary,
+                                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                   ),
-                                  children: const [
-                                    TextSpan(text: 'Remember your password? '),
+                                  children: [
+                                    const TextSpan(text: 'Remember your password? '),
                                     TextSpan(
                                       text: 'Back to Sign In',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
-                                        color: AppColors.primary,
+                                        color: isDark ? AppColors.accent : AppColors.primary,
                                         decoration: TextDecoration.underline,
                                         decorationColor: AppColors.accent,
                                       ),

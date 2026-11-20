@@ -1,4 +1,4 @@
-﻿import 'package:material_ui/material_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -70,10 +70,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isLastPage = _currentPage == _slides.length - 1;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -145,6 +146,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   /// Top Header: Centered Logo + Wordmark with Skip button on the right
   Widget _buildHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: SizedBox(
@@ -187,7 +189,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
+                        color: isDark ? Colors.white : AppColors.primary,
                         letterSpacing: -0.3,
                       ),
                       children: const [
@@ -217,7 +219,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ? null
                       : _completeOnboarding,
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.textSecondary,
+                    foregroundColor: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 6,
@@ -231,7 +233,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     ),
                   ),
                 ),
@@ -245,6 +247,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   /// Bottom Controls: Main Rounded CTA + Sign In secondary link
   Widget _buildBottomControls(bool isLastPage) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(
         left: 24.0,
@@ -262,7 +265,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: ElevatedButton(
               onPressed: _onNextPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: isDark ? AppColors.accent : AppColors.primary,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0),
@@ -291,7 +294,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textWhite,
+                        color: isDark ? AppColors.primaryDark : AppColors.textWhite,
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -301,7 +304,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ? Icons.check_circle_outline_rounded
                           : Icons.arrow_forward_rounded,
                       size: 20.0,
-                      color: AppColors.accent,
+                      color: isDark ? AppColors.primaryDark : AppColors.accent,
                     ),
                   ],
                 ),
@@ -323,15 +326,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   text: TextSpan(
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13.5,
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     ),
-                    children: const [
-                      TextSpan(text: 'Already have an account? '),
+                    children: [
+                      const TextSpan(text: 'Already have an account? '),
                       TextSpan(
                         text: 'Sign In',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: isDark ? AppColors.accent : AppColors.primary,
                           decoration: TextDecoration.underline,
                           decorationColor: AppColors.accent,
                         ),

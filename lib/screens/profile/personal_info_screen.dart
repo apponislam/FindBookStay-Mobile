@@ -89,7 +89,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
 
     // Detect if permanent address matches present
     if (present != null && permanent != null && !present.isEmpty) {
-      _sameAsPresent = present.street == permanent.street &&
+      _sameAsPresent =
+          present.street == permanent.street &&
           present.city == permanent.city &&
           present.state == permanent.state &&
           present.zipCode == permanent.zipCode;
@@ -101,7 +102,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     setState(() => _isFetching = true);
 
     try {
-      final freshUser = await ref.read(authControllerProvider.notifier).fetchCurrentUser();
+      final freshUser = await ref
+          .read(authControllerProvider.notifier)
+          .fetchCurrentUser();
       if (mounted && freshUser != null && !freshUser.isGuest) {
         _populateFields(freshUser);
       }
@@ -154,15 +157,16 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   }
 
   void _showImageSourceSheet() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     HapticFeedback.selectionClick();
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -171,7 +175,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: isDark ? AppColors.darkBorder : AppColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -181,23 +185,51 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 18),
             ListTile(
-              leading: const Icon(Icons.photo_library_rounded, color: AppColors.primary),
-              title: Text('Choose from Gallery', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              leading: Icon(
+                Icons.photo_library_rounded,
+                color: isDark ? AppColors.accent : AppColors.primary,
+              ),
+              title: Text(
+                'Choose from Gallery',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
+                ),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _pickImage(ImageSource.gallery);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt_rounded, color: AppColors.primary),
-              title: Text('Take a Photo', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              leading: Icon(
+                Icons.camera_alt_rounded,
+                color: isDark ? AppColors.accent : AppColors.primary,
+              ),
+              title: Text(
+                'Take a Photo',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
+                ),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _pickImage(ImageSource.camera);
@@ -240,10 +272,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
         'sameAsPresent': _sameAsPresent,
       };
 
-      await ref.read(authControllerProvider.notifier).updateProfile(
-            payload,
-            imageFilePath: _pickedImage?.path,
-          );
+      await ref
+          .read(authControllerProvider.notifier)
+          .updateProfile(payload, imageFilePath: _pickedImage?.path);
 
       if (!mounted) return;
 
@@ -257,10 +288,16 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
         SnackBar(
           backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           content: Row(
             children: [
-              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
               const SizedBox(width: 10),
               Text(
                 'Profile updated successfully!',
@@ -280,7 +317,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
         SnackBar(
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           content: Text(
             e.toString().replaceAll('Exception: ', ''),
             style: GoogleFonts.plusJakartaSans(color: Colors.white),
@@ -298,7 +337,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     final user = authState.user ?? UserModel.guest;
 
     final bgColor = isDark ? AppColors.darkBackground : AppColors.background;
-    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -368,7 +409,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
         child: Form(
           key: _formKey,
           child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 40),
             children: [
               if (_isFetching)
@@ -402,8 +445,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         child: _pickedImage != null
                             ? Image.file(_pickedImage!, fit: BoxFit.cover)
                             : () {
-                                final displayAvatarUrl = UrlUtils.resolveNullableUrl(user.avatarUrl ?? user.profileImage);
-                                return (displayAvatarUrl != null && displayAvatarUrl.isNotEmpty)
+                                final displayAvatarUrl =
+                                    UrlUtils.resolveNullableUrl(
+                                      user.avatarUrl ?? user.profileImage,
+                                    );
+                                return (displayAvatarUrl != null &&
+                                        displayAvatarUrl.isNotEmpty)
                                     ? Image.network(
                                         displayAvatarUrl,
                                         fit: BoxFit.cover,
@@ -415,12 +462,16 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                                               height: 24,
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2,
-                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                      Color
+                                                    >(Colors.white),
                                               ),
                                             ),
                                           );
                                         },
-                                        errorBuilder: (_, _, _) => _buildInitials(user.name),
+                                        errorBuilder: (_, _, _) =>
+                                            _buildInitials(user.name),
                                       )
                                     : _buildInitials(user.name);
                               }(),
@@ -466,7 +517,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -475,7 +528,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   user.email,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -499,28 +554,50 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     return null;
                   },
                 ),
-                Divider(height: 1, color: AppColors.borderSubtle),
+                Divider(
+                  height: 1,
+                  color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
+                ),
                 _buildField(
                   label: 'Email Address',
                   value: user.email,
                   enabled: false,
                   icon: Icons.mail_outline_rounded,
                   suffixBadge: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
-                      color: user.isEmailVerified ? AppColors.accentLight : AppColors.surface,
+                      color: user.isEmailVerified
+                          ? (isDark
+                                ? const Color(0xFF132F28)
+                                : AppColors.accentLight)
+                          : (isDark
+                                ? AppColors.darkSurface
+                                : AppColors.surface),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: user.isEmailVerified ? AppColors.accent : AppColors.border,
+                        color: user.isEmailVerified
+                            ? AppColors.accent
+                            : (isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.border),
                       ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          user.isEmailVerified ? Icons.check_circle_rounded : Icons.pending_outlined,
+                          user.isEmailVerified
+                              ? Icons.check_circle_rounded
+                              : Icons.pending_outlined,
                           size: 13,
-                          color: user.isEmailVerified ? AppColors.primary : AppColors.textSecondary,
+                          color: user.isEmailVerified
+                              ? (isDark ? AppColors.accent : AppColors.primary)
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -528,14 +605,23 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w700,
-                            color: user.isEmailVerified ? AppColors.primary : AppColors.textSecondary,
+                            color: user.isEmailVerified
+                                ? (isDark
+                                      ? AppColors.accent
+                                      : AppColors.primary)
+                                : (isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                Divider(height: 1, color: AppColors.borderSubtle),
+                Divider(
+                  height: 1,
+                  color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
+                ),
                 _buildField(
                   label: 'Phone Number',
                   controller: _phoneController,
@@ -560,7 +646,10 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   hint: 'House 12, Road 4, Sector 3',
                   icon: Icons.home_outlined,
                 ),
-                Divider(height: 1, color: AppColors.borderSubtle),
+                Divider(
+                  height: 1,
+                  color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
+                ),
                 _buildField(
                   label: 'City / District',
                   controller: _presentCityController,
@@ -568,7 +657,10 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   hint: 'Dhaka',
                   icon: Icons.location_city_rounded,
                 ),
-                Divider(height: 1, color: AppColors.borderSubtle),
+                Divider(
+                  height: 1,
+                  color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
+                ),
                 _buildField(
                   label: 'State / Division',
                   controller: _presentStateController,
@@ -576,7 +668,10 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   hint: 'Dhaka Division',
                   icon: Icons.map_outlined,
                 ),
-                Divider(height: 1, color: AppColors.borderSubtle),
+                Divider(
+                  height: 1,
+                  color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
+                ),
                 _buildField(
                   label: 'Postal / Zip Code',
                   controller: _presentZipController,
@@ -600,15 +695,21 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         Checkbox(
                           value: _sameAsPresent,
                           activeColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                           onChanged: (val) {
                             setState(() {
                               _sameAsPresent = val ?? false;
                               if (_sameAsPresent) {
-                                _permanentStreetController.text = _presentStreetController.text;
-                                _permanentCityController.text = _presentCityController.text;
-                                _permanentStateController.text = _presentStateController.text;
-                                _permanentZipController.text = _presentZipController.text;
+                                _permanentStreetController.text =
+                                    _presentStreetController.text;
+                                _permanentCityController.text =
+                                    _presentCityController.text;
+                                _permanentStateController.text =
+                                    _presentStateController.text;
+                                _permanentZipController.text =
+                                    _presentZipController.text;
                               }
                             });
                           },
@@ -618,7 +719,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
                           ),
                         ),
                       ],
@@ -636,7 +739,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     hint: 'Village / Holding',
                     icon: Icons.home_work_outlined,
                   ),
-                  Divider(height: 1, color: AppColors.borderSubtle),
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.borderSubtle,
+                  ),
                   _buildField(
                     label: 'City / District',
                     controller: _permanentCityController,
@@ -644,7 +752,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     hint: 'District',
                     icon: Icons.location_city_rounded,
                   ),
-                  Divider(height: 1, color: AppColors.borderSubtle),
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.borderSubtle,
+                  ),
                   _buildField(
                     label: 'State / Division',
                     controller: _permanentStateController,
@@ -652,7 +765,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     hint: 'Division',
                     icon: Icons.map_outlined,
                   ),
-                  Divider(height: 1, color: AppColors.borderSubtle),
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.borderSubtle,
+                  ),
                   _buildField(
                     label: 'Postal / Zip Code',
                     controller: _permanentZipController,
@@ -664,12 +782,19 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                 ])
               else
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkAccentLight : AppColors.accentLight.withValues(alpha: 0.5),
+                    color: isDark
+                        ? AppColors.darkAccentLight
+                        : AppColors.accentLight.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppColors.accent.withValues(alpha: isDark ? 0.45 : 0.3),
+                      color: AppColors.accent.withValues(
+                        alpha: isDark ? 0.45 : 0.3,
+                      ),
                     ),
                   ),
                   child: Row(
@@ -686,7 +811,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? AppColors.accent : AppColors.primary,
+                            color: isDark
+                                ? AppColors.accent
+                                : AppColors.primary,
                           ),
                         ),
                       ),
@@ -701,7 +828,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                 ElevatedButton(
                   onPressed: _isSaving ? null : _saveChanges,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: isDark
+                        ? AppColors.accent
+                        : AppColors.primary,
                     minimumSize: const Size(double.infinity, 52),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -709,12 +838,14 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     ),
                   ),
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            color: Colors.white,
+                            color: isDark
+                                ? AppColors.primaryDark
+                                : Colors.white,
                           ),
                         )
                       : Text(
@@ -722,7 +853,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: isDark
+                                ? AppColors.primaryDark
+                                : Colors.white,
                           ),
                         ),
                 ),
@@ -734,7 +867,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   }
 
   Widget _buildInitials(String name) {
-    final initials = name.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join();
+    final initials = name
+        .trim()
+        .split(' ')
+        .map((e) => e.isNotEmpty ? e[0] : '')
+        .take(2)
+        .join();
     return Center(
       child: Text(
         initials.isNotEmpty ? initials : 'U',
@@ -766,7 +904,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.border,
+        ),
       ),
       child: Column(children: children),
     );
@@ -784,16 +924,26 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     String? Function(String?)? validator,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryTextColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
-    final mutedTextColor = isDark ? AppColors.darkTextMuted : AppColors.textMuted;
+    final primaryTextColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
+    final secondaryTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.textSecondary;
+    final mutedTextColor = isDark
+        ? AppColors.darkTextMuted
+        : AppColors.textMuted;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 20, color: isDark ? AppColors.accent : secondaryTextColor),
+          Icon(
+            icon,
+            size: 20,
+            color: isDark ? AppColors.accent : secondaryTextColor,
+          ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -852,4 +1002,3 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     );
   }
 }
-

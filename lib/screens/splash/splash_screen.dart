@@ -103,8 +103,10 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: AnimatedBuilder(
           animation: _animController,
@@ -133,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen>
                       width: 96,
                       height: 96,
                       decoration: BoxDecoration(
-                        color: AppColors.background,
+                        color: isDark ? AppColors.darkCard : AppColors.background,
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
@@ -156,7 +158,7 @@ class _SplashScreenState extends State<SplashScreen>
                           errorBuilder: (_, _, _) => const Icon(
                             Icons.holiday_village_rounded,
                             size: 48,
-                            color: AppColors.primary,
+                            color: AppColors.accent,
                           ),
                         ),
                       ),
@@ -174,7 +176,7 @@ class _SplashScreenState extends State<SplashScreen>
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.primary,
+                            color: isDark ? Colors.white : AppColors.primary,
                           ),
                           children: const [
                             TextSpan(text: 'FindBookStay'),
@@ -195,7 +197,7 @@ class _SplashScreenState extends State<SplashScreen>
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -218,7 +220,7 @@ class _SplashScreenState extends State<SplashScreen>
                         valueColor: const AlwaysStoppedAnimation<Color>(
                           AppColors.accent,
                         ),
-                        backgroundColor: AppColors.borderSubtle,
+                        backgroundColor: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
                       ),
                     ),
 
@@ -229,7 +231,7 @@ class _SplashScreenState extends State<SplashScreen>
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textMuted,
+                        color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                         letterSpacing: 0.6,
                       ),
                     ),
@@ -239,7 +241,7 @@ class _SplashScreenState extends State<SplashScreen>
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
+                        color: isDark ? AppColors.accent : AppColors.primary,
                         letterSpacing: 1.6,
                       ),
                     ),

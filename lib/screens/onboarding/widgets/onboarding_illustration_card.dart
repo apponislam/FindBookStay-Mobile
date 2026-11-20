@@ -1,4 +1,4 @@
-﻿import 'package:material_ui/material_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -13,14 +13,15 @@ class OnboardingIllustrationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 280.0, maxWidth: 340.0),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: isDark ? AppColors.darkCard : AppColors.surface,
           borderRadius: BorderRadius.circular(28.0),
-          border: Border.all(color: AppColors.border, width: 1.2),
+          border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border, width: 1.2),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(alpha: 0.04),
@@ -86,6 +87,7 @@ class OnboardingIllustrationCard extends StatelessWidget {
 
   /// High-finish procedural illustration card
   Widget _buildProceduralIllustration(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       child: Column(
@@ -102,9 +104,9 @@ class OnboardingIllustrationCard extends StatelessWidget {
                   vertical: 6.0,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: isDark ? AppColors.darkSurface : AppColors.background,
                   borderRadius: BorderRadius.circular(20.0),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.primary.withValues(alpha: 0.05),
@@ -130,7 +132,7 @@ class OnboardingIllustrationCard extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
+                        color: isDark ? AppColors.accent : AppColors.primary,
                         letterSpacing: 0.3,
                       ),
                     ),
@@ -138,8 +140,8 @@ class OnboardingIllustrationCard extends StatelessWidget {
                       margin: const EdgeInsets.symmetric(horizontal: 7),
                       width: 3.5,
                       height: 3.5,
-                      decoration: const BoxDecoration(
-                        color: AppColors.textMuted,
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -148,7 +150,7 @@ class OnboardingIllustrationCard extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                         letterSpacing: 0.3,
                       ),
                     ),
@@ -226,9 +228,9 @@ class OnboardingIllustrationCard extends StatelessWidget {
                   vertical: 5.0,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.background.withValues(alpha: 0.9),
+                  color: (isDark ? AppColors.darkSurface : AppColors.background).withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(color: AppColors.border, width: 0.8),
+                  border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border, width: 0.8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -244,7 +246,7 @@ class OnboardingIllustrationCard extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
                   ],

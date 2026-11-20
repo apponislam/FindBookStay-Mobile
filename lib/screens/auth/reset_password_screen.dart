@@ -111,6 +111,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   }
 
   void _showSuccessDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     HapticFeedback.mediumImpact();
     showDialog(
       context: context,
@@ -120,7 +121,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24.0),
           ),
-          backgroundColor: AppColors.background,
+          backgroundColor: isDark ? AppColors.darkCard : AppColors.background,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
             child: Column(
@@ -131,7 +132,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: AppColors.accentLight,
+                    color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.accent, width: 2),
                     boxShadow: [
@@ -159,7 +160,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   ),
                 ),
 
@@ -170,7 +171,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13.5,
-                    color: AppColors.textSecondary,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     height: 1.45,
                   ),
                 ),
@@ -198,15 +199,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
@@ -233,7 +235,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                             vertical: 5.0,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.accentLight,
+                            color: isDark ? const Color(0xFF132F28) : AppColors.accentLight,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: AppColors.accent.withValues(alpha: 0.25),
@@ -244,7 +246,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.primary,
+                              color: isDark ? AppColors.accent : AppColors.primary,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -258,7 +260,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                             letterSpacing: -0.6,
                           ),
                         ),
@@ -271,7 +273,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w400,
-                            color: AppColors.textSecondary,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                             height: 1.45,
                           ),
                         ),
