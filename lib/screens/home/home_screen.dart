@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/theme_controller.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'tabs/bookings_tab.dart';
 import 'tabs/explore_tab.dart';
@@ -51,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final riverpodAuth = ref.watch(isAuthenticatedProvider);
+    ref.watch(themeModeProvider);
 
     return ListenableBuilder(
       listenable: AuthService.instance,
@@ -65,7 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surfaceCard,
               border: Border(
                 top: BorderSide(
                   color: AppColors.border,

@@ -5,10 +5,13 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/theme_controller.dart';
+import '../../../core/utils/url_utils.dart';
 import '../../../features/auth/presentation/providers/auth_providers.dart';
 import '../../auth/register_form_screen.dart';
 import '../../auth/sign_in_screen.dart';
 import '../../common/legal_modal_sheet.dart';
+import '../../profile/personal_info_screen.dart';
 
 /// Profile / Account Tab:
 /// Supports both Signed-In user and Non-Signed-In (Guest) user views via Riverpod & AuthService.
@@ -86,8 +89,13 @@ class ProfileTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
     final authState = ref.watch(authControllerProvider);
     final user = authState.user;
+
+    final bgColor = isDark ? AppColors.darkBackground : AppColors.background;
+    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
 
     return ListenableBuilder(
       listenable: AuthService.instance,
@@ -95,19 +103,19 @@ class ProfileTab extends ConsumerWidget {
         final isLoggedIn = authState.isAuthenticated || AuthService.instance.isLoggedIn;
         final userName = (user != null && !user.isGuest) ? user.name : AuthService.instance.userName;
         final userEmail = (user != null && !user.isGuest) ? user.email : AuthService.instance.userEmail;
-        final userRole = (user != null && !user.isGuest) ? user.role : AuthService.instance.userRole;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: bgColor,
           appBar: AppBar(
-            backgroundColor: AppColors.background,
+            backgroundColor: bgColor,
             elevation: 0,
+            scrolledUnderElevation: 0,
             title: Text(
               isLoggedIn ? 'Account Profile' : 'FindBookStay',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: textColor,
               ),
             ),
           ),
@@ -122,7 +130,8 @@ class ProfileTab extends ConsumerWidget {
                     ref,
                     name: userName,
                     email: userEmail,
-                    role: userRole,
+                    avatarUrl: user?.avatarUrl,
+                    isDark: isDark,
                   )
                 else
                   _buildGuestHero(context),
@@ -130,26 +139,38 @@ class ProfileTab extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 // ── Account / App Settings Section ────────────────────
-                _buildSectionTitle(isLoggedIn ? 'Account Settings' : 'Preferences'),
+                _buildSectionTitle(
+                  isLoggedIn ? 'Account Settings' : 'Preferences',
+                  isDark: isDark,
+                ),
                 const SizedBox(height: 10),
 
                 if (isLoggedIn) ...[
                   _buildMenuTile(
                     icon: Icons.person_outline_rounded,
                     title: 'Personal Information',
-                    subtitle: 'Name, phone, verified identity',
-                    onTap: () {},
+                    subtitle: 'Name, phone, address, and profile details',
+                    isDark: isDark,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PersonalInfoScreen(),
+                        ),
+                      );
+                    },
                   ),
                   _buildMenuTile(
                     icon: Icons.payment_rounded,
                     title: 'Payment Methods & Invoices',
                     subtitle: 'Cards, bKash, transaction history',
+                    isDark: isDark,
                     onTap: () {},
                   ),
                   _buildMenuTile(
                     icon: Icons.notifications_none_rounded,
                     title: 'Notification Preferences',
                     subtitle: 'Booking alerts, owner messages',
+                    isDark: isDark,
                     onTap: () {},
                   ),
                 ],
@@ -158,31 +179,38 @@ class ProfileTab extends ConsumerWidget {
                   icon: Icons.language_rounded,
                   title: 'Language & Currency',
                   subtitle: 'English (US) · BDT (৳)',
+                  isDark: isDark,
                   onTap: () {},
                 ),
+
+                // ── Theme / Appearance Toggle ────────────────────────
+                _buildThemeToggleTile(context, ref, isDark: isDark),
 
                 const SizedBox(height: 20),
 
                 // ── Legal & Support Section ───────────────────────────
-                _buildSectionTitle('Legal & Support'),
+                _buildSectionTitle('Legal & Support', isDark: isDark),
                 const SizedBox(height: 10),
 
                 _buildMenuTile(
                   icon: Icons.gavel_rounded,
                   title: 'Terms of Service',
                   subtitle: 'Platform rules and direct booking terms',
+                  isDark: isDark,
                   onTap: () => showLegalModalSheet(context, isTerms: true),
                 ),
                 _buildMenuTile(
                   icon: Icons.shield_outlined,
                   title: 'Privacy Policy',
                   subtitle: 'How FindBookStay protects your data',
+                  isDark: isDark,
                   onTap: () => showLegalModalSheet(context, isTerms: false),
                 ),
                 _buildMenuTile(
                   icon: Icons.help_outline_rounded,
                   title: 'Help Center & 24/7 Support',
                   subtitle: 'FAQs, contact agent, safety center',
+                  isDark: isDark,
                   onTap: () {},
                 ),
 
@@ -222,7 +250,7 @@ class ProfileTab extends ConsumerWidget {
                     'FindBookStay v1.0.0 (Build 1) · 0% Broker Fees',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 11.5,
-                      color: AppColors.textMuted,
+                      color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                     ),
                   ),
                 ),
@@ -240,133 +268,136 @@ class ProfileTab extends ConsumerWidget {
     WidgetRef ref, {
     required String name,
     required String email,
-    required String role,
+    String? avatarUrl,
+    required bool isDark,
   }) {
-    final initials = name.trim().split(' ').map((e) => e[0]).take(2).join();
+    final initials = name.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join();
+    final resolvedAvatar = UrlUtils.resolveNullableUrl(avatarUrl);
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.04),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              // Avatar
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.25),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    initials,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const PersonalInfoScreen()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: isDark ? Colors.black.withValues(alpha: 0.3) : AppColors.primary.withValues(alpha: 0.04),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Avatar
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                gradient: isDark ? AppColors.darkPrimaryGradient : AppColors.primaryGradient,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      email,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12.5,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        role,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+              child: ClipOval(
+                child: (resolvedAvatar != null && resolvedAvatar.isNotEmpty)
+                    ? Image.network(
+                        resolvedAvatar,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return const Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (_, _, _) => Center(
+                          child: Text(
+                            initials.isNotEmpty ? initials : 'U',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          initials.isNotEmpty ? initials : 'U',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      letterSpacing: -0.3,
                     ),
-                  ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    email,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12.5,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkAccentLight : AppColors.accentLight,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.accent.withValues(alpha: isDark ? 0.45 : 0.3),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Divider(height: 1, color: AppColors.border),
-          const SizedBox(height: 12),
-          // Switch Role Quick Button
-          GestureDetector(
-            onTap: () async {
-              HapticFeedback.selectionClick();
-              await ref.read(authControllerProvider.notifier).toggleRole();
-              await AuthService.instance.toggleRole();
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.swap_calls_rounded,
-                  size: 16,
-                  color: AppColors.accent,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  role.contains('Tenant')
-                      ? 'Switch to Host & Owner Mode'
-                      : 'Switch to Tenant & Player Mode',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
+              child: Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 13,
+                color: isDark ? AppColors.accent : AppColors.primary,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -490,13 +521,13 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, {required bool isDark}) {
     return Text(
       title,
       style: GoogleFonts.plusJakartaSans(
         fontSize: 14,
         fontWeight: FontWeight.w800,
-        color: AppColors.textPrimary,
+        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
         letterSpacing: 0.2,
       ),
     );
@@ -507,14 +538,15 @@ class ProfileTab extends ConsumerWidget {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    required bool isDark,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: AppColors.surface,
+        color: isDark ? AppColors.darkCard : AppColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
         ),
         clipBehavior: Clip.antiAlias,
         child: ListTile(
@@ -525,31 +557,90 @@ class ProfileTab extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: isDark ? AppColors.darkSurface : AppColors.background,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
             ),
-            child: Icon(icon, size: 20, color: AppColors.primary),
+            child: Icon(icon, size: 20, color: isDark ? AppColors.accent : AppColors.primary),
           ),
           title: Text(
             title,
             style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           subtitle: Text(
             subtitle,
             style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
             ),
           ),
-          trailing: const Icon(
+          trailing: Icon(
             Icons.arrow_forward_ios_rounded,
             size: 14,
-            color: AppColors.textMuted,
+            color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeToggleTile(BuildContext context, WidgetRef ref, {required bool isDark}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: isDark ? AppColors.darkCard : AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          onTap: () {
+            ref.read(themeModeProvider.notifier).toggleTheme();
+          },
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurface : AppColors.background,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+            ),
+            child: Icon(
+              isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+              size: 20,
+              color: isDark ? AppColors.accent : const Color(0xFFF59E0B),
+            ),
+          ),
+          title: Text(
+            'Theme Mode',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            ),
+          ),
+          subtitle: Text(
+            isDark ? 'Dark Mode (Active)' : 'Light Mode (Active)',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+            ),
+          ),
+          trailing: Switch.adaptive(
+            value: isDark,
+            activeThumbColor: AppColors.accent,
+            activeTrackColor: AppColors.accent.withValues(alpha: 0.35),
+            inactiveThumbColor: Colors.white,
+            inactiveTrackColor: isDark ? AppColors.darkBorder : AppColors.border,
+            onChanged: (val) {
+              ref.read(themeModeProvider.notifier).setThemeMode(
+                    val ? ThemeMode.dark : ThemeMode.light,
+                  );
+            },
           ),
         ),
       ),

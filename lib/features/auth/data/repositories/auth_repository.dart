@@ -57,6 +57,13 @@ abstract class AuthRepository {
   });
 
   Future<UserModel> saveUserProfile(UserModel user);
+
+  Future<UserModel> getCurrentUser();
+
+  Future<UserModel> updateProfile(
+    Map<String, dynamic> data, {
+    String? imageFilePath,
+  });
 }
 
 /// Implementation of [AuthRepository] coordinating remote data and local persistence.
@@ -175,7 +182,27 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<bool> isAuthenticated() async {
-    return await tokenStorage.hasAccessToken();
+    final hasAccess = await tokenStorage.hasAccessToken();
+    if (hasAccess) return true;
+
+    final refresh = await tokenStorage.getRefreshToken();
+    if (refresh != null && refresh.isNotEmpty) {
+      try {
+        final newTokens = await remoteDataSource.refreshToken(refresh);
+        if (newTokens.accessToken.isNotEmpty) {
+          await tokenStorage.saveTokens(
+            accessToken: newTokens.accessToken,
+            refreshToken: newTokens.refreshToken.isNotEmpty
+                ? newTokens.refreshToken
+                : refresh,
+          );
+          return true;
+        }
+      } catch (_) {
+        return false;
+      }
+    }
+    return false;
   }
 
   @override
@@ -226,5 +253,25 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserModel> saveUserProfile(UserModel user) async {
     await tokenStorage.saveUserRaw(user.toJson());
     return user;
+  }
+
+  @override
+  Future<UserModel> getCurrentUser() async {
+    final user = await remoteDataSource.getCurrentUser();
+    await tokenStorage.saveUserRaw(user.toJson());
+    return user;
+  }
+
+  @override
+  Future<UserModel> updateProfile(
+    Map<String, dynamic> data, {
+    String? imageFilePath,
+  }) async {
+    final updatedUser = await remoteDataSource.updateProfile(
+      data,
+      imageFilePath: imageFilePath,
+    );
+    await tokenStorage.saveUserRaw(updatedUser.toJson());
+    return updatedUser;
   }
 }

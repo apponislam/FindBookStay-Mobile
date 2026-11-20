@@ -40,7 +40,24 @@ class AuthController extends Notifier<AuthState> {
               _authRepository.registerFcmToken(token).catchError((_) {});
             }
           }).catchError((_) {});
+
+          // Fetch fresh profile from server in background to keep data current
+          _authRepository.getCurrentUser().then((freshUser) {
+            if (ref.mounted) {
+              state = AuthState.authenticated(freshUser);
+              _syncWithAuthService(freshUser, isLoggedIn: true);
+            }
+          }).catchError((_) {});
           return;
+        } else {
+          // No cached user but auth tokens exist (e.g. from cookies/refresh token)
+          try {
+            final serverUser = await _authRepository.getCurrentUser();
+            if (!ref.mounted) return;
+            state = AuthState.authenticated(serverUser);
+            _syncWithAuthService(serverUser, isLoggedIn: true);
+            return;
+          } catch (_) {}
         }
       }
       if (!ref.mounted) return;
@@ -87,11 +104,13 @@ class AuthController extends Notifier<AuthState> {
         });
       } else {
         // Retry capturing FCM token in background if not ready before login
-        NotificationService.instance.getFcmToken().then((lateToken) {
-          if (lateToken != null && lateToken.isNotEmpty) {
-            _authRepository.registerFcmToken(lateToken).catchError((_) {});
-          }
-        }).catchError((_) {});
+        try {
+          NotificationService.instance.getFcmToken().then((lateToken) {
+            if (lateToken != null && lateToken.isNotEmpty) {
+              _authRepository.registerFcmToken(lateToken).catchError((_) {});
+            }
+          }).catchError((_) {});
+        } catch (_) {}
       }
 
       return true;
@@ -151,7 +170,10 @@ class AuthController extends Notifier<AuthState> {
   Future<void> logout() async {
     state = AuthState.loading(state.user);
     try {
-      final fcmToken = NotificationService.instance.fcmToken;
+      String? fcmToken;
+      try {
+        fcmToken = NotificationService.instance.fcmToken;
+      } catch (_) {}
       await _authRepository.logout(fcmToken: fcmToken);
       try {
         await NotificationService.instance.unregisterDevice();
@@ -286,6 +308,46 @@ class AuthController extends Notifier<AuthState> {
     _syncWithAuthService(updatedUser, isLoggedIn: true);
   }
 
+  /// Fetch fresh profile from GET /api/v1/auth/me
+  Future<UserModel?> fetchCurrentUser() async {
+    try {
+      final user = await _authRepository.getCurrentUser();
+      if (!ref.mounted) return user;
+      state = AuthState.authenticated(user);
+      _syncWithAuthService(user, isLoggedIn: true);
+      return user;
+    } catch (e) {
+      debugPrint('Error fetching current user: $e');
+      return state.user;
+    }
+  }
+
+  /// Update profile via PATCH /api/v1/auth/profile
+  Future<UserModel> updateProfile(
+    Map<String, dynamic> data, {
+    String? imageFilePath,
+  }) async {
+    state = AuthState.loading(state.user);
+    try {
+      final updatedUser = await _authRepository.updateProfile(
+        data,
+        imageFilePath: imageFilePath,
+      );
+      if (!ref.mounted) return updatedUser;
+      state = AuthState.authenticated(updatedUser);
+      _syncWithAuthService(updatedUser, isLoggedIn: true);
+      return updatedUser;
+    } on AppException catch (e) {
+      if (!ref.mounted) rethrow;
+      state = AuthState.error(e.userMessage, state.user);
+      rethrow;
+    } catch (e) {
+      if (!ref.mounted) rethrow;
+      state = AuthState.error('Failed to update profile. Please try again.', state.user);
+      rethrow;
+    }
+  }
+
   /// Clear any error message
   void clearError() {
     if (state.hasError) {
@@ -295,15 +357,18 @@ class AuthController extends Notifier<AuthState> {
 
   /// Bi-directional sync with [AuthService] for backward compatibility with existing tests
   void _syncWithAuthService(UserModel user, {required bool isLoggedIn}) {
-    if (isLoggedIn) {
-      AuthService.instance.signIn(
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone: user.phone,
-      );
-    } else {
-      AuthService.instance.signOut();
-    }
+    try {
+      if (isLoggedIn) {
+        AuthService.instance.signIn(
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          phone: user.phone,
+          avatar: user.avatarUrl ?? user.profileImage,
+        ).catchError((_) {});
+      } else {
+        AuthService.instance.signOut().catchError((_) {});
+      }
+    } catch (_) {}
   }
 }

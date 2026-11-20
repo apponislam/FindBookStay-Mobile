@@ -107,6 +107,21 @@ class MockTestAuthRepository implements AuthRepository {
     cachedUser = user;
     return user;
   }
+
+  @override
+  Future<UserModel> getCurrentUser() async => cachedUser ?? UserModel.defaultUser;
+
+  @override
+  Future<UserModel> updateProfile(
+    Map<String, dynamic> data, {
+    String? imageFilePath,
+  }) async {
+    cachedUser = (cachedUser ?? UserModel.defaultUser).copyWith(
+      name: data['name'] as String?,
+      phone: data['phone'] as String?,
+    );
+    return cachedUser!;
+  }
 }
 
 void main() {

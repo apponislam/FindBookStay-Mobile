@@ -40,6 +40,24 @@ class EnvConfig {
     return url.endsWith('/') ? url : '$url/';
   }
 
+  /// Server root origin without path or trailing slash (e.g. 'https://findbookstayapi.apponislam.top').
+  /// Used for resolving relative media and uploaded asset URLs.
+  static String get serverOrigin {
+    try {
+      final uri = Uri.parse(apiBaseUrl);
+      if (uri.hasScheme && uri.host.isNotEmpty) {
+        return uri.origin;
+      }
+    } catch (_) {}
+
+    String base = apiBaseUrl.trim();
+    base = base.replaceAll(RegExp(r'/api/v\d+/?$'), '');
+    while (base.endsWith('/')) {
+      base = base.substring(0, base.length - 1);
+    }
+    return base.isNotEmpty ? base : 'https://findbookstayapi.apponislam.top';
+  }
+
   /// Request timeout duration.
   static Duration get apiTimeout {
     int timeoutMs = _defaultTimeoutMs;

@@ -80,6 +80,11 @@ class AuthInterceptor extends QueuedInterceptor {
           final refreshResponse = await refreshDio.post(
             ApiEndpoints.authRefreshToken,
             data: {'refreshToken': refreshToken},
+            options: Options(
+              headers: {
+                'Cookie': 'refreshToken=$refreshToken',
+              },
+            ),
           );
 
           if (refreshResponse.statusCode == 200 &&
@@ -88,12 +93,25 @@ class AuthInterceptor extends QueuedInterceptor {
             final newAccessToken =
                 data['accessToken'] as String? ??
                 data['data']?['accessToken'] as String?;
-            final newRefreshToken =
-                data['refreshToken'] as String? ??
-                data['data']?['refreshToken'] as String? ??
-                refreshToken;
 
-            if (newAccessToken != null) {
+            final setCookieHeader =
+                refreshResponse.headers['set-cookie']?.join('; ');
+            String cookieRefreshToken = '';
+            if (setCookieHeader != null) {
+              final match =
+                  RegExp(r'refreshToken=([^;]+)').firstMatch(setCookieHeader);
+              if (match != null) {
+                cookieRefreshToken = match.group(1) ?? '';
+              }
+            }
+
+            final newRefreshToken = cookieRefreshToken.isNotEmpty
+                ? cookieRefreshToken
+                : data['refreshToken'] as String? ??
+                    data['data']?['refreshToken'] as String? ??
+                    refreshToken;
+
+            if (newAccessToken != null && newAccessToken.isNotEmpty) {
               await tokenStorage.saveTokens(
                 accessToken: newAccessToken,
                 refreshToken: newRefreshToken,

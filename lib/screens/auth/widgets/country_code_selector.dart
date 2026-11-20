@@ -189,7 +189,7 @@ class _CountryPickerScreenState extends State<CountryPickerScreen> {
         scrolledUnderElevation: 0,
         leading: IconButton(
           splashRadius: 22,
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -263,7 +263,7 @@ class _CountryPickerScreenState extends State<CountryPickerScreen> {
               ),
             ),
           ),
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: AppColors.border),
 
           // Country List
           Expanded(
@@ -304,7 +304,7 @@ class _CountryPickerScreenState extends State<CountryPickerScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Divider(height: 20, color: AppColors.border),
+                        Divider(height: 20, color: AppColors.border),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 8, 20, 6),
                           child: Text(

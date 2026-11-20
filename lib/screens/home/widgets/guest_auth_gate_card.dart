@@ -160,7 +160,7 @@ class GuestAuthGateCard extends StatelessWidget {
               },
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
-                side: const BorderSide(color: AppColors.border, width: 1.2),
+                side: BorderSide(color: AppColors.border, width: 1.2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

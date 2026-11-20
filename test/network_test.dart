@@ -150,7 +150,7 @@ void main() {
 
       expect(appException, isA<ServerException>());
       expect(appException.statusCode, equals(500));
-      expect(appException.userMessage, contains('servers are experiencing issues'));
+      expect(appException.userMessage, equals('Database connection lost'));
     });
   });
 }

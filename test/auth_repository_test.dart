@@ -73,6 +73,17 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
+  Future<UserModel> updateProfile(
+    Map<String, dynamic> data, {
+    String? imageFilePath,
+  }) async {
+    return UserModel.defaultUser.copyWith(
+      name: data['name'] as String?,
+      phone: data['phone'] as String?,
+    );
+  }
+
+  @override
   Future<void> forgotPassword(String email) async {}
 
   @override

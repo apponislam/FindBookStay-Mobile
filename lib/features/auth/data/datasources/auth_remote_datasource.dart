@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:dio/dio.dart';
+
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/dio_client.dart';
 import '../models/auth_response_model.dart';
@@ -15,6 +18,7 @@ abstract class AuthRemoteDataSource {
   Future<void> registerFcmToken(String fcmToken);
   Future<void> removeFcmToken(String fcmToken);
   Future<UserModel> getCurrentUser();
+  Future<UserModel> updateProfile(Map<String, dynamic> data, {String? imageFilePath});
   Future<void> forgotPassword(String email);
   Future<bool> verifyOtp({required String email, required String otp});
   Future<void> resendOtp(String email);
@@ -40,8 +44,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: request.toJson(),
     );
 
-    final responseData = response.data as Map<String, dynamic>;
-    return AuthResponseModel.fromJson(responseData);
+    return AuthResponseModel.fromResponse(response);
   }
 
   @override
@@ -51,8 +54,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: request.toJson(),
     );
 
-    final responseData = response.data as Map<String, dynamic>;
-    return AuthResponseModel.fromJson(responseData);
+    return AuthResponseModel.fromResponse(response);
   }
 
   @override
@@ -60,10 +62,35 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final response = await dioClient.post(
       ApiEndpoints.authRefreshToken,
       data: {'refreshToken': refreshToken},
+      options: Options(
+        headers: {
+          'Cookie': 'refreshToken=$refreshToken',
+        },
+      ),
     );
 
     final responseData = response.data as Map<String, dynamic>;
-    return AuthTokensModel.fromJson(responseData);
+    final setCookieHeader = response.headers['set-cookie']?.join('; ');
+    final tokens = AuthTokensModel.fromJson(responseData);
+    if (tokens.refreshToken.isEmpty && setCookieHeader != null) {
+      final match = RegExp(r'refreshToken=([^;]+)').firstMatch(setCookieHeader);
+      if (match != null) {
+        return AuthTokensModel(
+          accessToken: tokens.accessToken,
+          refreshToken: match.group(1) ?? refreshToken,
+          tokenType: tokens.tokenType,
+          expiresIn: tokens.expiresIn,
+        );
+      }
+    }
+    return tokens.refreshToken.isEmpty
+        ? AuthTokensModel(
+            accessToken: tokens.accessToken,
+            refreshToken: refreshToken,
+            tokenType: tokens.tokenType,
+            expiresIn: tokens.expiresIn,
+          )
+        : tokens;
   }
 
   @override
@@ -109,6 +136,47 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> getCurrentUser() async {
     final response = await dioClient.get(ApiEndpoints.authMe);
+    final responseData = response.data as Map<String, dynamic>;
+    final userData = responseData['data'] is Map<String, dynamic>
+        ? responseData['data'] as Map<String, dynamic>
+        : responseData;
+    return UserModel.fromJson(userData);
+  }
+
+  @override
+  Future<UserModel> updateProfile(
+    Map<String, dynamic> data, {
+    String? imageFilePath,
+  }) async {
+    dynamic requestData;
+
+    if (imageFilePath != null && imageFilePath.isNotEmpty) {
+      final fileName = imageFilePath.split(RegExp(r'[\\/]')).last;
+      final map = <String, dynamic>{};
+
+      data.forEach((key, value) {
+        if (value is Map) {
+          map[key] = jsonEncode(value);
+        } else if (value != null) {
+          map[key] = value;
+        }
+      });
+
+      map['profileImage'] = await MultipartFile.fromFile(
+        imageFilePath,
+        filename: fileName,
+      );
+
+      requestData = FormData.fromMap(map);
+    } else {
+      requestData = data;
+    }
+
+    final response = await dioClient.patch(
+      ApiEndpoints.authUpdateProfile,
+      data: requestData,
+    );
+
     final responseData = response.data as Map<String, dynamic>;
     final userData = responseData['data'] is Map<String, dynamic>
         ? responseData['data'] as Map<String, dynamic>

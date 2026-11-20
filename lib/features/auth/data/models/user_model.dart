@@ -1,3 +1,4 @@
+import '../../../../core/utils/url_utils.dart';
 import 'register_request.dart';
 
 /// Strongly typed immutable domain model for a registered or guest user,
@@ -28,6 +29,15 @@ class UserModel {
     this.isEmailVerified = false,
     this.createdAt,
   });
+
+  /// Returns fully resolved avatar URL (e.g. prepending backend host if relative)
+  String? get resolvedAvatarUrl =>
+      UrlUtils.resolveNullableUrl(avatarUrl ?? profileImage);
+
+  /// Whether the user has a valid avatar or profile picture
+  bool get hasAvatar =>
+      (avatarUrl != null && avatarUrl!.isNotEmpty) ||
+      (profileImage != null && profileImage!.isNotEmpty);
 
   /// Unit test fixture profile
   static const UserModel defaultUser = UserModel(
@@ -62,7 +72,7 @@ class UserModel {
       role: json['role'] as String? ?? 'USER',
       phone: json['phone'] as String?,
       profileImage: image,
-      avatarUrl: image,
+      avatarUrl: UrlUtils.resolveNullableUrl(image),
       presentAddress: json['presentAddress'] is Map<String, dynamic>
           ? AddressModel.fromJson(json['presentAddress'] as Map<String, dynamic>)
           : null,

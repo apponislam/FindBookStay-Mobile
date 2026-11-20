@@ -71,19 +71,28 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
-    final targetScreen = hasSeenOnboarding
-        ? const HomeScreen()
-        : const OnboardingScreen();
+    try {
+      final targetScreen = hasSeenOnboarding
+          ? const HomeScreen()
+          : const OnboardingScreen();
 
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, _, _) => targetScreen,
-        transitionsBuilder: (_, animation, _, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 400),
-      ),
-    );
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (_, _, _) => targetScreen,
+          transitionsBuilder: (_, animation, _, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 400),
+        ),
+      );
+    } catch (e) {
+      debugPrint('SplashScreen: Navigation error: $e');
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
+    }
   }
 
   @override

@@ -4,17 +4,18 @@ import 'package:findbookstay/core/config/env_config.dart';
 void main() {
   group('EnvConfig tests', () {
     test('Default API Base URL is valid and ends with slash', () {
-      expect(EnvConfig.apiBaseUrl, equals('http://localhost:5075/'));
+      expect(EnvConfig.apiBaseUrl, equals('https://findbookstayapi.apponislam.top/'));
+      expect(EnvConfig.serverOrigin, equals('https://findbookstayapi.apponislam.top'));
     });
 
     test('Endpoint helper constructs clean paths correctly', () {
       expect(
         EnvConfig.endpoint('api/v1/auth/login'),
-        equals('http://localhost:5075/api/v1/auth/login'),
+        equals('https://findbookstayapi.apponislam.top/api/v1/auth/login'),
       );
       expect(
         EnvConfig.endpoint('/api/v1/listings'),
-        equals('http://localhost:5075/api/v1/listings'),
+        equals('https://findbookstayapi.apponislam.top/api/v1/listings'),
       );
     });
 

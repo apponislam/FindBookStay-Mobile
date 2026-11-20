@@ -1,20 +1,22 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/theme_controller.dart';
 import '../../auth/sign_in_screen.dart';
 
 /// Explore / Home Tab: Marketplace discovery for Renting, Booking, Sports Turfs & Buying.
-class ExploreTab extends StatefulWidget {
+class ExploreTab extends ConsumerStatefulWidget {
   const ExploreTab({super.key});
 
   @override
-  State<ExploreTab> createState() => _ExploreTabState();
+  ConsumerState<ExploreTab> createState() => _ExploreTabState();
 }
 
-class _ExploreTabState extends State<ExploreTab> {
+class _ExploreTabState extends ConsumerState<ExploreTab> {
   int _selectedCategoryIndex = 0;
 
   final List<Map<String, dynamic>> _categories = const [
@@ -29,11 +31,11 @@ class _ExploreTabState extends State<ExploreTab> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(themeModeProvider);
     return ListenableBuilder(
       listenable: AuthService.instance,
       builder: (context, _) {
         final isLoggedIn = AuthService.instance.isLoggedIn;
-        final userName = AuthService.instance.userName;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -138,7 +140,9 @@ class _ExploreTabState extends State<ExploreTab> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  isLoggedIn ? 'Hi, ${userName.split(" ").first}' : 'Sign In',
+                                  isLoggedIn
+                                      ? 'Hi, ${AuthService.instance.shortDisplayName.isNotEmpty ? AuthService.instance.shortDisplayName : "User"}'
+                                      : 'Sign In',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
