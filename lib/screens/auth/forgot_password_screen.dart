@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../l10n/app_localizations.dart';
 import 'otp_verification_screen.dart';
 import 'widgets/custom_auth_button.dart';
 import 'widgets/custom_auth_input.dart';
@@ -90,6 +91,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
@@ -135,7 +137,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             ),
                           ),
                           child: Text(
-                            'Account Recovery',
+                            l10n?.accountRecovery ?? 'Account Recovery',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -149,7 +151,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                         // Title
                         Text(
-                          'Forgot your password?',
+                          l10n?.forgotYourPassword ?? 'Forgot your password?',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
@@ -162,7 +164,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                         // Subtitle
                         Text(
-                          'Enter your registered email address and we will send you a 6-digit code to reset your password.',
+                          l10n?.forgotPasswordSubtitle ?? 'Enter your registered email address and we will send you a 6-digit code to reset your password.',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w400,
@@ -175,7 +177,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                         // Form Input (Required Email Only)
                         CustomAuthInput(
-                          label: 'Email Address',
+                          label: l10n?.emailAddress ?? 'Email Address',
                           hint: 'name@example.com',
                           prefixIcon: Icons.email_outlined,
                           isRequired: true,
@@ -193,7 +195,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                         // Primary CTA
                         CustomAuthButton(
-                          text: 'Send Reset Code',
+                          text: l10n?.sendResetCode ?? 'Send Reset Code',
                           icon: Icons.arrow_forward_rounded,
                           isLoading: _isLoading,
                           onPressed: _onSendResetCode,
@@ -216,9 +218,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                     color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                   ),
                                   children: [
-                                    const TextSpan(text: 'Remember your password? '),
+                                    TextSpan(text: l10n?.rememberPasswordQuestion ?? 'Remember your password? '),
                                     TextSpan(
-                                      text: 'Back to Sign In',
+                                      text: l10n?.goToSignIn ?? 'Back to Sign In',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         color: isDark ? AppColors.accent : AppColors.primary,

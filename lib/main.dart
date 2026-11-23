@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'core/config/env_config.dart';
+import 'core/localization/locale_controller.dart';
 import 'core/services/auth_service.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/splash/splash_screen.dart';
 import 'services/notification_service.dart';
 
@@ -57,6 +59,7 @@ class FindBookStayApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final locale = ref.watch(localeProvider);
 
     return MaterialApp(
       title: 'FindBookStay',
@@ -64,6 +67,13 @@ class FindBookStayApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
+      locale: locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
+        ...AppLocalizations.localizationsDelegates,
+      ],
       builder: (context, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         SystemChrome.setSystemUIOverlayStyle(

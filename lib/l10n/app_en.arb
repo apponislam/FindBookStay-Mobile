@@ -1,0 +1,859 @@
+{
+  "@@locale": "en",
+  "appName": "FindBookStay",
+  "@appName": {
+    "description": "Application brand name"
+  },
+  "appTagline": "Find, Book & Stay Anywhere",
+  "@appTagline": {
+    "description": "Application tagline"
+  },
+  "navExplore": "Explore",
+  "@navExplore": {
+    "description": "Bottom nav explore tab label"
+  },
+  "navBookings": "Bookings",
+  "@navBookings": {
+    "description": "Bottom nav bookings tab label"
+  },
+  "navSaved": "Saved",
+  "@navSaved": {
+    "description": "Bottom nav saved tab label"
+  },
+  "navInbox": "Inbox",
+  "@navInbox": {
+    "description": "Bottom nav inbox tab label"
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Bottom nav profile tab label"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search label"
+  },
+  "searchPlaceholder": "Search destinations, properties...",
+  "@searchPlaceholder": {
+    "description": "Search input placeholder"
+  },
+  "filter": "Filter",
+  "@filter": {
+    "description": "Filter label"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button label"
+  },
+  "saveChanges": "Save Changes",
+  "@saveChanges": {
+    "description": "Save changes button label"
+  },
+  "saving": "Saving...",
+  "@saving": {
+    "description": "Saving in-progress label"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button label"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button label"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button label"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button label"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next button label"
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Done button label"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button label"
+  },
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all action label"
+  },
+  "seeAll": "See All",
+  "@seeAll": {
+    "description": "See all action label"
+  },
+  "seeMore": "See More",
+  "@seeMore": {
+    "description": "See more action label"
+  },
+  "seeLess": "See Less",
+  "@seeLess": {
+    "description": "See less action label"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading state label"
+  },
+  "signIn": "Sign In",
+  "@signIn": {
+    "description": "Sign in button label"
+  },
+  "signUp": "Sign Up",
+  "@signUp": {
+    "description": "Sign up button label"
+  },
+  "signOut": "Sign Out",
+  "@signOut": {
+    "description": "Sign out button label"
+  },
+  "register": "Register",
+  "@register": {
+    "description": "Register button label"
+  },
+  "createAnAccount": "Create an Account",
+  "@createAnAccount": {
+    "description": "Create an account button label"
+  },
+  "guestMode": "Guest Mode",
+  "@guestMode": {
+    "description": "Guest mode badge text"
+  },
+  "guestUser": "Guest User",
+  "@guestUser": {
+    "description": "Guest user label"
+  },
+  "signInToContinue": "Sign in to access your full profile, saved wishlists, and bookings.",
+  "@signInToContinue": {
+    "description": "Sign in callout for guest users"
+  },
+  "dontHaveAccount": "Don't have an account? ",
+  "@dontHaveAccount": {
+    "description": "Don't have an account question"
+  },
+  "alreadyHaveAccount": "Already have an account? ",
+  "@alreadyHaveAccount": {
+    "description": "Already have an account question"
+  },
+  "gotIt": "Got it",
+  "@gotIt": {
+    "description": "Got it confirmation button label"
+  },
+
+  "joinFindBookStay": "Join FindBookStay",
+  "@joinFindBookStay": {
+    "description": "Guest hero banner title"
+  },
+  "guestHeroSubtitle": "Sign in or create an account to book stays, rent flats, and reserve sports turfs with zero broker fees.",
+  "@guestHeroSubtitle": {
+    "description": "Guest hero banner subtitle"
+  },
+  "findBookStayBadge": "FIND · BOOK · STAY",
+  "@findBookStayBadge": {
+    "description": "Brand pill badge text"
+  },
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings section title"
+  },
+  "preferences": "Preferences",
+  "@preferences": {
+    "description": "Preferences section title"
+  },
+  "personalInfo": "Personal Information",
+  "@personalInfo": {
+    "description": "Personal information menu title"
+  },
+  "personalInfoSubtitle": "Name, phone, address, and profile details",
+  "@personalInfoSubtitle": {
+    "description": "Personal information menu subtitle"
+  },
+  "paymentMethods": "Payment Methods & Invoices",
+  "@paymentMethods": {
+    "description": "Payment methods menu title"
+  },
+  "paymentMethodsSubtitle": "Cards, bKash, transaction history",
+  "@paymentMethodsSubtitle": {
+    "description": "Payment methods menu subtitle"
+  },
+  "notifications": "Notification Preferences",
+  "@notifications": {
+    "description": "Notifications menu title"
+  },
+  "notificationsSubtitle": "Booking alerts, owner messages",
+  "@notificationsSubtitle": {
+    "description": "Notifications menu subtitle"
+  },
+  "languageAndCurrency": "Language & Currency",
+  "@languageAndCurrency": {
+    "description": "Language and currency menu label"
+  },
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Select language modal title"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language name"
+  },
+  "bangla": "বাংলা",
+  "@bangla": {
+    "description": "Bangla language name"
+  },
+  "themeMode": "Theme Mode",
+  "@themeMode": {
+    "description": "Theme mode label"
+  },
+  "activeDarkMode": "Dark Mode (Active)",
+  "@activeDarkMode": {
+    "description": "Dark mode active state"
+  },
+  "activeLightMode": "Light Mode (Active)",
+  "@activeLightMode": {
+    "description": "Light mode active state"
+  },
+  "lightMode": "Light Mode",
+  "@lightMode": {
+    "description": "Light mode label"
+  },
+  "darkMode": "Dark Mode",
+  "@darkMode": {
+    "description": "Dark mode label"
+  },
+  "systemDefault": "System Default",
+  "@systemDefault": {
+    "description": "System default theme label"
+  },
+  "legalAndSupport": "Legal & Support",
+  "@legalAndSupport": {
+    "description": "Legal and support section title"
+  },
+  "termsOfService": "Terms of Service",
+  "@termsOfService": {
+    "description": "Terms of service label"
+  },
+  "termsOfServiceSubtitle": "Platform rules and direct booking terms",
+  "@termsOfServiceSubtitle": {
+    "description": "Terms of service subtitle"
+  },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy label"
+  },
+  "privacyPolicySubtitle": "How FindBookStay protects your data",
+  "@privacyPolicySubtitle": {
+    "description": "Privacy policy subtitle"
+  },
+  "helpCenter": "Help Center & 24/7 Support",
+  "@helpCenter": {
+    "description": "Help center label"
+  },
+  "helpCenterSubtitle": "FAQs, contact agent, safety center",
+  "@helpCenterSubtitle": {
+    "description": "Help center subtitle"
+  },
+  "signOutConfirmTitle": "Sign Out",
+  "@signOutConfirmTitle": {
+    "description": "Sign out confirmation dialog title"
+  },
+  "signOutConfirmMessage": "Are you sure you want to sign out? You can sign back in at any time.",
+  "@signOutConfirmMessage": {
+    "description": "Sign out confirmation dialog message"
+  },
+  "signedOutSuccess": "Signed out successfully. Switched to Guest mode.",
+  "@signedOutSuccess": {
+    "description": "Signed out success snackbar"
+  },
+  "appVersionInfo": "FindBookStay v1.0.0 (Build 1) · 0% Broker Fees",
+  "@appVersionInfo": {
+    "description": "Footer app version text"
+  },
+  "accountProfile": "Account Profile",
+  "@accountProfile": {
+    "description": "Profile tab title when signed in"
+  },
+
+  "userGreeting": "Hi, {name}",
+  "@userGreeting": {
+    "description": "Greeting user header",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "whereToStayOrPlay": "Where to stay or play?",
+  "@whereToStayOrPlay": {
+    "description": "Explore search card title"
+  },
+  "exploreSearchSubtext": "Flats · Bachelor seats · Hotels · Sports turfs",
+  "@exploreSearchSubtext": {
+    "description": "Explore search card subtitle"
+  },
+  "categoryAllSpaces": "All Spaces",
+  "@categoryAllSpaces": {
+    "description": "Explore category all spaces"
+  },
+  "categoryRentFlats": "Rent Flats",
+  "@categoryRentFlats": {
+    "description": "Explore category rent flats"
+  },
+  "categoryHotelStays": "Hotel Stays",
+  "@categoryHotelStays": {
+    "description": "Explore category hotel stays"
+  },
+  "categorySportsTurfs": "Sports Turfs",
+  "@categorySportsTurfs": {
+    "description": "Explore category sports turfs"
+  },
+  "categoryBuyProperty": "Buy Property",
+  "@categoryBuyProperty": {
+    "description": "Explore category buy property"
+  },
+  "badgeDirect": "100% DIRECT",
+  "@badgeDirect": {
+    "description": "100% direct badge"
+  },
+  "zeroBrokerFeesTitle": "Zero Broker Fees Guaranteed",
+  "@zeroBrokerFeesTitle": {
+    "description": "Zero broker fees banner title"
+  },
+  "zeroBrokerFeesSubtitle": "Rent family apartments or reserve turfs directly with owners.",
+  "@zeroBrokerFeesSubtitle": {
+    "description": "Zero broker fees banner subtitle"
+  },
+  "featuredAcrossSpaces": "Featured Across Spaces",
+  "@featuredAcrossSpaces": {
+    "description": "Featured listings section title"
+  },
+  "noListingsAvailable": "No listings available yet",
+  "@noListingsAvailable": {
+    "description": "No listings empty state title"
+  },
+  "noListingsDesc": "Check back shortly as verified property owners add new listings.",
+  "@noListingsDesc": {
+    "description": "No listings empty state description"
+  },
+
+  "myBookingsAndStays": "My Bookings & Stays",
+  "@myBookingsAndStays": {
+    "description": "Bookings tab title"
+  },
+  "manageReservations": "Manage your reservations",
+  "@manageReservations": {
+    "description": "Bookings guest auth gate title"
+  },
+  "manageReservationsSubtitle": "Sign in to view your upcoming sports turf slots, hotel reservations, and rental viewing appointments in one place.",
+  "@manageReservationsSubtitle": {
+    "description": "Bookings guest auth gate subtitle"
+  },
+  "signInToViewBookings": "Sign In to View Bookings",
+  "@signInToViewBookings": {
+    "description": "Bookings guest auth gate CTA button"
+  },
+  "filterUpcoming": "Upcoming",
+  "@filterUpcoming": {
+    "description": "Bookings filter upcoming"
+  },
+  "filterCompleted": "Completed",
+  "@filterCompleted": {
+    "description": "Bookings filter completed"
+  },
+  "filterCancelled": "Cancelled",
+  "@filterCancelled": {
+    "description": "Bookings filter cancelled"
+  },
+  "noBookingsFound": "No reservations found",
+  "@noBookingsFound": {
+    "description": "Bookings empty state title"
+  },
+  "noBookingsDesc": "When you book turf slots, resort suites, or schedule rental viewings, your bookings will be shown here.",
+  "@noBookingsDesc": {
+    "description": "Bookings empty state description"
+  },
+
+  "savedWishlist": "Saved Wishlist",
+  "@savedWishlist": {
+    "description": "Saved tab title"
+  },
+  "saveFavoriteSpots": "Save your favorite spots",
+  "@saveFavoriteSpots": {
+    "description": "Saved tab guest auth gate title"
+  },
+  "saveFavoriteSpotsSubtitle": "Sign in to keep track of family flats, hotel getaways, and sports turfs you love across all your devices.",
+  "@saveFavoriteSpotsSubtitle": {
+    "description": "Saved tab guest auth gate subtitle"
+  },
+  "signInToViewWishlist": "Sign In to View Wishlist",
+  "@signInToViewWishlist": {
+    "description": "Saved tab guest auth gate CTA button"
+  },
+  "wishlistSynced": "Wishlist synced with your account",
+  "@wishlistSynced": {
+    "description": "Wishlist sync snackbar"
+  },
+  "wishlistEmpty": "Your wishlist is empty",
+  "@wishlistEmpty": {
+    "description": "Wishlist empty state title"
+  },
+  "wishlistEmptyDesc": "Tap the heart icon on any flat, hotel, or turf to save it to your wishlist.",
+  "@wishlistEmptyDesc": {
+    "description": "Wishlist empty state description"
+  },
+
+  "inboxAndInquiries": "Inbox & Inquiries",
+  "@inboxAndInquiries": {
+    "description": "Inbox tab title"
+  },
+  "chatDirectlyOwners": "Chat directly with owners",
+  "@chatDirectlyOwners": {
+    "description": "Inbox guest auth gate title"
+  },
+  "chatDirectlyOwnersSubtitle": "Sign in to message verified property landlords, inquire about bachelor seats, and confirm turf reservations in real-time.",
+  "@chatDirectlyOwnersSubtitle": {
+    "description": "Inbox guest auth gate subtitle"
+  },
+  "signInToAccessMessages": "Sign In to Access Messages",
+  "@signInToAccessMessages": {
+    "description": "Inbox guest auth gate CTA button"
+  },
+  "noMessages": "No conversations yet",
+  "@noMessages": {
+    "description": "Inbox empty state title"
+  },
+  "noMessagesDesc": "When you message property owners, landlord representatives, or turf managers, your chats will appear here.",
+  "@noMessagesDesc": {
+    "description": "Inbox empty state description"
+  },
+
+  "editProfile": "Edit Profile",
+  "@editProfile": {
+    "description": "Edit profile title"
+  },
+  "basicInformation": "Basic Information",
+  "@basicInformation": {
+    "description": "Basic information section title"
+  },
+  "fullName": "Full Name",
+  "@fullName": {
+    "description": "Full name field label"
+  },
+  "phone": "Phone Number",
+  "@phone": {
+    "description": "Phone number field label"
+  },
+  "emailAddress": "Email Address",
+  "@emailAddress": {
+    "description": "Email address field label"
+  },
+  "verified": "Verified",
+  "@verified": {
+    "description": "Verified status badge"
+  },
+  "unverified": "Unverified",
+  "@unverified": {
+    "description": "Unverified status badge"
+  },
+  "presentAddress": "Present Address",
+  "@presentAddress": {
+    "description": "Present address section title"
+  },
+  "permanentAddress": "Permanent Address",
+  "@permanentAddress": {
+    "description": "Permanent address section title"
+  },
+  "sameAsPresent": "Permanent address is same as present",
+  "@sameAsPresent": {
+    "description": "Same address checkbox label"
+  },
+  "street": "Street Address",
+  "@street": {
+    "description": "Street address field label"
+  },
+  "city": "City",
+  "@city": {
+    "description": "City field label"
+  },
+  "state": "State / Division",
+  "@state": {
+    "description": "State field label"
+  },
+  "zipCode": "Postal / Zip Code",
+  "@zipCode": {
+    "description": "Postal code field label"
+  },
+  "changeProfilePhoto": "Change Profile Photo",
+  "@changeProfilePhoto": {
+    "description": "Change profile photo title"
+  },
+  "chooseFromGallery": "Choose from Gallery",
+  "@chooseFromGallery": {
+    "description": "Choose photo from gallery option"
+  },
+  "takePhoto": "Take a Photo",
+  "@takePhoto": {
+    "description": "Take photo with camera option"
+  },
+  "removePhoto": "Remove Selected Photo",
+  "@removePhoto": {
+    "description": "Remove selected photo option"
+  },
+  "profileUpdatedSuccess": "Profile updated successfully!",
+  "@profileUpdatedSuccess": {
+    "description": "Profile updated success message"
+  },
+  "pleaseEnterFullName": "Please enter your full name",
+  "@pleaseEnterFullName": {
+    "description": "Name validation error message"
+  },
+
+  "signInToAccount": "Sign In to Account",
+  "@signInToAccount": {
+    "description": "Sign in screen main heading"
+  },
+  "signInDescription": "Sign in to access your verified rentals, boutique stays, turf slots, and account preferences.",
+  "@signInDescription": {
+    "description": "Sign in screen description"
+  },
+  "emailAddressRequired": "Email address is required",
+  "@emailAddressRequired": {
+    "description": "Email required validation message"
+  },
+  "validEmailRequired": "Please enter a valid email",
+  "@validEmailRequired": {
+    "description": "Valid email required validation message"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  "passwordRequired": "Password is required",
+  "@passwordRequired": {
+    "description": "Password required validation message"
+  },
+  "passwordMinLength": "Min. 6 characters required",
+  "@passwordMinLength": {
+    "description": "Password min length validation message"
+  },
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Forgot password link label"
+  },
+  "resetPassword": "Reset Password",
+  "@resetPassword": {
+    "description": "Reset password label"
+  },
+  "verifyOtp": "Verify OTP",
+  "@verifyOtp": {
+    "description": "Verify OTP label"
+  },
+  "welcomeBack": "Welcome Back",
+  "@welcomeBack": {
+    "description": "Welcome back badge title"
+  },
+  "security": "Security",
+  "@security": {
+    "description": "Security label"
+  },
+
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip onboarding label"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Get started button label"
+  },
+  "onboardingRentTitle": "Rent Verified Spaces",
+  "@onboardingRentTitle": {
+    "description": "Onboarding rent slide title"
+  },
+  "onboardingRentSubtitle": "Rent family apartments, furnished flats, and flexible bachelor seats directly from verified owners with zero broker fees.",
+  "@onboardingRentSubtitle": {
+    "description": "Onboarding rent slide subtitle"
+  },
+  "onboardingRentTag": "01 / RENT",
+  "@onboardingRentTag": {
+    "description": "Onboarding rent slide tag"
+  },
+  "onboardingBookTitle": "Book Stays & Getaways",
+  "@onboardingBookTitle": {
+    "description": "Onboarding book slide title"
+  },
+  "onboardingBookSubtitle": "Discover and book boutique hotels, vacation resorts, and short stays with transparent pricing and instant confirmations.",
+  "@onboardingBookSubtitle": {
+    "description": "Onboarding book slide subtitle"
+  },
+  "onboardingBookTag": "02 / BOOK",
+  "@onboardingBookTag": {
+    "description": "Onboarding book slide tag"
+  },
+  "onboardingSportsTitle": "Reserve Sports Turfs",
+  "@onboardingSportsTitle": {
+    "description": "Onboarding sports slide title"
+  },
+  "onboardingSportsSubtitle": "Book football pitches, cricket nets, and sports arenas by the hour with real-time slot availability.",
+  "@onboardingSportsSubtitle": {
+    "description": "Onboarding sports slide subtitle"
+  },
+  "onboardingSportsTag": "03 / SPORTS",
+  "@onboardingSportsTag": {
+    "description": "Onboarding sports slide tag"
+  },
+  "onboardingBuyTitle": "Buy Verified Properties",
+  "@onboardingBuyTitle": {
+    "description": "Onboarding buy slide title"
+  },
+  "onboardingBuySubtitle": "Explore premium residential apartments, luxury villas, and verified plots with direct developer & owner connections.",
+  "@onboardingBuySubtitle": {
+    "description": "Onboarding buy slide subtitle"
+  },
+  "onboardingBuyTag": "04 / BUY",
+  "@onboardingBuyTag": {
+    "description": "Onboarding buy slide tag"
+  },
+
+  "step1Of2": "Step 1 of 2",
+  "@step1Of2": {
+    "description": "Step 1 of 2 tag"
+  },
+  "selectYourRole": "Select your role",
+  "@selectYourRole": {
+    "description": "Role selection screen title"
+  },
+  "selectYourRoleSubtitle": "Choose how you want to use FindBookStay. You can always switch or manage both from account settings.",
+  "@selectYourRoleSubtitle": {
+    "description": "Role selection screen subtitle"
+  },
+  "roleTenantTitle": "Tenant, Guest or Player",
+  "@roleTenantTitle": {
+    "description": "Tenant role title"
+  },
+  "roleTenantDesc": "Rent family apartments, bachelor seats, book hotel stays, or reserve sports turfs.",
+  "@roleTenantDesc": {
+    "description": "Tenant role description"
+  },
+  "roleHostTitle": "Host, Landlord or Turf Owner",
+  "@roleHostTitle": {
+    "description": "Host role title"
+  },
+  "roleHostDesc": "List residential properties, rent shared seats, or manage sports turf reservations.",
+  "@roleHostDesc": {
+    "description": "Host role description"
+  },
+  "continueToSignUp": "Continue to Sign Up",
+  "@continueToSignUp": {
+    "description": "Continue to sign up button"
+  },
+
+  "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Create account screen title"
+  },
+  "step1Title": "Personal Details",
+  "@step1Title": {
+    "description": "Registration step 1 title"
+  },
+  "step1Subtitle": "Enter your name, contact information, and upload an optional profile photo.",
+  "@step1Subtitle": {
+    "description": "Registration step 1 subtitle"
+  },
+  "step2Title": "Addresses & Referral",
+  "@step2Title": {
+    "description": "Registration step 2 title"
+  },
+  "step2Subtitle": "Provide your present address and permanent residence details for verified booking records.",
+  "@step2Subtitle": {
+    "description": "Registration step 2 subtitle"
+  },
+  "step3Title": "Account Security",
+  "@step3Title": {
+    "description": "Registration step 3 title"
+  },
+  "step3Subtitle": "Create a strong password and accept our terms to safeguard your account.",
+  "@step3Subtitle": {
+    "description": "Registration step 3 subtitle"
+  },
+  "stepCountOf": "Step {current} of {total}",
+  "@stepCountOf": {
+    "description": "Step progress indicator",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "nextStep": "Next Step",
+  "@nextStep": {
+    "description": "Next step button"
+  },
+  "previousStep": "Previous Step",
+  "@previousStep": {
+    "description": "Previous step button"
+  },
+  "completeRegistration": "Complete Registration",
+  "@completeRegistration": {
+    "description": "Complete registration button"
+  },
+  "takePhotoWithCamera": "Take Photo with Camera",
+  "@takePhotoWithCamera": {
+    "description": "Take photo with camera"
+  },
+  "profilePhoto": "Profile Photo",
+  "@profilePhoto": {
+    "description": "Profile photo modal title"
+  },
+  "fullNameRequired": "Full name is required",
+  "@fullNameRequired": {
+    "description": "Full name required message"
+  },
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password label"
+  },
+  "confirmPasswordRequired": "Confirm password is required",
+  "@confirmPasswordRequired": {
+    "description": "Confirm password required message"
+  },
+  "passwordsDoNotMatch": "Passwords do not match",
+  "@passwordsDoNotMatch": {
+    "description": "Passwords do not match error"
+  },
+  "passwordsMatch": "Passwords match",
+  "@passwordsMatch": {
+    "description": "Passwords match success"
+  },
+  "referralCodeOptional": "Referral Code (Optional)",
+  "@referralCodeOptional": {
+    "description": "Referral code field"
+  },
+  "termsAgreementText": "I agree to the Terms of Service and Privacy Policy",
+  "@termsAgreementText": {
+    "description": "Terms agreement checkbox text"
+  },
+  "pleaseAcceptTerms": "Please accept Terms of Service & Privacy Policy to continue",
+  "@pleaseAcceptTerms": {
+    "description": "Please accept terms validation message"
+  },
+
+  "accountRecovery": "Account Recovery",
+  "@accountRecovery": {
+    "description": "Account recovery badge"
+  },
+  "forgotYourPassword": "Forgot your password?",
+  "@forgotYourPassword": {
+    "description": "Forgot password screen heading"
+  },
+  "forgotPasswordSubtitle": "Enter your registered email address and we will send you a 6-digit code to reset your password.",
+  "@forgotPasswordSubtitle": {
+    "description": "Forgot password screen subtitle"
+  },
+  "sendResetCode": "Send Reset Code",
+  "@sendResetCode": {
+    "description": "Send reset code button label"
+  },
+  "rememberPasswordQuestion": "Remember your password? ",
+  "@rememberPasswordQuestion": {
+    "description": "Remember password question"
+  },
+
+  "verification": "Verification",
+  "@verification": {
+    "description": "Verification badge"
+  },
+  "verifyYourEmail": "Verify your email",
+  "@verifyYourEmail": {
+    "description": "Verify email heading"
+  },
+  "otpSubtitle": "Enter the 6-digit verification code sent to {email}",
+  "@otpSubtitle": {
+    "description": "OTP screen subtitle",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyCode": "Verify Code",
+  "@verifyCode": {
+    "description": "Verify code button"
+  },
+  "resendCodeIn": "Resend Code in {seconds}s",
+  "@resendCodeIn": {
+    "description": "Resend code timer",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resendCode": "Resend Code",
+  "@resendCode": {
+    "description": "Resend code button"
+  },
+  "didntReceiveCode": "Didn't receive code? ",
+  "@didntReceiveCode": {
+    "description": "Didn't receive code prompt"
+  },
+  "clearCode": "Clear Code",
+  "@clearCode": {
+    "description": "Clear code button"
+  },
+  "otpRequired": "Please enter the 6-digit OTP code",
+  "@otpRequired": {
+    "description": "OTP required validation message"
+  },
+
+  "newCredentials": "New Credentials",
+  "@newCredentials": {
+    "description": "New credentials badge"
+  },
+  "resetYourPassword": "Reset your password",
+  "@resetYourPassword": {
+    "description": "Reset password screen heading"
+  },
+  "resetPasswordSubtitle": "Create a strong new password with at least 8 characters and 1 number.",
+  "@resetPasswordSubtitle": {
+    "description": "Reset password screen subtitle"
+  },
+  "newPassword": "New Password",
+  "@newPassword": {
+    "description": "New password label"
+  },
+  "passwordMustContainNumber": "Must contain at least 1 number",
+  "@passwordMustContainNumber": {
+    "description": "Password must contain number validation"
+  },
+  "passwordMin8Characters": "Min. 8 characters required",
+  "@passwordMin8Characters": {
+    "description": "Password min 8 characters validation"
+  },
+  "resetPasswordAndSignIn": "Reset Password & Sign In",
+  "@resetPasswordAndSignIn": {
+    "description": "Reset password button"
+  },
+  "passwordResetSuccessTitle": "Password Reset Successful",
+  "@passwordResetSuccessTitle": {
+    "description": "Password reset success title"
+  },
+  "passwordResetSuccessDesc": "Your password has been updated. You can now sign in with your new credentials.",
+  "@passwordResetSuccessDesc": {
+    "description": "Password reset success description"
+  },
+  "goToSignIn": "Go to Sign In",
+  "@goToSignIn": {
+    "description": "Go to sign in button"
+  }
+}

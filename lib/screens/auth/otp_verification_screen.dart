@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../l10n/app_localizations.dart';
 import '../home/home_screen.dart';
 import 'reset_password_screen.dart';
 import 'widgets/custom_auth_button.dart';
@@ -214,6 +215,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
@@ -256,7 +258,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                             ),
                           ),
                           child: Text(
-                            'Verification',
+                            l10n?.verification ?? 'Verification',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -273,7 +275,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Enter 6-Digit Code',
+                              l10n?.verifyYourEmail ?? 'Enter 6-Digit Code',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w800,
@@ -307,7 +309,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        'Clear',
+                                        l10n?.clearCode ?? 'Clear',
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
@@ -333,18 +335,8 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                               height: 1.45,
                             ),
                             children: [
-                              const TextSpan(
-                                text: 'We have sent a 6-digit confirmation code to ',
-                              ),
                               TextSpan(
-                                text: widget.email,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: isDark ? AppColors.accent : AppColors.primary,
-                                ),
-                              ),
-                              const TextSpan(
-                                text: '. Enter the code below to confirm your identity.',
+                                text: l10n?.otpSubtitle(widget.email) ?? 'We have sent a 6-digit confirmation code to ${widget.email}. Enter the code below to confirm your identity.',
                               ),
                             ],
                           ),
@@ -428,15 +420,8 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                       color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                     ),
                                     children: [
-                                      const TextSpan(
-                                        text: "Didn't receive code? Resend in ",
-                                      ),
                                       TextSpan(
-                                        text: _formattedTimer,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          color: isDark ? AppColors.accent : AppColors.primary,
-                                        ),
+                                        text: l10n?.resendCodeIn(_secondsRemaining) ?? "Didn't receive code? Resend in $_formattedTimer",
                                       ),
                                     ],
                                   ),
@@ -460,7 +445,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                         color: isDark ? AppColors.accent : AppColors.primary,
                                       ),
                                       label: Text(
-                                        'Resend Code',
+                                        l10n?.resendCode ?? 'Resend Code',
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
@@ -476,7 +461,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
                         // Verify Code CTA
                         CustomAuthButton(
-                          text: 'Verify Code',
+                          text: l10n?.verifyCode ?? 'Verify Code',
                           icon: Icons.arrow_forward_rounded,
                           isLoading: _isLoading,
                           onPressed: _onVerifyCode,

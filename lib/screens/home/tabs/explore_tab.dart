@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/theme_controller.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/sign_in_screen.dart';
 
 /// Explore / Home Tab: Marketplace discovery for Renting, Booking, Sports Turfs & Buying.
@@ -19,12 +20,12 @@ class ExploreTab extends ConsumerStatefulWidget {
 class _ExploreTabState extends ConsumerState<ExploreTab> {
   int _selectedCategoryIndex = 0;
 
-  final List<Map<String, dynamic>> _categories = const [
-    {'title': 'All Spaces', 'icon': Icons.grid_view_rounded},
-    {'title': 'Rent Flats', 'icon': Icons.home_work_rounded},
-    {'title': 'Hotel Stays', 'icon': Icons.hotel_rounded},
-    {'title': 'Sports Turfs', 'icon': Icons.sports_soccer_rounded},
-    {'title': 'Buy Property', 'icon': Icons.real_estate_agent_rounded},
+  List<Map<String, dynamic>> _getCategories(AppLocalizations? l10n) => [
+    {'title': l10n?.categoryAllSpaces ?? 'All Spaces', 'icon': Icons.grid_view_rounded},
+    {'title': l10n?.categoryRentFlats ?? 'Rent Flats', 'icon': Icons.home_work_rounded},
+    {'title': l10n?.categoryHotelStays ?? 'Hotel Stays', 'icon': Icons.hotel_rounded},
+    {'title': l10n?.categorySportsTurfs ?? 'Sports Turfs', 'icon': Icons.sports_soccer_rounded},
+    {'title': l10n?.categoryBuyProperty ?? 'Buy Property', 'icon': Icons.real_estate_agent_rounded},
   ];
 
   final List<Map<String, dynamic>> _featuredListings = const [];
@@ -33,6 +34,8 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
   Widget build(BuildContext context) {
     ref.watch(themeModeProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
+    final categories = _getCategories(l10n);
 
     return ListenableBuilder(
       listenable: AuthService.instance,
@@ -143,8 +146,8 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                 const SizedBox(width: 6),
                                 Text(
                                   isLoggedIn
-                                      ? 'Hi, ${AuthService.instance.shortDisplayName.isNotEmpty ? AuthService.instance.shortDisplayName : "User"}'
-                                      : 'Sign In',
+                                      ? (l10n?.userGreeting(AuthService.instance.shortDisplayName.isNotEmpty ? AuthService.instance.shortDisplayName : "User") ?? 'Hi, ${AuthService.instance.shortDisplayName.isNotEmpty ? AuthService.instance.shortDisplayName : "User"}')
+                                      : (l10n?.signIn ?? 'Sign In'),
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -196,7 +199,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Where to stay or play?',
+                                  l10n?.whereToStayOrPlay ?? 'Where to stay or play?',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w700,
@@ -204,7 +207,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                   ),
                                 ),
                                 Text(
-                                  'Flats · Bachelor seats · Hotels · Sports turfs',
+                                  l10n?.exploreSearchSubtext ?? 'Flats · Bachelor seats · Hotels · Sports turfs',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 11.5,
                                     color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
@@ -239,10 +242,10 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _categories.length,
+                      itemCount: categories.length,
                       separatorBuilder: (_, _) => const SizedBox(width: 10),
                       itemBuilder: (context, index) {
-                        final cat = _categories[index];
+                        final cat = categories[index];
                         final isSelected = _selectedCategoryIndex == index;
                         return GestureDetector(
                           onTap: () {
@@ -332,7 +335,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    '100% DIRECT',
+                                    l10n?.badgeDirect ?? '100% DIRECT',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w800,
@@ -343,7 +346,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Zero Broker Fees Guaranteed',
+                                  l10n?.zeroBrokerFeesTitle ?? 'Zero Broker Fees Guaranteed',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 16.5,
                                     fontWeight: FontWeight.w800,
@@ -353,7 +356,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Rent family apartments or reserve turfs directly with owners.',
+                                  l10n?.zeroBrokerFeesSubtitle ?? 'Rent family apartments or reserve turfs directly with owners.',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 12,
                                     color: Colors.white.withValues(alpha: 0.8),
@@ -392,7 +395,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                       children: [
                         Expanded(
                           child: Text(
-                            'Featured Across Spaces',
+                            l10n?.featuredAcrossSpaces ?? 'Featured Across Spaces',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
@@ -403,7 +406,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                         ),
                         if (_featuredListings.isNotEmpty)
                           Text(
-                            'See All (${_featuredListings.length})',
+                            '${l10n?.seeAll ?? "See All"} (${_featuredListings.length})',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w700,
@@ -441,7 +444,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'No listings available yet',
+                              l10n?.noListingsAvailable ?? 'No listings available yet',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -450,7 +453,7 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Check back soon or explore different categories.',
+                              l10n?.noListingsDesc ?? 'Check back shortly as verified property owners add new listings.',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 12.5,
                                 color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,

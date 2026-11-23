@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../l10n/app_localizations.dart';
 import 'sign_in_screen.dart';
 import 'widgets/custom_auth_button.dart';
 import 'widgets/custom_auth_input.dart';
@@ -112,6 +113,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   void _showSuccessDialog() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     HapticFeedback.mediumImpact();
     showDialog(
       context: context,
@@ -155,7 +157,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 const SizedBox(height: 20),
 
                 Text(
-                  'Password Updated!',
+                  l10n?.passwordResetSuccessTitle ?? 'Password Updated!',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 22,
@@ -167,7 +169,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 const SizedBox(height: 8),
 
                 Text(
-                  'Your password has been changed successfully. You can now sign in with your new credentials.',
+                  l10n?.passwordResetSuccessDesc ?? 'Your password has been changed successfully. You can now sign in with your new credentials.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13.5,
@@ -179,7 +181,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 const SizedBox(height: 24),
 
                 CustomAuthButton(
-                  text: 'Sign In Now',
+                  text: l10n?.goToSignIn ?? 'Sign In Now',
                   icon: Icons.login_rounded,
                   onPressed: () {
                     Navigator.of(ctx).pop();
@@ -200,6 +202,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
@@ -242,7 +245,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                             ),
                           ),
                           child: Text(
-                            'Security Update',
+                            l10n?.newCredentials ?? 'Security Update',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -256,7 +259,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                         // Title
                         Text(
-                          'Create New Password',
+                          l10n?.resetYourPassword ?? 'Create New Password',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
@@ -269,7 +272,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                         // Subtitle
                         Text(
-                          'Your new password must be different from previously used passwords.',
+                          l10n?.resetPasswordSubtitle ?? 'Your new password must be different from previously used passwords.',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w400,
@@ -282,7 +285,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                         // New Password Input (Required)
                         CustomAuthInput(
-                          label: 'New Password',
+                          label: l10n?.newPassword ?? 'New Password',
                           hint: '••••••••',
                           prefixIcon: Icons.lock_outline_rounded,
                           isPassword: true,
@@ -302,7 +305,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                         // Confirm Password Input with Match Indicator (Required)
                         CustomAuthInput(
-                          label: 'Confirm Password',
+                          label: l10n?.confirmPassword ?? 'Confirm Password',
                           hint: '••••••••',
                           prefixIcon: Icons.lock_reset_rounded,
                           isPassword: true,
@@ -338,8 +341,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                                 const SizedBox(width: 6),
                                 Text(
                                   _doPasswordsMatch
-                                      ? 'Passwords match perfectly'
-                                      : 'Passwords do not match yet',
+                                      ? (l10n?.passwordsMatch ?? 'Passwords match perfectly')
+                                      : (l10n?.passwordsDoNotMatch ?? 'Passwords do not match yet'),
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -356,7 +359,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                         // Reset Password CTA
                         CustomAuthButton(
-                          text: 'Reset Password & Sign In',
+                          text: l10n?.resetPasswordAndSignIn ?? 'Reset Password & Sign In',
                           icon: Icons.arrow_forward_rounded,
                           isLoading: _isLoading,
                           onPressed: _onResetPassword,

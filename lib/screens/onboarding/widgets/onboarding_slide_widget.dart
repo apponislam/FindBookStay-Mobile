@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/onboarding_item.dart';
 import 'onboarding_illustration_card.dart';
 
@@ -14,6 +15,30 @@ class OnboardingSlideWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
+
+    String localizedTag = item.tag;
+    String localizedTitle = item.title;
+    String localizedSubtitle = item.subtitle;
+
+    if (item.tag.contains('RENT')) {
+      localizedTag = l10n?.onboardingRentTag ?? item.tag;
+      localizedTitle = l10n?.onboardingRentTitle ?? item.title;
+      localizedSubtitle = l10n?.onboardingRentSubtitle ?? item.subtitle;
+    } else if (item.tag.contains('BOOK')) {
+      localizedTag = l10n?.onboardingBookTag ?? item.tag;
+      localizedTitle = l10n?.onboardingBookTitle ?? item.title;
+      localizedSubtitle = l10n?.onboardingBookSubtitle ?? item.subtitle;
+    } else if (item.tag.contains('SPORTS')) {
+      localizedTag = l10n?.onboardingSportsTag ?? item.tag;
+      localizedTitle = l10n?.onboardingSportsTitle ?? item.title;
+      localizedSubtitle = l10n?.onboardingSportsSubtitle ?? item.subtitle;
+    } else if (item.tag.contains('BUY')) {
+      localizedTag = l10n?.onboardingBuyTag ?? item.tag;
+      localizedTitle = l10n?.onboardingBuyTitle ?? item.title;
+      localizedSubtitle = l10n?.onboardingBuySubtitle ?? item.subtitle;
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final availableHeight = constraints.maxHeight;
@@ -55,7 +80,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      item.tag,
+                      localizedTag,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11.5,
@@ -73,7 +98,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: Text(
-                    item.title,
+                    localizedTitle,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: isShortScreen ? 22.0 : 26.0,
@@ -91,7 +116,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: Text(
-                    item.subtitle,
+                    localizedSubtitle,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: isShortScreen ? 13.0 : 14.5,

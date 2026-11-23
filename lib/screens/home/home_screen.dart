@@ -7,6 +7,7 @@ import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_controller.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../l10n/app_localizations.dart';
 import 'tabs/bookings_tab.dart';
 import 'tabs/explore_tab.dart';
 import 'tabs/inbox_tab.dart';
@@ -59,6 +60,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       listenable: AuthService.instance,
       builder: (context, _) {
         final isLoggedIn = riverpodAuth || AuthService.instance.isLoggedIn;
+        final l10n = AppLocalizations.of(context);
 
         return Scaffold(
           backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
@@ -95,7 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     _NavBarItem(
                       index: 0,
-                      label: 'Explore',
+                      label: l10n?.navExplore ?? 'Explore',
                       activeIcon: Icons.explore_rounded,
                       inactiveIcon: Icons.explore_outlined,
                       isSelected: _currentIndex == 0,
@@ -103,7 +105,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     _NavBarItem(
                       index: 1,
-                      label: 'Saved',
+                      label: l10n?.navSaved ?? 'Saved',
                       activeIcon: Icons.favorite_rounded,
                       inactiveIcon: Icons.favorite_outline_rounded,
                       isSelected: _currentIndex == 1,
@@ -111,7 +113,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     _NavBarItem(
                       index: 2,
-                      label: 'Bookings',
+                      label: l10n?.navBookings ?? 'Bookings',
                       activeIcon: Icons.calendar_month_rounded,
                       inactiveIcon: Icons.calendar_month_outlined,
                       isSelected: _currentIndex == 2,
@@ -119,7 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     _NavBarItem(
                       index: 3,
-                      label: 'Inbox',
+                      label: l10n?.navInbox ?? 'Inbox',
                       activeIcon: Icons.chat_bubble_rounded,
                       inactiveIcon: Icons.chat_bubble_outline_rounded,
                       badgeCount: isLoggedIn ? 2 : 0,
@@ -128,7 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     _NavBarItem(
                       index: 4,
-                      label: isLoggedIn ? 'Profile' : 'Account',
+                      label: l10n?.navProfile ?? (isLoggedIn ? 'Profile' : 'Account'),
                       activeIcon: Icons.person_rounded,
                       inactiveIcon: Icons.person_outline_rounded,
                       isSelected: _currentIndex == 4,

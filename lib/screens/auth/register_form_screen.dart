@@ -11,6 +11,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/theme/app_colors.dart';
 import '../../features/auth/data/models/register_request.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../l10n/app_localizations.dart';
 import 'otp_verification_screen.dart';
 import 'register_role_screen.dart';
 import 'widgets/country_code_selector.dart';
@@ -548,6 +549,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   // ---------------------------------------------------------------------------
   Widget _buildModernRoundStepper() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(28, 10, 28, 14),
       decoration: BoxDecoration(
@@ -564,19 +566,19 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
         children: [
           _buildStepNode(
             stepIndex: 0,
-            label: 'Personal',
+            label: l10n?.step1Title ?? 'Personal',
             icon: Icons.person_rounded,
           ),
           Expanded(child: _buildConnectingLine(0)),
           _buildStepNode(
             stepIndex: 1,
-            label: 'Address',
+            label: l10n?.step2Title ?? 'Address',
             icon: Icons.location_on_rounded,
           ),
           Expanded(child: _buildConnectingLine(1)),
           _buildStepNode(
             stepIndex: 2,
-            label: 'Security',
+            label: l10n?.step3Title ?? 'Security',
             icon: Icons.shield_rounded,
           ),
         ],
@@ -741,6 +743,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
   // ---------------------------------------------------------------------------
   Widget _buildFixedBottomBar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       decoration: BoxDecoration(
@@ -772,7 +775,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
               ? KeyedSubtree(
                   key: const ValueKey('step_0_actions'),
                   child: _buildModernPrimaryButton(
-                    text: 'Continue',
+                    text: l10n?.nextStep ?? 'Continue',
                     icon: Icons.arrow_forward_rounded,
                     onPressed: _onStep1Continue,
                   ),
@@ -788,7 +791,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildModernPrimaryButton(
-                              text: 'Continue',
+                              text: l10n?.nextStep ?? 'Continue',
                               icon: Icons.arrow_forward_rounded,
                               onPressed: _onStep2Continue,
                             ),
@@ -806,7 +809,7 @@ class _RegisterFormScreenState extends ConsumerState<RegisterFormScreen>
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildModernPrimaryButton(
-                              text: 'Create Account',
+                              text: l10n?.createAccount ?? 'Create Account',
                               icon: Icons.check_circle_rounded,
                               isLoading: _isLoading,
                               onPressed: _validateAndSubmit,

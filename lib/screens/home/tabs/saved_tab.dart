@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../widgets/guest_auth_gate_card.dart';
 
 /// Wishlist / Saved Spaces Tab:
@@ -21,6 +22,7 @@ class _SavedTabState extends State<SavedTab> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
 
     return ListenableBuilder(
       listenable: AuthService.instance,
@@ -30,13 +32,13 @@ class _SavedTabState extends State<SavedTab> {
         if (!isLoggedIn) {
           return Scaffold(
             backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-            body: const SafeArea(
+            body: SafeArea(
               child: GuestAuthGateCard(
                 icon: Icons.favorite_rounded,
-                title: 'Save your favorite spots',
-                subtitle:
+                title: l10n?.saveFavoriteSpots ?? 'Save your favorite spots',
+                subtitle: l10n?.saveFavoriteSpotsSubtitle ??
                     'Sign in to keep track of family flats, hotel getaways, and sports turfs you love across all your devices.',
-                ctaText: 'Sign In to View Wishlist',
+                ctaText: l10n?.signInToViewWishlist ?? 'Sign In to View Wishlist',
               ),
             ),
           );
@@ -48,7 +50,7 @@ class _SavedTabState extends State<SavedTab> {
             backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
             elevation: 0,
             title: Text(
-              'Saved Wishlist',
+              l10n?.savedWishlist ?? 'Saved Wishlist',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -63,7 +65,7 @@ class _SavedTabState extends State<SavedTab> {
                     SnackBar(
                       backgroundColor: isDark ? AppColors.accent : AppColors.primary,
                       content: Text(
-                        'Wishlist synced with your account',
+                        l10n?.wishlistSynced ?? 'Wishlist synced with your account',
                         style: GoogleFonts.plusJakartaSans(
                           color: isDark ? AppColors.primaryDark : Colors.white,
                         ),
@@ -102,7 +104,7 @@ class _SavedTabState extends State<SavedTab> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Your wishlist is empty',
+                            l10n?.wishlistEmpty ?? 'Your wishlist is empty',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -111,7 +113,8 @@ class _SavedTabState extends State<SavedTab> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Explore rental flats, stays, and sports turfs and tap the heart icon to save your favorites here.',
+                            l10n?.wishlistEmptyDesc ??
+                                'Explore rental flats, stays, and sports turfs and tap the heart icon to save your favorites here.',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,

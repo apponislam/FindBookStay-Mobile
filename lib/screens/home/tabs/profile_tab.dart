@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/localization/locale_controller.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../core/utils/url_utils.dart';
 import '../../../features/auth/presentation/providers/auth_providers.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/register_form_screen.dart';
 import '../../auth/sign_in_screen.dart';
 import '../../common/legal_modal_sheet.dart';
@@ -20,6 +22,7 @@ class ProfileTab extends ConsumerWidget {
 
   void _confirmSignOut(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     HapticFeedback.mediumImpact();
     showDialog<void>(
       context: context,
@@ -27,14 +30,14 @@ class ProfileTab extends ConsumerWidget {
         backgroundColor: isDark ? AppColors.darkCard : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Sign Out',
+          l10n?.signOutConfirmTitle ?? 'Sign Out',
           style: GoogleFonts.plusJakartaSans(
             fontWeight: FontWeight.w800,
             color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
           ),
         ),
         content: Text(
-          'Are you sure you want to sign out? You can sign back in at any time.',
+          l10n?.signOutConfirmMessage ?? 'Are you sure you want to sign out? You can sign back in at any time.',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 14,
             color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
@@ -44,7 +47,7 @@ class ProfileTab extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.of(dialogCtx).pop(),
             child: Text(
-              'Cancel',
+              l10n?.cancel ?? 'Cancel',
               style: GoogleFonts.plusJakartaSans(
                 fontWeight: FontWeight.w600,
                 color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
@@ -61,7 +64,7 @@ class ProfileTab extends ConsumerWidget {
                   SnackBar(
                     backgroundColor: AppColors.primary,
                     content: Text(
-                      'Signed out successfully. Switched to Guest mode.',
+                      l10n?.signedOutSuccess ?? 'Signed out successfully. Switched to Guest mode.',
                       style: GoogleFonts.plusJakartaSans(color: Colors.white),
                     ),
                   ),
@@ -76,7 +79,7 @@ class ProfileTab extends ConsumerWidget {
               ),
             ),
             child: Text(
-              'Sign Out',
+              l10n?.signOut ?? 'Sign Out',
               style: GoogleFonts.plusJakartaSans(
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -92,6 +95,8 @@ class ProfileTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final isDark = themeMode == ThemeMode.dark;
+    final currentLocale = ref.watch(localeProvider);
+    final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authControllerProvider);
     final user = authState.user;
 
@@ -112,7 +117,9 @@ class ProfileTab extends ConsumerWidget {
             elevation: 0,
             scrolledUnderElevation: 0,
             title: Text(
-              isLoggedIn ? 'Account Profile' : 'FindBookStay',
+              isLoggedIn
+                  ? (l10n?.accountProfile ?? l10n?.navProfile ?? 'Account Profile')
+                  : (l10n?.appName ?? 'FindBookStay'),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -141,7 +148,9 @@ class ProfileTab extends ConsumerWidget {
 
                 // ── Account / App Settings Section ────────────────────
                 _buildSectionTitle(
-                  isLoggedIn ? 'Account Settings' : 'Preferences',
+                  isLoggedIn
+                      ? (l10n?.accountSettings ?? 'Account Settings')
+                      : (l10n?.preferences ?? 'Preferences'),
                   isDark: isDark,
                 ),
                 const SizedBox(height: 10),
@@ -149,8 +158,8 @@ class ProfileTab extends ConsumerWidget {
                 if (isLoggedIn) ...[
                   _buildMenuTile(
                     icon: Icons.person_outline_rounded,
-                    title: 'Personal Information',
-                    subtitle: 'Name, phone, address, and profile details',
+                    title: l10n?.personalInfo ?? 'Personal Information',
+                    subtitle: l10n?.personalInfoSubtitle ?? 'Name, phone, address, and profile details',
                     isDark: isDark,
                     onTap: () {
                       Navigator.of(context).push(
@@ -162,15 +171,15 @@ class ProfileTab extends ConsumerWidget {
                   ),
                   _buildMenuTile(
                     icon: Icons.payment_rounded,
-                    title: 'Payment Methods & Invoices',
-                    subtitle: 'Cards, bKash, transaction history',
+                    title: l10n?.paymentMethods ?? 'Payment Methods & Invoices',
+                    subtitle: l10n?.paymentMethodsSubtitle ?? 'Cards, bKash, transaction history',
                     isDark: isDark,
                     onTap: () {},
                   ),
                   _buildMenuTile(
                     icon: Icons.notifications_none_rounded,
-                    title: 'Notification Preferences',
-                    subtitle: 'Booking alerts, owner messages',
+                    title: l10n?.notifications ?? 'Notification Preferences',
+                    subtitle: l10n?.notificationsSubtitle ?? 'Booking alerts, owner messages',
                     isDark: isDark,
                     onTap: () {},
                   ),
@@ -178,10 +187,12 @@ class ProfileTab extends ConsumerWidget {
 
                 _buildMenuTile(
                   icon: Icons.language_rounded,
-                  title: 'Language & Currency',
-                  subtitle: 'English (US) · BDT (৳)',
+                  title: l10n?.languageAndCurrency ?? 'Language & Currency',
+                  subtitle: currentLocale.languageCode == 'bn'
+                      ? 'বাংলা (BD) · BDT (৳)'
+                      : 'English (US) · BDT (৳)',
                   isDark: isDark,
-                  onTap: () {},
+                  onTap: () => _showLanguageSelector(context, ref, isDark: isDark),
                 ),
 
                 // ── Theme / Appearance Toggle ────────────────────────
@@ -190,27 +201,30 @@ class ProfileTab extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 // ── Legal & Support Section ───────────────────────────
-                _buildSectionTitle('Legal & Support', isDark: isDark),
+                _buildSectionTitle(
+                  l10n?.legalAndSupport ?? 'Legal & Support',
+                  isDark: isDark,
+                ),
                 const SizedBox(height: 10),
 
                 _buildMenuTile(
                   icon: Icons.gavel_rounded,
-                  title: 'Terms of Service',
-                  subtitle: 'Platform rules and direct booking terms',
+                  title: l10n?.termsOfService ?? 'Terms of Service',
+                  subtitle: l10n?.termsOfServiceSubtitle ?? 'Platform rules and direct booking terms',
                   isDark: isDark,
                   onTap: () => showLegalModalSheet(context, isTerms: true),
                 ),
                 _buildMenuTile(
                   icon: Icons.shield_outlined,
-                  title: 'Privacy Policy',
-                  subtitle: 'How FindBookStay protects your data',
+                  title: l10n?.privacyPolicy ?? 'Privacy Policy',
+                  subtitle: l10n?.privacyPolicySubtitle ?? 'How FindBookStay protects your data',
                   isDark: isDark,
                   onTap: () => showLegalModalSheet(context, isTerms: false),
                 ),
                 _buildMenuTile(
                   icon: Icons.help_outline_rounded,
-                  title: 'Help Center & 24/7 Support',
-                  subtitle: 'FAQs, contact agent, safety center',
+                  title: l10n?.helpCenter ?? 'Help Center & 24/7 Support',
+                  subtitle: l10n?.helpCenterSubtitle ?? 'FAQs, contact agent, safety center',
                   isDark: isDark,
                   onTap: () {},
                 ),
@@ -227,7 +241,7 @@ class ProfileTab extends ConsumerWidget {
                       color: AppColors.error,
                     ),
                     label: Text(
-                      'Sign Out',
+                      l10n?.signOut ?? 'Sign Out',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
@@ -248,7 +262,7 @@ class ProfileTab extends ConsumerWidget {
                 // App Version info
                 Center(
                   child: Text(
-                    'FindBookStay v1.0.0 (Build 1) · 0% Broker Fees',
+                    l10n?.appVersionInfo ?? 'FindBookStay v1.0.0 (Build 1) · 0% Broker Fees',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 11.5,
                       color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
@@ -405,6 +419,7 @@ class ProfileTab extends ConsumerWidget {
 
   /// Guest (Non-signed-in) hero card
   Widget _buildGuestHero(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -428,7 +443,7 @@ class ProfileTab extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              'FIND · BOOK · STAY',
+              l10n?.findBookStayBadge ?? 'FIND · BOOK · STAY',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
@@ -439,7 +454,7 @@ class ProfileTab extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Join FindBookStay',
+            l10n?.joinFindBookStay ?? 'Join FindBookStay',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -449,7 +464,8 @@ class ProfileTab extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Sign in or create an account to book stays, rent flats, and reserve sports turfs with zero broker fees.',
+            l10n?.guestHeroSubtitle ??
+                'Sign in or create an account to book stays, rent flats, and reserve sports turfs with zero broker fees.',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 13.5,
               color: Colors.white.withValues(alpha: 0.85),
@@ -479,7 +495,7 @@ class ProfileTab extends ConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    'Sign In',
+                    l10n?.signIn ?? 'Sign In',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -507,7 +523,7 @@ class ProfileTab extends ConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    'Register',
+                    l10n?.register ?? 'Register',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -590,6 +606,7 @@ class ProfileTab extends ConsumerWidget {
   }
 
   Widget _buildThemeToggleTile(BuildContext context, WidgetRef ref, {required bool isDark}) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
@@ -617,7 +634,7 @@ class ProfileTab extends ConsumerWidget {
             ),
           ),
           title: Text(
-            'Theme Mode',
+            l10n?.themeMode ?? 'Theme Mode',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -625,7 +642,9 @@ class ProfileTab extends ConsumerWidget {
             ),
           ),
           subtitle: Text(
-            isDark ? 'Dark Mode (Active)' : 'Light Mode (Active)',
+            isDark
+                ? (l10n?.activeDarkMode ?? 'Dark Mode (Active)')
+                : (l10n?.activeLightMode ?? 'Light Mode (Active)'),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
               color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
@@ -644,6 +663,132 @@ class ProfileTab extends ConsumerWidget {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  void _showLanguageSelector(BuildContext context, WidgetRef ref, {required bool isDark}) {
+    final currentLocale = ref.read(localeProvider);
+    final l10n = AppLocalizations.of(context);
+
+    HapticFeedback.selectionClick();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final sheetIsDark = Theme.of(ctx).brightness == Brightness.dark;
+        final textColor = sheetIsDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+
+        return SafeArea(
+          top: false,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            decoration: BoxDecoration(
+              color: sheetIsDark ? AppColors.darkCard : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: sheetIsDark ? AppColors.darkBorder : AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n?.selectLanguage ?? 'Select Language',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: textColor,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                _buildLanguageOption(
+                  title: 'English',
+                  subtitle: 'English (US)',
+                  isSelected: currentLocale.languageCode == 'en',
+                  sheetIsDark: sheetIsDark,
+                  onTap: () {
+                    ref.read(localeProvider.notifier).setLocale(AppLocales.english);
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+                const SizedBox(height: 10),
+                _buildLanguageOption(
+                  title: 'বাংলা',
+                  subtitle: 'Bangla (BD)',
+                  isSelected: currentLocale.languageCode == 'bn',
+                  sheetIsDark: sheetIsDark,
+                  onTap: () {
+                    ref.read(localeProvider.notifier).setLocale(AppLocales.bangla);
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLanguageOption({
+    required String title,
+    required String subtitle,
+    required bool isSelected,
+    required bool sheetIsDark,
+    required VoidCallback onTap,
+  }) {
+    final textColor = sheetIsDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final secondaryTextColor = sheetIsDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+
+    return Material(
+      color: isSelected
+          ? (sheetIsDark ? const Color(0xFF132F28) : AppColors.accentLight)
+          : (sheetIsDark ? AppColors.darkSurface : AppColors.surface),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isSelected
+              ? AppColors.accent
+              : (sheetIsDark ? AppColors.darkBorder : AppColors.border),
+          width: isSelected ? 1.5 : 1.0,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        title: Text(
+          title,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 15,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+            color: textColor,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            color: secondaryTextColor,
+          ),
+        ),
+        trailing: isSelected
+            ? const Icon(
+                Icons.check_circle_rounded,
+                color: AppColors.accent,
+                size: 22,
+              )
+            : null,
       ),
     );
   }

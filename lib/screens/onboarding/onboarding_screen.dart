@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/onboarding_item.dart';
 import '../auth/sign_in_screen.dart';
 import '../home/home_screen.dart';
@@ -147,6 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   /// Top Header: Centered Logo + Wordmark with Skip button on the right
   Widget _buildHeader(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: SizedBox(
@@ -229,7 +231,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                   child: Text(
-                    'Skip',
+                    l10n?.skip ?? 'Skip',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w600,
@@ -248,6 +250,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   /// Bottom Controls: Main Rounded CTA + Sign In secondary link
   Widget _buildBottomControls(bool isLastPage) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(
         left: 24.0,
@@ -290,7 +293,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      isLastPage ? 'Get Started' : 'Next',
+                      isLastPage ? (l10n?.getStarted ?? 'Get Started') : (l10n?.next ?? 'Next'),
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w700,
@@ -329,9 +332,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     ),
                     children: [
-                      const TextSpan(text: 'Already have an account? '),
+                      TextSpan(text: l10n?.alreadyHaveAccount ?? 'Already have an account? '),
                       TextSpan(
-                        text: 'Sign In',
+                        text: l10n?.signIn ?? 'Sign In',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: isDark ? AppColors.accent : AppColors.primary,

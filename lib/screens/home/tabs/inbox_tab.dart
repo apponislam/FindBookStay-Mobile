@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../widgets/guest_auth_gate_card.dart';
 
 /// Inbox / Messages Tab:
@@ -15,6 +16,7 @@ class InboxTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
 
     return ListenableBuilder(
       listenable: AuthService.instance,
@@ -24,13 +26,13 @@ class InboxTab extends StatelessWidget {
         if (!isLoggedIn) {
           return Scaffold(
             backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-            body: const SafeArea(
+            body: SafeArea(
               child: GuestAuthGateCard(
                 icon: Icons.chat_bubble_rounded,
-                title: 'Chat directly with owners',
-                subtitle:
+                title: l10n?.chatDirectlyOwners ?? 'Chat directly with owners',
+                subtitle: l10n?.chatDirectlyOwnersSubtitle ??
                     'Sign in to message verified property landlords, inquire about bachelor seats, and confirm turf reservations in real-time.',
-                ctaText: 'Sign In to Access Messages',
+                ctaText: l10n?.signInToAccessMessages ?? 'Sign In to Access Messages',
               ),
             ),
           );
@@ -43,7 +45,7 @@ class InboxTab extends StatelessWidget {
               backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
               elevation: 0,
               title: Text(
-                'Inbox & Inquiries',
+                l10n?.inboxAndInquiries ?? 'Inbox & Inquiries',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
@@ -73,7 +75,7 @@ class InboxTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No conversations yet',
+                      l10n?.noMessages ?? 'No conversations yet',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -82,7 +84,8 @@ class InboxTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'When you message property owners, landlord representatives, or turf managers, your chats will appear here.',
+                      l10n?.noMessagesDesc ??
+                          'When you message property owners, landlord representatives, or turf managers, your chats will appear here.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13,

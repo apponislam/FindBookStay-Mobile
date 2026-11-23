@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_colors.dart';
 import '../../features/auth/domain/auth_state.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../l10n/app_localizations.dart';
 import '../home/home_screen.dart';
 import 'forgot_password_screen.dart';
 import 'register_form_screen.dart';
@@ -54,20 +55,21 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
   void _onSignIn() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final l10n = AppLocalizations.of(context);
 
     setState(() {
       if (email.isEmpty) {
-        _emailError = 'Email address is required';
+        _emailError = l10n?.emailAddressRequired ?? 'Email address is required';
       } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
-        _emailError = 'Please enter a valid email';
+        _emailError = l10n?.validEmailRequired ?? 'Please enter a valid email';
       } else {
         _emailError = null;
       }
 
       if (password.isEmpty) {
-        _passwordError = 'Password is required';
+        _passwordError = l10n?.passwordRequired ?? 'Password is required';
       } else if (password.length < 6) {
-        _passwordError = 'Min. 6 characters required';
+        _passwordError = l10n?.passwordMinLength ?? 'Min. 6 characters required';
       } else {
         _passwordError = null;
       }
@@ -162,7 +164,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                 ],
               ),
               child: Text(
-                'Welcome Back',
+                AppLocalizations.of(context)?.welcomeBack ?? 'Welcome Back',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13.0,
@@ -243,7 +245,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Sign In',
+                            AppLocalizations.of(context)?.signIn ?? 'Sign In',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -271,6 +273,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLoading = ref.watch(authStatusProvider) == AuthStatus.loading;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
@@ -368,7 +371,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                             const SizedBox(height: 16),
 
                             Text(
-                              'Sign In to Account',
+                              l10n?.signInToAccount ?? 'Sign In to Account',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 29,
                                 fontWeight: FontWeight.w800,
@@ -380,7 +383,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                             const SizedBox(height: 8),
 
                             Text(
-                              'Sign in to access your verified rentals, boutique stays, turf slots, and account preferences.',
+                              l10n?.signInDescription ??
+                                  'Sign in to access your verified rentals, boutique stays, turf slots, and account preferences.',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w400,
@@ -393,7 +397,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
 
                             // Email Input (Required)
                             CustomAuthInput(
-                              label: 'Email Address',
+                              label: l10n?.emailAddress ?? 'Email Address',
                               hint: 'name@example.com',
                               prefixIcon: Icons.mail_outline_rounded,
                               keyboardType: TextInputType.emailAddress,
@@ -409,7 +413,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
 
                             // Password Input (Required)
                             CustomAuthInput(
-                              label: 'Password',
+                              label: l10n?.password ?? 'Password',
                               hint: '••••••••',
                               prefixIcon: Icons.lock_outline_rounded,
                               isPassword: true,
@@ -440,7 +444,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                                   child: Text(
-                                    'Forgot password?',
+                                    l10n?.forgotPassword ?? 'Forgot password?',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
@@ -478,9 +482,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                                         color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                       ),
                                       children: [
-                                        const TextSpan(text: "Don't have an account? "),
+                                        TextSpan(text: l10n?.dontHaveAccount ?? "Don't have an account? "),
                                         TextSpan(
-                                          text: 'Sign Up',
+                                          text: l10n?.signUp ?? 'Sign Up',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
                                             color: isDark ? AppColors.accent : AppColors.primary,

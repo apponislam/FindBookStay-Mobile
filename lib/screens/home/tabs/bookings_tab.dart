@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../widgets/guest_auth_gate_card.dart';
 
 /// Bookings / Reservations Tab:
@@ -23,6 +24,7 @@ class _BookingsTabState extends State<BookingsTab> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
 
     return ListenableBuilder(
       listenable: AuthService.instance,
@@ -32,13 +34,13 @@ class _BookingsTabState extends State<BookingsTab> {
         if (!isLoggedIn) {
           return Scaffold(
             backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-            body: const SafeArea(
+            body: SafeArea(
               child: GuestAuthGateCard(
                 icon: Icons.calendar_month_rounded,
-                title: 'Manage your reservations',
-                subtitle:
+                title: l10n?.manageReservations ?? 'Manage your reservations',
+                subtitle: l10n?.manageReservationsSubtitle ??
                     'Sign in to view your upcoming sports turf slots, hotel reservations, and rental viewing appointments in one place.',
-                ctaText: 'Sign In to View Bookings',
+                ctaText: l10n?.signInToViewBookings ?? 'Sign In to View Bookings',
               ),
             ),
           );
@@ -50,7 +52,7 @@ class _BookingsTabState extends State<BookingsTab> {
             backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
             elevation: 0,
             title: Text(
-              'My Bookings & Stays',
+              l10n?.myBookingsAndStays ?? 'My Bookings & Stays',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -69,11 +71,11 @@ class _BookingsTabState extends State<BookingsTab> {
                   physics: const BouncingScrollPhysics(),
                   child: Row(
                     children: [
-                      _buildFilterChip('Upcoming (0)', 0, isDark),
+                      _buildFilterChip('${l10n?.filterUpcoming ?? "Upcoming"} (0)', 0, isDark),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Completed (0)', 1, isDark),
+                      _buildFilterChip('${l10n?.filterCompleted ?? "Completed"} (0)', 1, isDark),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Cancelled (0)', 2, isDark),
+                      _buildFilterChip('${l10n?.filterCancelled ?? "Cancelled"} (0)', 2, isDark),
                     ],
                   ),
                 ),
@@ -104,7 +106,7 @@ class _BookingsTabState extends State<BookingsTab> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'No reservations found',
+                            l10n?.noBookingsFound ?? 'No reservations found',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -113,7 +115,8 @@ class _BookingsTabState extends State<BookingsTab> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'When you book turf slots, resort suites, or schedule rental viewings, your bookings will be shown here.',
+                            l10n?.noBookingsDesc ??
+                                'When you book turf slots, resort suites, or schedule rental viewings, your bookings will be shown here.',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,

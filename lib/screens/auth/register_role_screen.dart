@@ -2,6 +2,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import 'register_form_screen.dart';
 import 'sign_in_screen.dart';
 import 'widgets/custom_auth_button.dart';
@@ -32,6 +33,7 @@ class _RegisterRoleScreenState extends State<RegisterRoleScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
@@ -74,7 +76,7 @@ class _RegisterRoleScreenState extends State<RegisterRoleScreen> {
                             ),
                           ),
                           child: Text(
-                            'Step 1 of 2',
+                            l10n?.step1Of2 ?? 'Step 1 of 2',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -88,7 +90,7 @@ class _RegisterRoleScreenState extends State<RegisterRoleScreen> {
 
                         // Title
                         Text(
-                          'Select your role',
+                          l10n?.selectYourRole ?? 'Select your role',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
@@ -101,7 +103,7 @@ class _RegisterRoleScreenState extends State<RegisterRoleScreen> {
 
                         // Subtitle
                         Text(
-                          'Choose how you want to use FindBookStay. You can always switch or manage both from account settings.',
+                          l10n?.selectYourRoleSubtitle ?? 'Choose how you want to use FindBookStay. You can always switch or manage both from account settings.',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w400,
@@ -114,9 +116,9 @@ class _RegisterRoleScreenState extends State<RegisterRoleScreen> {
 
                         // Role Cards
                         RoleSelectionCard(
-                          title: 'Tenant, Guest or Player',
+                          title: l10n?.roleTenantTitle ?? 'Tenant, Guest or Player',
                           description:
-                              'Rent family apartments, bachelor seats, book hotel stays, or reserve sports turfs.',
+                              l10n?.roleTenantDesc ?? 'Rent family apartments, bachelor seats, book hotel stays, or reserve sports turfs.',
                           icon: Icons.person_rounded,
                           isSelected: _selectedRole == UserRole.tenant,
                           onTap: () {
@@ -129,9 +131,9 @@ class _RegisterRoleScreenState extends State<RegisterRoleScreen> {
                         const SizedBox(height: 16),
 
                         RoleSelectionCard(
-                          title: 'Host, Landlord or Turf Owner',
+                          title: l10n?.roleHostTitle ?? 'Host, Landlord or Turf Owner',
                           description:
-                              'List residential properties, rent shared seats, or manage sports turf reservations.',
+                              l10n?.roleHostDesc ?? 'List residential properties, rent shared seats, or manage sports turf reservations.',
                           icon: Icons.domain_rounded,
                           isSelected: _selectedRole == UserRole.host,
                           onTap: () {
@@ -145,7 +147,7 @@ class _RegisterRoleScreenState extends State<RegisterRoleScreen> {
 
                         // CTA Continue Button
                         CustomAuthButton(
-                          text: 'Continue to Sign Up',
+                          text: l10n?.continueToSignUp ?? 'Continue to Sign Up',
                           icon: Icons.arrow_forward_rounded,
                           onPressed: _selectedRole != null ? _onContinue : null,
                         ),
@@ -171,9 +173,9 @@ class _RegisterRoleScreenState extends State<RegisterRoleScreen> {
                                     color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                   ),
                                   children: [
-                                    const TextSpan(text: 'Already have an account? '),
+                                    TextSpan(text: l10n?.alreadyHaveAccount ?? 'Already have an account? '),
                                     TextSpan(
-                                      text: 'Sign In',
+                                      text: l10n?.signIn ?? 'Sign In',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         color: isDark ? AppColors.accent : AppColors.primary,

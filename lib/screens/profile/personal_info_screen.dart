@@ -11,6 +11,7 @@ import '../../../core/theme/theme_controller.dart';
 import '../../../core/utils/url_utils.dart';
 import '../../../features/auth/data/models/user_model.dart';
 import '../../../features/auth/presentation/providers/auth_providers.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Screen for viewing and editing Personal Information.
 /// Uses GET /api/v1/auth/me to fetch fresh user data and
@@ -166,6 +167,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
         final textColor = sheetIsDark
             ? AppColors.darkTextPrimary
             : AppColors.textPrimary;
+        final l10n = AppLocalizations.of(ctx);
         return SafeArea(
           top: false,
           child: Container(
@@ -191,7 +193,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Change Profile Photo',
+                  l10n?.changeProfilePhoto ?? 'Change Profile Photo',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -215,7 +217,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     ),
                   ),
                   title: Text(
-                    'Choose from Gallery',
+                    l10n?.chooseFromGallery ?? 'Choose from Gallery',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -247,7 +249,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     ),
                   ),
                   title: Text(
-                    'Take a Photo',
+                    l10n?.takePhoto ?? 'Take a Photo',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -278,7 +280,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                       ),
                     ),
                     title: Text(
-                      'Remove Selected Photo',
+                      l10n?.removePhoto ?? 'Remove Selected Photo',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -339,6 +341,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
 
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context);
       setState(() {
         _isEditing = false;
         _isSaving = false;
@@ -361,7 +364,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               ),
               const SizedBox(width: 10),
               Text(
-                'Profile updated successfully!',
+                l10n?.profileUpdatedSuccess ?? 'Profile updated successfully!',
                 style: GoogleFonts.plusJakartaSans(
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -394,6 +397,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
     final isDark = themeMode == ThemeMode.dark;
+    final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authControllerProvider);
     final user = authState.user ?? UserModel.guest;
 
@@ -414,7 +418,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          _isEditing ? 'Edit Profile' : 'Personal Information',
+          _isEditing
+              ? (l10n?.editProfile ?? 'Edit Profile')
+              : (l10n?.personalInfo ?? 'Personal Information'),
           style: GoogleFonts.plusJakartaSans(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -434,7 +440,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                 color: isDark ? AppColors.accent : AppColors.primary,
               ),
               label: Text(
-                'Edit',
+                l10n?.edit ?? 'Edit',
                 style: GoogleFonts.plusJakartaSans(
                   fontWeight: FontWeight.w700,
                   color: isDark ? AppColors.accent : AppColors.primary,
@@ -454,7 +460,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                       });
                     },
               child: Text(
-                'Cancel',
+                l10n?.cancel ?? 'Cancel',
                 style: GoogleFonts.plusJakartaSans(
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -599,18 +605,18 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               const SizedBox(height: 24),
 
               // ── Basic Info Section ────────────────────────────────
-              _buildSectionHeader('Basic Information'),
+              _buildSectionHeader(l10n?.basicInformation ?? 'Basic Information'),
               const SizedBox(height: 12),
 
               _buildCardContainer([
                 _buildField(
-                  label: 'Full Name',
+                  label: l10n?.fullName ?? 'Full Name',
                   controller: _nameController,
                   enabled: _isEditing,
                   icon: Icons.person_outline_rounded,
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
-                      return 'Please enter your full name';
+                      return l10n?.pleaseEnterFullName ?? 'Please enter your full name';
                     }
                     return null;
                   },
@@ -620,7 +626,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
                 ),
                 _buildField(
-                  label: 'Email Address',
+                  label: l10n?.emailAddress ?? 'Email Address',
                   value: user.email,
                   enabled: false,
                   icon: Icons.mail_outline_rounded,
@@ -662,7 +668,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          user.isEmailVerified ? 'Verified' : 'Unverified',
+                          user.isEmailVerified
+                              ? (l10n?.verified ?? 'Verified')
+                              : (l10n?.unverified ?? 'Unverified'),
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w700,
@@ -684,7 +692,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
                 ),
                 _buildField(
-                  label: 'Phone Number',
+                  label: l10n?.phone ?? 'Phone Number',
                   controller: _phoneController,
                   enabled: _isEditing,
                   icon: Icons.phone_outlined,
@@ -696,12 +704,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               const SizedBox(height: 24),
 
               // ── Present Address Section ───────────────────────────
-              _buildSectionHeader('Present Address'),
+              _buildSectionHeader(l10n?.presentAddress ?? 'Present Address'),
               const SizedBox(height: 12),
 
               _buildCardContainer([
                 _buildField(
-                  label: 'Street Address',
+                  label: l10n?.street ?? 'Street Address',
                   controller: _presentStreetController,
                   enabled: _isEditing,
                   hint: 'House 12, Road 4, Sector 3',
@@ -712,7 +720,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
                 ),
                 _buildField(
-                  label: 'City / District',
+                  label: l10n?.city ?? 'City / District',
                   controller: _presentCityController,
                   enabled: _isEditing,
                   hint: 'Dhaka',
@@ -723,7 +731,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
                 ),
                 _buildField(
-                  label: 'State / Division',
+                  label: l10n?.state ?? 'State / Division',
                   controller: _presentStateController,
                   enabled: _isEditing,
                   hint: 'Dhaka Division',
@@ -734,7 +742,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   color: isDark ? AppColors.darkBorder : AppColors.borderSubtle,
                 ),
                 _buildField(
-                  label: 'Postal / Zip Code',
+                  label: l10n?.zipCode ?? 'Postal / Zip Code',
                   controller: _presentZipController,
                   enabled: _isEditing,
                   hint: '1230',
@@ -749,7 +757,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildSectionHeader('Permanent Address'),
+                  _buildSectionHeader(l10n?.permanentAddress ?? 'Permanent Address'),
                   if (_isEditing)
                     Row(
                       children: [
@@ -776,7 +784,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           },
                         ),
                         Text(
-                          'Same as present',
+                          l10n?.sameAsPresent ?? 'Same as present',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -794,7 +802,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               if (!_sameAsPresent || !_isEditing)
                 _buildCardContainer([
                   _buildField(
-                    label: 'Street Address',
+                    label: l10n?.street ?? 'Street Address',
                     controller: _permanentStreetController,
                     enabled: _isEditing,
                     hint: 'Village / Holding',
@@ -807,7 +815,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         : AppColors.borderSubtle,
                   ),
                   _buildField(
-                    label: 'City / District',
+                    label: l10n?.city ?? 'City / District',
                     controller: _permanentCityController,
                     enabled: _isEditing,
                     hint: 'District',
@@ -820,7 +828,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         : AppColors.borderSubtle,
                   ),
                   _buildField(
-                    label: 'State / Division',
+                    label: l10n?.state ?? 'State / Division',
                     controller: _permanentStateController,
                     enabled: _isEditing,
                     hint: 'Division',
@@ -833,7 +841,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         : AppColors.borderSubtle,
                   ),
                   _buildField(
-                    label: 'Postal / Zip Code',
+                    label: l10n?.zipCode ?? 'Postal / Zip Code',
                     controller: _permanentZipController,
                     enabled: _isEditing,
                     hint: 'Zip Code',
@@ -868,7 +876,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Permanent address is set to the same as present address.',
+                          l10n?.sameAsPresent ?? 'Permanent address is set to the same as present address.',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
@@ -910,7 +918,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           ),
                         )
                       : Text(
-                          'Save Changes',
+                          l10n?.saveChanges ?? 'Save Changes',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,

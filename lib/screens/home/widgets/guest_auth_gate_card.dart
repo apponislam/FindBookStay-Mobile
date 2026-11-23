@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/register_form_screen.dart';
 import '../../auth/sign_in_screen.dart';
 
@@ -25,6 +26,7 @@ class GuestAuthGateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
 
     return Center(
       child: SingleChildScrollView(
@@ -83,7 +85,7 @@ class GuestAuthGateCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'Guest Mode',
+                    l10n?.guestMode ?? 'Guest Mode',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -175,7 +177,7 @@ class GuestAuthGateCard extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Create an Account',
+                l10n?.createAnAccount ?? 'Create an Account',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
